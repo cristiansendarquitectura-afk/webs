@@ -390,6 +390,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .flist.contra .fli i{color:var(--rose-deep)}
 .fbtns{display:flex;flex-direction:column;gap:10px;margin-top:22px}
 .fbtns .cta{margin-top:0}
+
+/* ===== FICHA DERMAPEN (BB Glow) — correo de Jodie 29-ago =====
+   Vista corta arriba (resumen, pasos, viales, 5 cuidados, agendar) y todo el
+   detalle en desplegables abajo, para que la pantalla no sea eterna. */
+.dp-res{background:var(--white);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-sm);margin-top:14px}
+.dp-res p{font-size:14px;line-height:1.55;color:var(--ink)}
+.dp-h{font-family:'Playfair Display',serif;font-size:17px;color:var(--rose-deep);font-weight:600;margin:22px 0 11px}
+.dp-pasos{position:relative}
+.dp-pasos::before{content:'';position:absolute;left:13px;top:10px;bottom:14px;width:2px;background:linear-gradient(var(--gold),var(--rose-soft))}
+.dp-paso{position:relative;display:flex;gap:13px;align-items:flex-start;margin:0 0 13px}
+.dp-num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--cream);border:2px solid var(--gold);color:var(--rose-deep);font-family:'Playfair Display',serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.dp-paso b{display:block;font-size:14px;color:var(--ink);font-weight:600;line-height:1.3;padding-top:3px}
+.dp-paso span{display:block;font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.dp-viales{display:flex;flex-wrap:wrap;gap:7px}
+.dp-viales span{background:var(--rose-ghost);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;color:var(--rose-deep)}
+.dp-nota{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.5;font-style:italic}
+.dp-mas{background:none;border:1px solid var(--rose-soft);color:var(--rose-deep);border-radius:22px;padding:9px 16px;font-family:'Poppins';font-size:13px;font-weight:500;cursor:pointer;margin-top:8px}
+.dp-link{display:block;width:100%;text-align:center;margin-top:13px;background:none;border:none;color:#2F9E63;font-family:'Poppins';font-size:14px;font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.dp-acc{margin-top:26px;border-top:1px solid var(--line)}
+.dp-acc details{border-bottom:1px solid var(--line)}
+.dp-acc summary{list-style:none;cursor:pointer;padding:15px 2px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--ink)}
+.dp-acc summary::-webkit-details-marker{display:none}
+.dp-acc summary::after{content:'+';flex:none;font-size:21px;line-height:1;color:var(--gold);transition:transform .25s}
+.dp-acc details[open] summary::after{transform:rotate(45deg)}
+.dp-acc summary:focus-visible,.dp-mas:focus-visible,.dp-link:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
+.dp-in{padding:0 2px 17px}
+.dp-sub{font-size:12.5px;font-weight:600;color:var(--rose-deep);margin:12px 0 4px}
+.dp-sub:first-child{margin-top:0}
+.dp-vial{padding:9px 0;border-bottom:1px dashed var(--line)}
+.dp-vial:last-of-type{border-bottom:none}
+.dp-vial b{display:block;font-size:13.5px;color:var(--ink);font-weight:600}
+.dp-vial span{display:block;font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:2px}
+.dp-acc details.alerta summary{color:#9C3B3B}
+.dp-alerta{background:#FDF1F0;border:1px solid #EFC4C1;border-left:4px solid #B8474A;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:#6B2D2D}
+@media (prefers-reduced-motion:reduce){.dp-acc summary::after{transition:none}}
 .cta.wa{background:linear-gradient(120deg,#3EB073,#2F9E63);box-shadow:0 12px 26px rgba(47,158,99,.32);display:flex;align-items:center;justify-content:center;gap:9px}
 .cta.wa::before{content:"";width:19px;height:19px;background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.6.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.6-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5-.1-.2-.6-1.5-.9-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.7.7-1 1.6-1 2.6 0 .9.4 1.8.6 2.1.2.3 2.4 3.9 5.9 5.3 2.1.9 2.9.9 4 .8.6-.1 1.7-.7 2-1.4.2-.6.2-1.2.2-1.4-.1-.1-.2-.2-.5-.3z'/><path d='M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.4 1.3 4.9L2 22l5.3-1.4c1.4.8 3 1.2 4.7 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.5 0-3-.4-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.4 14.9 4 13.5 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8z'/></svg>")}
 
@@ -977,19 +1012,38 @@ const TREATMENTS=[
   previos:['Llega con la piel limpia, sin maquillaje si es posible.'],
   posteriores:['Hidrata y usa protector solar durante el día.'],
   contra:['Lesiones, irritación o infección activa en la piel.','Alergia a alguno de los activos (se revisa en evaluación).']},
+ /* BB Glow — ficha rediseñada con el correo de Jodie del 29-ago.
+    Usa la PLANTILLA DERMAPEN (DERMAPEN_PASOS + VIALES, más abajo).
+    'quitar' desactiva pasos o partes de un paso para este tratamiento,
+    ej: quitar:['dermo','altafrec']. Sin 'recup': el enrojecimiento va,
+    tranquilo, dentro de los cuidados posteriores (pedido de Jodie). */
  {e:'💫',n:'BB Glow',cat:['luminosidad','manchas','marcas'],dur:'60 a 90 minutos',precio:'',eval:true,
-  d:'Aporta luminosidad y ayuda a mejorar visualmente la uniformidad del tono del rostro.',
-  b:['Luminosidad','Tono uniforme','Efecto descansado'],
-  quees:'BB Glow es un tratamiento facial realizado mediante microagujas y activos cosméticos pigmentados, que ayuda a mejorar visualmente la uniformidad del tono, aportar luminosidad y atenuar la apariencia de manchas superficiales, rojeces y marcas leves.',
-  sirve:'Favorece una piel con efecto más descansado, luminoso y uniforme.',
-  mejora:['Tono apagado o poco uniforme','Apariencia de manchas superficiales','Rojeces leves','Marcas postacné superficiales','Textura y luminosidad de la piel'],
-  paraquien:'Ideal para quienes buscan una piel con efecto más descansado, luminoso y uniforme.',
-  incluye:'Preparación de la piel, aplicación de activos mediante Dermapen, mascarilla calmante, fototerapia LED y productos de finalización.',
+  plantilla:'dermapen', quitar:[],
+  d:'Dermapen, activos elegidos para tu piel y un pigmento personalizado para una piel más luminosa y de tono más uniforme.',
+  b:['Luminosidad','Tono más uniforme','Apariencia de manchas'],
+  resumen:'Tratamiento facial con Dermapen, un vial de activos elegido para tu piel y un pigmento personalizado según tu tono. Ayuda a mejorar visualmente la luminosidad y la uniformidad de la piel, con resultados progresivos.',
+  quees:'BB Glow es un tratamiento facial realizado con Dermapen, activos cosméticos seleccionados según las necesidades de la piel y un pigmento personalizado que ayuda a mejorar visualmente la luminosidad, la uniformidad del tono y la apariencia de manchas e imperfecciones superficiales.',
+  mejora:['Tono apagado o visualmente poco uniforme.','Apariencia de manchas superficiales.','Marcas postacné superficiales.','Textura y luminosidad de la piel.','Apariencia general de una piel cansada.'],
+  notaResultados:'Los resultados son progresivos y pueden variar según el tipo de piel, el número de sesiones y los cuidados posteriores.',
+  pigmento:'Luego de aplicar el vial seleccionado con Dermapen, se utiliza un pigmento cosmético personalizado según el tono de la piel. Su objetivo es ayudar a disimular visualmente manchas e imperfecciones superficiales y conseguir una apariencia más uniforme.',
   sesiones:'Suele trabajarse en plan de varias sesiones; la cantidad se define en tu evaluación.',
-  recup:'Puede quedar un leve enrojecimiento temporal. Los resultados son progresivos y pueden variar según el tipo de piel, hábitos y cuidados posteriores.',
   previos:['Evita exfoliar o exponerte al sol los días previos.','Llega sin maquillaje.'],
-  posteriores:['Durante las primeras horas evita maquillaje, calor intenso, ejercicio vigoroso y manipular la piel.','Usa los productos indicados y protector solar.'],
-  contra:['Embarazo o lactancia.','Acné activo, heridas, herpes, irritación o infección en la piel.','Alergia a los activos.']},
+  /* Los 5 primeros son los que se ven en la vista principal. */
+  posteriores:[
+   'Es esperable que la piel se observe ligeramente rosada, sensible o con sensación de calor después del procedimiento. Generalmente disminuye progresivamente y puede durar hasta 48 horas.',
+   'Aplicar Cicaplast Baume B5+ en una capa fina, con la frecuencia indicada, siempre que la piel lo tolere. Aplicar sobre piel limpia y seca, evitando heridas abiertas y el contorno de ojos.',
+   'Utilizar protector solar de amplio espectro FPS 50+ y reaplicarlo durante el día.',
+   'Evitar maquillaje durante las primeras 24 horas o hasta que la piel se encuentre recuperada.',
+   'No tocar, rascar, frotar ni retirar pequeñas costras.',
+   'No utilizar ácidos, retinoides, exfoliantes, peróxido de benzoilo ni productos irritantes durante aproximadamente 5 a 7 días o hasta recuperar completamente la piel.',
+   'Evitar sol directo, calor intenso, ejercicio vigoroso, sudor excesivo, sauna y vapor durante 24 a 48 horas.',
+   'Evitar piscinas, mar y jacuzzi durante 48 horas.',
+   'No realizar depilación, peeling, láser, radiofrecuencia ni otros procedimientos faciales hasta que la piel esté recuperada.',
+   'Utilizar limpiador suave, sin alcohol, perfume ni partículas exfoliantes.',
+   'Cambiar la funda de la almohada y utilizar una toalla limpia para el rostro.',
+   'Seguir siempre las indicaciones específicas entregadas después de la sesión.'],
+  contra:['Embarazo o lactancia.','Acné activo, heridas, herpes, irritación o infección en la piel.','Alergia a los activos.'],
+  alerta:'Comunícate con Patagonia Glow si presentas dolor intenso o creciente, inflamación progresiva, secreción, ampollas, cambios importantes en la coloración o enrojecimiento que empeora después de 48 horas. Si presentas dificultad para respirar o inflamación de labios, lengua o rostro, busca atención de urgencia.'},
  {e:'🌿',n:'Limpieza Facial Profunda',cat:['hidratacion'],dur:'60 min',precio:'',eval:false,
   d:'Limpieza, extracción y descongestión de la piel. La base de cualquier rutina sana.',
   b:['Poros limpios','Piel fresca'],
@@ -1162,7 +1216,94 @@ window.openMejorar=openMejorar;
 
 function fsec(lbl,txt){ return txt?('<div class="lbl2">'+lbl+'</div><div class="dtext">'+txt+'</div>'):''; }
 function flist(lbl,arr,cls){ if(!arr||!arr.length)return ''; return '<div class="lbl2">'+lbl+'</div><div class="flist '+(cls||'')+'">'+arr.map(function(x){return '<div class="fli"><i>•</i><span>'+x+'</span></div>';}).join('')+'</div>'; }
-function openDetail(i){ var t=TREATMENTS[i], b=document.getElementById('sheetBody');
+/* ===== PLANTILLA DERMAPEN (punto 7 del correo de Jodie, 29-ago) =====
+   Editable: cambiar textos aqui cambia TODAS las fichas con plantilla:'dermapen'.
+   Cada paso y cada item tiene un id; un tratamiento puede apagarlos con
+   quitar:['id',...] porque no todos se hacen en todas las pieles.
+   Sin marcas, fabricantes ni proveedores (pedido de Jodie). */
+const DERMAPEN_PASOS=[
+ {id:'prep', t:'Preparación y limpieza', corto:'Evaluamos tu piel y la preparamos.', items:[
+   {id:'evaluacion', x:'Evaluación del estado actual de la piel.'},
+   {id:'higiene',    x:'Higienización con una fórmula de agua volcánica, zinc, cobre y ácido salicílico, cuando sea adecuada para el tipo de piel.'},
+   {id:'vapor',      x:'Vapor de ozono para preparar la piel.'},
+   {id:'altafrec',   x:'Alta frecuencia de ozono según evaluación.'},
+   {id:'extraccion', x:'Extracción de comedones con espátula ultrasónica.'},
+   {id:'dermo',      x:'Dermoabrasión solamente cuando esté indicada y sea compatible con la condición de la piel y el resto de la sesión.'}]},
+ {id:'vial', t:'Vial personalizado con Dermapen', corto:'Aplicamos el vial elegido para tu piel.',
+   texto:'Después de preparar la piel, se selecciona un vial según sus necesidades y se aplica mediante Dermapen.'},
+ {id:'pigmento', t:'Pigmento personalizado', corto:'Un pigmento según el tono de tu piel.', soloSi:'pigmento'},
+ {id:'final', t:'Finalización', corto:'Hidratamos, calmamos y protegemos.', items:[
+   {id:'mascarilla', x:'Mascarilla hidratante con ácido hialurónico.'},
+   {id:'led',        x:'Fototerapia LED con el color seleccionado según las necesidades de la piel.'},
+   {id:'calmantes',  x:'Aplicación de productos calmantes y de protección final.'}]},
+ {id:'casa', t:'Cuidados en casa', corto:'Cicaplast Baume B5+ según indicación y protector solar FPS 50+.'}
+];
+const VIALES=[
+ {n:'ADN de salmón', para:'Revitalizar', d:'Orientado a revitalizar y mejorar visualmente la calidad general de la piel.'},
+ {n:'Pink Glow', para:'Piel apagada o deshidratada', d:'Para piel apagada, deshidratada o que busca mayor luminosidad.'},
+ {n:'Ácido hialurónico con células madre', para:'Deshidratada y opaca', d:'Ideal para piel deshidratada y opaca.'},
+ {n:'Centella asiática con péptidos de oro', para:'Sensible o con marcas', d:'Ideal para piel sensible, con marcas o que necesita reparación cosmética.'},
+ {n:'Células madre con niacinamida, péptidos y adenosina', para:'Manchas o tono desigual', d:'Ideal para piel opaca, con manchas superficiales o tono desigual.'},
+ {n:'ADN de salmón con péptidos de oro', para:'Madura o sin elasticidad', d:'Ideal para piel madura, apagada o con pérdida de elasticidad.'},
+ {n:'Factor de crecimiento epidérmico, péptidos y oro puro', para:'Líneas finas y firmeza', d:'Ideal para líneas finas, textura irregular y pérdida de firmeza.'}
+];
+const VIAL_NOTA='El vial se selecciona durante la evaluación según las características y necesidades actuales de la piel.';
+
+function dpPasos(t){ var q=t.quitar||[];
+  return DERMAPEN_PASOS.filter(function(p){ return q.indexOf(p.id)<0 && (!p.soloSi || t[p.soloSi]); })
+    .map(function(p){ var c=Object.assign({},p); if(p.items) c.items=p.items.filter(function(it){ return q.indexOf(it.id)<0; }); return c; });
+}
+function dpLista(arr,cls){ return '<div class="flist '+(cls||'')+'">'+(arr||[]).map(function(x){ return '<div class="fli"><i>•</i><span>'+x+'</span></div>'; }).join('')+'</div>'; }
+function dpAcc(id,titulo,html,cls){ return '<details id="'+id+'"'+(cls?' class="'+cls+'"':'')+'><summary>'+titulo+'</summary><div class="dp-in">'+html+'</div></details>'; }
+function dpVerCuidados(){
+  var d=document.getElementById('dpPost'); if(!d) return; d.open=true;
+  var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  d.scrollIntoView({behavior: quieto?'auto':'smooth', block:'start'});
+}
+window.dpVerCuidados=dpVerCuidados;
+function openDermapen(i){
+  var t=TREATMENTS[i], b=document.getElementById('sheetBody'), pasos=dpPasos(t);
+  var precio = t.precio ? ('Desde '+t.precio) : 'A confirmar en tu evaluación';
+  var nombreWa = t.n.replace(/'/g,'');
+  var html='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
+   +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
+   +'<div class="fmeta"><div class="fmi"><small>Duración</small><b>'+t.dur+'</b></div><div class="fmi"><small>Precio desde</small><b>'+precio+'</b></div></div>'
+   +(t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '')
+   /* --- vista principal --- */
+   +'<div class="dp-res"><p>'+t.resumen+'</p><div class="benefs">'+t.b.map(function(x){ return '<span>'+x+'</span>'; }).join('')+'</div></div>'
+   +'<div class="dp-h">Tu sesión en '+pasos.length+' pasos</div><div class="dp-pasos">'
+   +pasos.map(function(p,k){ return '<div class="dp-paso"><div class="dp-num">'+(k+1)+'</div><div><b>'+p.t+'</b><span>'+p.corto+'</span></div></div>'; }).join('')+'</div>'
+   +'<div class="dp-h">Viales según tu piel</div><div class="dp-viales">'+VIALES.map(function(v){ return '<span>'+v.para+'</span>'; }).join('')+'</div>'
+   +'<div class="dp-nota">'+VIAL_NOTA+'</div>'
+   +'<div class="dp-h">Cuidados después de tu sesión</div>'+dpLista(t.posteriores.slice(0,5))
+   +'<button class="dp-mas" onclick="dpVerCuidados()">Ver todos los cuidados</button>'
+   +'<div class="fbtns"><button class="cta" onclick="agendarDe('+i+')">Agendar una evaluación</button></div>'
+   +'<button class="dp-link" onclick="waTratamiento(\''+nombreWa+'\')">Resolver dudas por WhatsApp</button>'
+   /* --- todo el detalle, en desplegables --- */
+   +'<div class="dp-acc">'
+   +dpAcc('dpQue','¿Qué es?','<div class="dtext">'+t.quees+'</div>')
+   +dpAcc('dpBen','Beneficios','<div class="dp-sub">Ayuda a mejorar</div>'+dpLista(t.mejora)+'<div class="dp-nota">'+t.notaResultados+'</div>')
+   +dpAcc('dpSes','Tu sesión, paso a paso', pasos.map(function(p,k){
+       var cuerpo = p.items ? dpLista(p.items.map(function(x){ return x.x; }))
+                 : '<div class="dtext">'+(p.id==='pigmento' ? t.pigmento : (p.texto||p.corto))+'</div>';
+       return '<div class="dp-sub">Paso '+(k+1)+': '+p.t+'</div>'+cuerpo;
+     }).join('') + (t.sesiones ? '<div class="dp-sub">Sesiones recomendadas</div><div class="dtext">'+t.sesiones+'</div>' : ''))
+   +dpAcc('dpVial','Vial según tu piel', VIALES.map(function(v){ return '<div class="dp-vial"><b>'+v.n+'</b><span>'+v.d+'</span></div>'; }).join('')+'<div class="dp-nota">'+VIAL_NOTA+'</div>')
+   +(t.pigmento ? dpAcc('dpPig','Pigmento personalizado','<div class="dtext">'+t.pigmento+'</div>') : '')
+   +dpAcc('dpPre','Cuidados previos', dpLista(t.previos))
+   +dpAcc('dpPost','Cuidados posteriores', dpLista(t.posteriores))
+   +dpAcc('dpContra','Contraindicaciones', dpLista(t.contra,'contra'))
+   +(t.alerta ? dpAcc('dpAlerta','Signos de alerta','<div class="dp-alerta">'+t.alerta+'</div>','alerta') : '')
+   +'</div>'
+   /* sin nombres de personas en esta ficha (pedido de Jodie) */
+   +'<div class="rdisc" style="text-align:center">Los resultados pueden variar entre personas. El plan final se define en tu <b>evaluación profesional personalizada</b>.</div>';
+  b.innerHTML=html;
+  document.getElementById('sheet').classList.add('on'); document.getElementById('sheetBg').classList.add('on');
+  var sh=document.getElementById('sheet'); if(sh) sh.scrollTop=0;
+}
+
+function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'){ openDermapen(i); return; }
+  var t=TREATMENTS[i], b=document.getElementById('sheetBody');
   var precio = t.precio ? ('Desde '+t.precio) : 'A confirmar en tu evaluación';
   var meta='<div class="fmeta">'
      +'<div class="fmi"><small>Duración</small><b>'+t.dur+'</b></div>'
@@ -1269,10 +1410,13 @@ window.addToCalendar=addToCalendar;
 function renderPostHome(){
   var el=document.getElementById('postHome'); if(!el)return;
   var t=TREATMENTS[1]; // demo: última sesión realizada = BB Glow
-  var cuidado=(t.posteriores&&t.posteriores.length)?t.posteriores.join(' '):'';
+  /* 14-sep: BB Glow ahora trae 12 cuidados; unirlos todos llenaba la tarjeta
+     del inicio. Se muestran los 2 primeros y el boton abre la lista completa. */
+  var cuidado=(t.posteriores&&t.posteriores.length)?t.posteriores.slice(0,2).join(' '):'';
+  var abrir = t.plantilla==='dermapen' ? 'openDetail(1);dpVerCuidados()' : 'openDetail(1)';
   el.innerHTML='<div class="postcard fade-up"><div class="pt">🌿 Después de tu sesión</div>'
     +'<p>Hoy te realizaste <b>'+t.n+'</b>. '+cuidado+'</p>'
-    +'<button class="pa" onclick="openDetail(1)">Ver cuidados completos</button></div>';
+    +'<button class="pa" onclick="'+abrir+'">Ver cuidados completos</button></div>';
 }
 renderPostHome();
 
