@@ -1070,19 +1070,34 @@ const TREATMENTS=[
   previos:['Evita antiinflamatorios el día previo si no son indispensables.','Llega sin maquillaje.'],
   posteriores:['Evita maquillaje y sol directo por unas horas.','Usa protector solar.'],
   contra:['Embarazo o lactancia.','Lesiones o infección en la piel.','Alergias a los activos.']},
- {e:'🧬',n:'ADN de Salmón (PDRN)',cat:['rejuvenecimiento','lineas','hidratacion'],dur:'45 min',precio:'',eval:true,
+ /* PDRN separado en dos servicios (correo de Jodie del 14-sep, «Pdrn aplicacion"):
+    el que existía pasa a ser «con Dermapen» y se agrega el «inyectable». */
+ {e:'🧬',n:'ADN de salmón con Dermapen',cat:['rejuvenecimiento','lineas','hidratacion'],dur:'45 min',precio:'',eval:true,
   d:'Apoya la hidratación, la elasticidad y la calidad de la piel. Resultados graduales.',
   b:['Elasticidad','Calidad de piel'],
   quees:'Tratamiento con polinucleótidos (PDRN) que favorece la calidad, hidratación y elasticidad de la piel.',
   sirve:'Ayuda a mejorar la firmeza, la hidratación profunda y la apariencia general de la piel de forma gradual.',
   mejora:['Piel deshidratada o fatigada','Pérdida de elasticidad','Líneas finas'],
   paraquien:'Para quienes buscan mejorar la calidad de la piel de forma progresiva; requiere evaluación.',
-  incluye:'Preparación de la piel, aplicación del activo y finalización con protección.',
+  incluye:'Preparación y limpieza de la piel, aplicación de PDRN mediante Dermapen y finalización con productos calmantes y protección solar.',
   sesiones:'Se trabaja en plan de varias sesiones; la cantidad se define en evaluación.',
   recup:'Puede quedar un leve enrojecimiento; los resultados aparecen de forma gradual.',
   previos:['Llega sin maquillaje.','Evita exponerte al sol los días previos.'],
   posteriores:['Evita maquillaje y calor intenso por unas horas.','Usa protector solar.'],
   contra:['Embarazo o lactancia.','Alergia al pescado/derivados (se revisa en evaluación).','Lesiones o infección en la piel.']},
+ {e:'💉',n:'ADN de salmón inyectable',cat:['rejuvenecimiento','lineas','hidratacion','firmeza'],dur:'45–60 minutos',precio:'',eval:true,
+  d:'Microinyecciones de PDRN en puntos estratégicos para mejorar progresivamente la calidad de la piel.',
+  b:['Bioestimulación','Calidad de piel'],
+  quees:'Tratamiento de bioestimulación en el que se aplican pequeñas dosis de polinucleótidos (PDRN) directamente en puntos estratégicos de la piel mediante microinyecciones.',
+  sirve:'Ayuda a mejorar progresivamente la hidratación, firmeza, elasticidad, luminosidad y calidad general de la piel, favoreciendo una apariencia más revitalizada.',
+  mejora:['Piel deshidratada, opaca o fatigada.','Pérdida de firmeza y elasticidad.','Líneas finas.','Textura irregular.','Signos visibles del envejecimiento.'],
+  paraquien:'Para personas que buscan mejorar la calidad de su piel mediante un tratamiento inyectable de bioestimulación. La indicación y el plan se determinan durante la evaluación profesional.',
+  incluye:'Evaluación, preparación y limpieza de la piel, aplicación del producto mediante microinyecciones y recomendaciones de cuidados posteriores.',
+  sesiones:'La cantidad y frecuencia de las sesiones se determina de manera personalizada según las características de la piel, el producto utilizado y los objetivos de cada paciente.',
+  recup:'Pueden aparecer pequeñas elevaciones o “pápulas” en los puntos de aplicación, además de enrojecimiento, sensibilidad, inflamación leve o pequeños hematomas. Generalmente disminuyen progresivamente durante las siguientes horas o días.',
+  previos:['Llegar sin maquillaje.','Informar medicamentos, enfermedades, alergias y procedimientos recientes.','Evitar alcohol durante las 24 horas previas.','No suspender medicamentos indicados por un médico sin su autorización.'],
+  posteriores:['No tocar, presionar ni masajear la zona, salvo indicación profesional.','Evitar maquillaje durante las primeras 12–24 horas.','Evitar ejercicio intenso, sauna, piscina, calor y alcohol por 24–48 horas.','Evitar exposición solar directa y utilizar protector solar.','Seguir las indicaciones entregadas por la profesional.'],
+  contra:['Embarazo o lactancia.','Infección, heridas o inflamación activa en la zona.','Antecedentes de alergia o hipersensibilidad a los componentes del producto.','Enfermedades autoinmunes, alteraciones de coagulación o enfermedades descompensadas, según evaluación.','Uso de anticoagulantes o medicamentos relevantes, que deben informarse previamente.']},
  {e:'🩸',n:'PRP Facial',cat:['rejuvenecimiento','marcas','lineas'],dur:'60 min',precio:'',eval:true,
   d:'Plasma rico en plaquetas para favorecer la renovación de la piel y mejorar la textura.',
   b:['Renovación','Textura'],
@@ -1173,7 +1188,46 @@ const TREATMENTS=[
   recup:'Sin tiempo de recuperación.',
   previos:['Hidrátate y evita ir en ayunas prolongado.'],
   posteriores:['Bebe agua e hidrátate durante el día.'],
-  contra:['Embarazo o lactancia.','Enfermedades renales o cardíacas (se revisa en evaluación).','Alergias a los componentes.']}
+  contra:['Embarazo o lactancia.','Enfermedades renales o cardíacas (se revisa en evaluación).','Alergias a los componentes.']},
+ /* Sueroterapias independientes (correos de Jodie del 14-sep). Usan 'secciones'
+    para respetar exactamente sus títulos y su orden. */
+ {e:'🍊',n:'Sueroterapia con vitamina C',cat:['sueroterapia'],dur:'40 min',precio:'',eval:true,
+  d:'Administración intravenosa de vitamina C, nutriente esencial con función antioxidante y participación en la formación normal de colágeno.',
+  b:['Antioxidante','Colágeno'],
+  secciones:[
+   {t:'Qué es', x:'Administración intravenosa de vitamina C bajo evaluación e indicación profesional. La vitamina C es un nutriente esencial que el organismo no produce por sí solo y que participa en diferentes procesos fisiológicos.'},
+   {t:'Para qué sirve', x:'Contribuye a la síntesis normal de colágeno, el funcionamiento del sistema inmunitario, la absorción del hierro y la protección antioxidante de las células. La vitamina C ayuda a neutralizar radicales libres involucrados en el estrés oxidativo.'},
+   {t:'Beneficios fisiológicos', l:['Es indispensable para la formación normal de colágeno.','Participa en la cicatrización y mantenimiento de los tejidos.','Actúa como antioxidante fisiológico.','Contribuye al funcionamiento normal del sistema inmunitario.','Favorece la absorción del hierro no hemínico.','Participa en la síntesis de carnitina y determinados neurotransmisores.']},
+   {t:'Para quién está recomendado', x:'Para personas que, luego de una evaluación profesional, presenten indicación de suplementación o necesiten corregir un aporte insuficiente de vitamina C. No reemplaza una alimentación equilibrada ni el tratamiento indicado por un médico.'},
+   {t:'Qué incluye la sesión', x:'Evaluación previa, control de signos vitales, instalación de vía venosa periférica, administración supervisada de la solución y control posterior.'},
+   {t:'Duración', x:'Aproximadamente 40 minutos. Puede variar según la dosis, formulación utilizada y tolerancia de cada paciente.'},
+   {t:'Sesiones recomendadas', x:'La cantidad y frecuencia no son iguales para todas las personas. Se determinan de manera individual según la evaluación, los antecedentes de salud y la indicación profesional.'},
+   {t:'Posibles molestias o reacciones', x:'Puede producir dolor o hematoma en el sitio de punción, irritación de la vena, sensación de frío, náuseas, mareos o malestar. Aunque es poco frecuente, existe riesgo de reacción alérgica u otras complicaciones asociadas a una administración intravenosa.'},
+   {t:'Cuidados previos', l:['Informar enfermedades, alergias y medicamentos de uso habitual.','Informar antecedentes renales, cálculos renales o sobrecarga de hierro.','No acudir en ayunas, salvo indicación contraria.','Mantener una hidratación adecuada.','No suspender medicamentos sin autorización médica.']},
+   {t:'Cuidados posteriores', l:['Mantener una hidratación adecuada.','Evitar esfuerzos intensos inmediatamente después de la sesión si existe mareo o malestar.','Consultar ante dolor intenso, inflamación persistente o reacción inesperada.','Seguir las indicaciones entregadas por la profesional.']},
+   {t:'Contraindicaciones y precauciones principales', cls:'contra', l:['Enfermedad renal o antecedentes de cálculos renales.','Deficiencia de glucosa-6-fosfato deshidrogenasa, especialmente ante dosis elevadas.','Hemocromatosis u otros trastornos por sobrecarga de hierro.','Embarazo o lactancia, salvo indicación médica.','Alergia o hipersensibilidad a algún componente.','Enfermedad aguda o crónica descompensada.','Tratamiento oncológico activo sin autorización del oncólogo tratante.','Uso de medicamentos con posibles interacciones, según evaluación.']}
+  ]},
+ {e:'⚡',n:'Sueroterapia con complejo B (B1, B3, B6, B7 y B12)',cat:['sueroterapia'],dur:'40 min',precio:'',eval:true,
+  d:'Vitaminas esenciales que participan en el metabolismo energético, el sistema nervioso, la formación de células sanguíneas y la síntesis de neurotransmisores.',
+  b:['Metabolismo energético','Sistema nervioso'],
+  secciones:[
+   {t:'Qué es', x:'Administración intravenosa de vitaminas B1, B3, B6, B7 y B12, sujeta a evaluación e indicación profesional. Estas vitaminas hidrosolubles participan en el aprovechamiento de los nutrientes y en el funcionamiento normal del sistema nervioso, la sangre y numerosos procesos celulares.'},
+   {t:'Para qué sirve', x:'Contribuye a mantener niveles adecuados de vitaminas del complejo B y apoya procesos relacionados con el metabolismo energético, la función neurológica, la producción de glóbulos rojos y la síntesis de determinados neurotransmisores. Su beneficio puede ser especialmente relevante cuando existe déficit o un requerimiento aumentado.'},
+   {t:'¿Qué hace cada vitamina?', l:['<b>Vitamina B1 (tiamina):</b> ayuda a transformar los carbohidratos en energía y participa en el funcionamiento normal de los nervios, músculos y corazón.','<b>Vitamina B3 (niacina o nicotinamida):</b> forma parte de las coenzimas NAD y NADP, fundamentales para el metabolismo energético, la reparación celular y el funcionamiento de la piel y el sistema nervioso.','<b>Vitamina B6 (piridoxina):</b> interviene en el metabolismo de proteínas, la formación de hemoglobina y la síntesis de neurotransmisores como serotonina, dopamina y GABA.','<b>Vitamina B7 (biotina):</b> participa en el metabolismo de grasas, carbohidratos y aminoácidos. Ayuda a mantener funciones normales relacionadas con la piel y el cabello, especialmente cuando existe deficiencia.','<b>Vitamina B12 (cobalamina):</b> es necesaria para la formación normal de glóbulos rojos, la síntesis de ADN y el mantenimiento del sistema nervioso.']},
+   {t:'Apoyo fisiológico', l:['Metabolismo y aprovechamiento energético de los nutrientes.','Funcionamiento normal del sistema nervioso.','Síntesis de neurotransmisores.','Formación normal de glóbulos rojos y hemoglobina.','Mantenimiento de la piel y otros tejidos.','Corrección o prevención de déficits, cuando existe indicación profesional.']},
+   {t:'Para quién está recomendado', x:'Para personas que, después de una evaluación profesional, presenten déficit, riesgo de aporte insuficiente, necesidades aumentadas o una indicación específica de suplementación. No sustituye una alimentación equilibrada ni el diagnóstico y tratamiento de las causas de cansancio.'},
+   {t:'Qué incluye la sesión', x:'Evaluación previa, revisión de antecedentes y medicamentos, control de signos vitales, instalación de vía venosa periférica, administración supervisada y control posterior.'},
+   {t:'Duración', x:'Aproximadamente 40 minutos. El tiempo puede variar según la formulación, la velocidad de administración y la tolerancia de cada paciente.'},
+   {t:'Sesiones recomendadas', x:'La frecuencia y cantidad de sesiones se determinan individualmente según los antecedentes clínicos, alimentación, síntomas, exámenes cuando correspondan y formulación utilizada.'},
+   {t:'Lo que muestra la ciencia', x:'Las vitaminas B participan en funciones neurológicas y metabólicas esenciales. Algunos ensayos con suplementos orales de complejo B han observado reducción del estrés percibido en ciertos grupos después de varias semanas.'},
+   {t:'Importante sobre la serotonina', x:'La vitamina B6 funciona como cofactor en reacciones necesarias para sintetizar serotonina y otros neurotransmisores. Esto significa que participa en el proceso fisiológico, pero no que la sueroterapia aumente directamente la serotonina ni que trate por sí sola depresión, ansiedad o trastornos del ánimo. <i>(Fuente: NIH – Vitamina B6)</i>'},
+   {t:'Posibles molestias o reacciones', l:['Dolor, irritación o hematoma en el lugar de punción.','Sensación de calor, rubor, picazón, náuseas o mareos.','Cambios transitorios en el color u olor de la orina.','Reacción alérgica; en casos excepcionales puede ser grave.','Algunas formas o dosis de vitamina B3 pueden producir rubor, calor o descenso de la presión arterial.']},
+   {t:'Cuidados previos', l:['Informar enfermedades, alergias y medicamentos de uso habitual.','Informar antecedentes renales, hepáticos, neurológicos o de sensibilidad al cobalto.','Comunicar si se realizarán exámenes de sangre próximamente.','No acudir en ayunas, salvo indicación diferente.','Mantener una hidratación adecuada.','No suspender medicamentos sin autorización médica.']},
+   {t:'Cuidados posteriores', l:['Mantener una hidratación adecuada.','Evitar ejercicio intenso inmediatamente después si existe mareo o malestar.','No manipular excesivamente la zona de punción.','Consultar ante dolor intenso, inflamación persistente, dificultad respiratoria o cualquier reacción inesperada.','Informar al laboratorio o al médico que se recibió biotina antes de realizarse exámenes.']},
+   {t:'Contraindicaciones y precauciones principales', cls:'contra', l:['Embarazo o lactancia, salvo indicación médica.','Alergia a alguna vitamina o componente de la solución.','Sensibilidad al cobalto o antecedentes de reacción a vitamina B12.','Enfermedad renal, hepática o neurológica relevante.','Enfermedad aguda o crónica descompensada.','Uso de medicamentos con posibles interacciones.','Administración repetida de dosis altas de B6, por riesgo de neuropatía.','Exámenes de laboratorio próximos, debido a que la biotina puede alterar ciertos resultados.']},
+   {t:'Advertencia sobre la biotina', alerta:true, x:'La vitamina B7 o biotina puede interferir con algunos exámenes y generar resultados falsos, incluidos análisis tiroideos, hormonales y ciertas pruebas de troponina utilizadas ante sospecha de infarto. La paciente debe informar siempre su uso antes de realizarse exámenes. <i>(Fuente: advertencia de la FDA)</i>'},
+   {t:'Aviso importante', alerta:true, x:'Este servicio no está destinado a diagnosticar ni tratar depresión, ansiedad, anemia sin diagnóstico, fatiga crónica, enfermedades neurológicas u otras patologías. Si existe cansancio persistente, se recomienda evaluación médica para investigar su causa.'}
+  ]}
 ];
 function trow(t,i,mode){ return '<div class="srow" onclick="'+(mode==='sel'?'selService('+i+')':'openDetail('+i+')')+'"><div class="circ" style="font-size:24px">'+t.e+'</div><div class="nm"><b>'+t.n+'</b><small>'+t.dur+'</small></div>'+(mode==='sel'?'<span class="badge">✓ Elegido</span><span class="info">ⓘ</span>':'<span class="chev">›</span>')+'</div>'; }
 function renderTreatments(){
@@ -1215,6 +1269,9 @@ function openMejorar(k){
 window.openMejorar=openMejorar;
 
 function fsec(lbl,txt){ return txt?('<div class="lbl2">'+lbl+'</div><div class="dtext">'+txt+'</div>'):''; }
+/* Fichas con secciones propias (sueroterapias, correo de Jodie del 14-sep):
+   {t:'Título', x:'texto'} · {t, l:[lista], cls:'contra'} · {t, x, alerta:true} */
+function fseccion(s){ if(s.l) return flist(s.t, s.l, s.cls); if(s.alerta) return '<div class="lbl2">'+s.t+'</div><div class="dp-alerta">'+s.x+'</div>'; return fsec(s.t, s.x); }
 function flist(lbl,arr,cls){ if(!arr||!arr.length)return ''; return '<div class="lbl2">'+lbl+'</div><div class="flist '+(cls||'')+'">'+arr.map(function(x){return '<div class="fli"><i>•</i><span>'+x+'</span></div>';}).join('')+'</div>'; }
 /* ===== PLANTILLA DERMAPEN (punto 7 del correo de Jodie, 29-ago) =====
    Editable: cambiar textos aqui cambia TODAS las fichas con plantilla:'dermapen'.
@@ -1312,7 +1369,8 @@ function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'
   b.innerHTML='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
    +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
    +meta+evalBadge
-   +fsec('Qué es', t.quees)
+   +(t.secciones ? t.secciones.map(fseccion).join('') : (
+    fsec('Qué es', t.quees)
    +fsec('Para qué sirve', t.sirve)
    +flist('Ayuda a mejorar', t.mejora)
    +fsec('Para quién está recomendado', t.paraquien)
@@ -1321,7 +1379,7 @@ function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'
    +fsec('Tiempo de recuperación', t.recup)
    +flist('Cuidados previos', t.previos)
    +flist('Cuidados posteriores', t.posteriores)
-   +flist('Contraindicaciones principales', t.contra, 'contra')
+   +flist('Contraindicaciones principales', t.contra, 'contra')))
    +'<div class="fbtns"><button class="cta" onclick="agendarDe('+i+')">Agendar 🗓️</button>'
    +'<button class="cta wa" onclick="waTratamiento(\''+t.n.replace(/'/g,'')+'\')">Consultar por WhatsApp</button></div>'
    +'<div class="rdisc" style="text-align:center">Los resultados pueden variar entre personas. El plan final se define en tu <b>evaluación profesional personalizada</b> con Jodie Berríos (enfermera).</div>';
@@ -1472,18 +1530,20 @@ function renderQuiz(){
     Q.opts.map(function(o){ return '<div class="qopt" onclick="answer(\''+o[0]+'\')"><span class="em">'+o[1]+'</span><span>'+o[2]+'</span></div>'; }).join('');
   var sc=document.querySelector('#test .scroll'); if(sc)sc.scrollTop=0;
 }
+/* Por NOMBRE, no por posición: al agregar tratamientos la lista se corre (29-sep). */
+function TI(nombre){ var i=TREATMENTS.findIndex(function(t){return t.n===nombre;}); return i<0?0:i; }
 function renderResult(){
   var a=qans;
   var MAP={
-   hidratacion:{ti:0,d:'Hidratación profunda, luminosidad y piel más suave.',needle:false,alt:'También puede sumar mesoterapia hidratante o ADN de salmón, según tu evaluación.'},
-   luminosidad:{ti:0,d:'Aporta luz y frescura al rostro. Para más uniformidad de tono se evalúa BB Glow.',needle:false,alt:'BB Glow ayuda a emparejar el tono, con microagujas.'},
-   manchas:{ti:1,d:'Ayuda a mejorar la uniformidad del tono, siempre con evaluación previa de tus manchas.',needle:true,alt:'También: mesoterapia con activos seleccionados para tu piel.'},
-   poros:{ti:3,d:'Trabaja poros y grasa; se complementa con una limpieza facial profunda.',needle:true,alt:'Un buen punto de partida es la limpieza facial profunda.'},
-   textura:{ti:5,d:'Ayuda a mejorar la textura y las marcas superficiales de acné.',needle:true,alt:'También: ADN de salmón, según evaluación.'},
-   lineas:{ti:4,d:'Apoya la hidratación, la elasticidad y las líneas finas de forma gradual.',needle:true,alt:'Complemento: radiofrecuencia para firmeza.'},
-   firmeza:{ti:6,d:'Trabaja firmeza y flacidez leve; resultados graduales y variables.',needle:false,alt:'También: ADN de salmón o PRP, según evaluación.'}
+   hidratacion:{ti:TI('Pink Glow'),d:'Hidratación profunda, luminosidad y piel más suave.',needle:false,alt:'También puede sumar mesoterapia hidratante o ADN de salmón, según tu evaluación.'},
+   luminosidad:{ti:TI('Pink Glow'),d:'Aporta luz y frescura al rostro. Para más uniformidad de tono se evalúa BB Glow.',needle:false,alt:'BB Glow ayuda a emparejar el tono, con microagujas.'},
+   manchas:{ti:TI('BB Glow'),d:'Ayuda a mejorar la uniformidad del tono, siempre con evaluación previa de tus manchas.',needle:true,alt:'También: mesoterapia con activos seleccionados para tu piel.'},
+   poros:{ti:TI('Mesoterapia Facial'),d:'Trabaja poros y grasa; se complementa con una limpieza facial profunda.',needle:true,alt:'Un buen punto de partida es la limpieza facial profunda.'},
+   textura:{ti:TI('PRP Facial'),d:'Ayuda a mejorar la textura y las marcas superficiales de acné.',needle:true,alt:'También: ADN de salmón, según evaluación.'},
+   lineas:{ti:TI('ADN de salmón con Dermapen'),d:'Apoya la hidratación, la elasticidad y las líneas finas de forma gradual.',needle:true,alt:'Complemento: radiofrecuencia para firmeza.'},
+   firmeza:{ti:TI('Radiofrecuencia'),d:'Trabaja firmeza y flacidez leve; resultados graduales y variables.',needle:false,alt:'También: ADN de salmón o PRP, según evaluación.'}
   };
-  var NEEDLEFREE={luminosidad:0,hidratacion:0,manchas:0,poros:2,textura:6,lineas:6,firmeza:6};
+  var NEEDLEFREE={luminosidad:TI('Pink Glow'),hidratacion:TI('Pink Glow'),manchas:TI('Pink Glow'),poros:TI('Limpieza Facial Profunda'),textura:TI('Radiofrecuencia'),lineas:TI('Radiofrecuencia'),firmeza:TI('Radiofrecuencia')};
   var base=MAP[a.meta]||MAP.hidratacion, safe='';
   if(a.alerta==='si'){ safe='Como indicaste acné activo, heridas, herpes, irritación o infección, <b>lo primero es una evaluación presencial</b>. Por tu seguridad no aplicamos microagujas ni alta frecuencia sobre piel con lesiones o infección.'; }
   else if(a.medica==='si'){ safe='Por embarazo, lactancia o un tratamiento médico, <b>necesitamos una evaluación previa</b> antes de recomendarte un procedimiento.'; }
@@ -1536,7 +1596,7 @@ const MISRESULT=[
 const PUBRESULT=[
  {t:'BB Glow',fecha:'Caso real',ses:'Después de 3 sesiones',prog:75},
  {t:'Limpieza Facial Profunda',fecha:'Caso real',ses:'Sesión única',prog:58},
- {t:'ADN de Salmón (PDRN)',fecha:'Caso real',ses:'Después de 4 sesiones',prog:70}
+ {t:'ADN de salmón con Dermapen',fecha:'Caso real',ses:'Después de 4 sesiones',prog:70}
 ];
 function resCard(r){
   return '<div class="rescard fade-up"><h4>'+r.t+'</h4>'
@@ -1630,7 +1690,7 @@ window.toggleFav=toggleFav; window.renderFavs=renderFavs;
 const HIST=[
  {t:'Limpieza Facial Profunda',fecha:'2 abr 2026',sede:'Santiago'},
  {t:'BB Glow',fecha:'18 mar 2026',sede:'Santiago'},
- {t:'ADN de Salmón (PDRN)',fecha:'28 feb 2026',sede:'Santiago'}
+ {t:'ADN de salmón con Dermapen',fecha:'28 feb 2026',sede:'Santiago'}
 ];
 (function renderHist(){
   var el=document.getElementById('histList'); if(!el)return;
