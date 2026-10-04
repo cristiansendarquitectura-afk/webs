@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#33536b">
-<meta charset="utf-8">
 <title>Cubicador Metalcon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -131,7 +130,7 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
         <button class="b" id="foto-cal" hidden>Ajustar foto a la casa</button>
         <label class="mini" id="foto-op-l" hidden>Transparencia <input type="range" id="foto-op" min="10" max="90" value="45" style="vertical-align:middle;width:110px"></label>
         <button class="b del" id="foto-quitar" hidden>Quitar foto</button></div>
-      <div class="row" style="margin-top:10px"><button class="b pri" data-ir2="materiales">Ver materiales de esta obra →</button><button class="b" data-ir2="tabiques">Ver tabiques</button><button class="b" data-ir2="techo">Ver techo</button></div></div>
+      <div class="row" style="margin-top:10px"><button class="b pri" data-ir2="materiales">Ver materiales de esta obra →</button><button class="b" data-ir2="tabiques">Ver tabiques</button><button class="b" data-ir2="techo">Ver techo</button><button class="b" data-ir-base>Ver base (pollos y fierros)</button></div></div>
     <div class="card"><details open><summary>Contorno</summary><div class="body" id="f-contorno"></div></details></div>
     <div class="card"><details><summary>Tabiques interiores</summary><div class="body"><div id="f-tabiques" style="display:flex;flex-direction:column;gap:8px"></div><button class="b" id="add-tab">+ Tabique</button></div></details></div>
     <div class="card"><details><summary>Puertas y ventanas</summary><div class="body"><div id="f-vanos" style="display:flex;flex-direction:column;gap:8px"></div><button class="b" id="add-vano">+ Vano</button></div></details></div>
@@ -1552,6 +1551,9 @@ $('#nav').innerHTML=PANT.map(([k,n])=>`<button data-ir="${k}" class="${k==='trab
 function ir(k){ document.querySelectorAll('section.s').forEach(s=>s.classList.toggle('on',s.id==='s-'+k)); document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.ir===k)); try{ localStorage.setItem('cub-pant',k); }catch(e){} window.scrollTo(0,0); }
 $('#nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) ir(b.dataset.ir); });
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-ir2]'); if(b) ir(b.dataset.ir2); });
+// ir directo al dibujo de la base: abre la sección «Base» de Materiales y baja hasta el plano de pollos
+document.addEventListener('click',e=>{ if(!e.target.closest('[data-ir-base]')) return; ir('materiales');
+  setTimeout(()=>{ const d=[...document.querySelectorAll('#tiles details.card.sub')].find(x=>/^\s*Base/.test(x.querySelector('summary').textContent)); if(!d) return; d.open=true; (d.querySelector('svg')||d).scrollIntoView({behavior:'smooth',block:'center'}); },150); });
 
 /* ---------- lista de trabajos ---------- */
 function pintarLista(){
