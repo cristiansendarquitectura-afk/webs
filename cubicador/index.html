@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#33536b">
+<meta charset="utf-8">
 <title>Cubicador Metalcon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -99,6 +100,9 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
 .subir:hover{filter:brightness(1.05)} .subir .ico{font-size:34px;line-height:1}
 .subir b{display:block;font-family:var(--display);font-size:26px;letter-spacing:.04em;font-weight:700} .subir span span{font-size:14px;opacity:.95}
 .hint{background:var(--accent-soft);border-radius:8px;padding:8px 10px;font-size:14px}
+dialog#dl-dlg{border:0;border-radius:14px;padding:18px;max-width:560px;width:calc(100% - 32px);background:var(--panel);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+dialog#dl-dlg::backdrop{background:rgba(10,15,20,.55)} .dl-ops{display:flex;flex-wrap:wrap;gap:8px} .dl-ops .chip{display:flex;gap:6px;align-items:center;cursor:pointer}
+.dl-ops input{margin:0;width:18px;height:18px} button.b:disabled{opacity:.5;cursor:wait}
 </style>
 </head>
 <body>
@@ -130,7 +134,7 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
         <button class="b" id="foto-cal" hidden>Ajustar foto a la casa</button>
         <label class="mini" id="foto-op-l" hidden>Transparencia <input type="range" id="foto-op" min="10" max="90" value="45" style="vertical-align:middle;width:110px"></label>
         <button class="b del" id="foto-quitar" hidden>Quitar foto</button></div>
-      <div class="row" style="margin-top:10px"><button class="b pri" data-ir2="materiales">Ver materiales de esta obra →</button><button class="b" data-ir2="tabiques">Ver tabiques</button><button class="b" data-ir2="techo">Ver techo</button><button class="b" data-ir-base>Ver base (pollos y fierros)</button></div></div>
+      <div class="row" style="margin-top:10px"><button class="b pri" data-ir2="materiales">Ver materiales de esta obra →</button><button class="b" data-ir2="tabiques">Ver tabiques</button><button class="b" data-ir2="techo">Ver techo</button><button class="b" data-ir-base>Ver base (pollos y fierros)</button><button class="b" data-dl="plano">⬇️ Descargar o imprimir el plano</button></div></div>
     <div class="card"><details open><summary>Contorno</summary><div class="body" id="f-contorno"></div></details></div>
     <div class="card"><details><summary>Tabiques interiores</summary><div class="body"><div id="f-tabiques" style="display:flex;flex-direction:column;gap:8px"></div><button class="b" id="add-tab">+ Tabique</button></div></details></div>
     <div class="card"><details><summary>Puertas y ventanas</summary><div class="body"><div id="f-vanos" style="display:flex;flex-direction:column;gap:8px"></div><button class="b" id="add-vano">+ Vano</button></div></details></div>
@@ -145,24 +149,24 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
     <div class="card"><h2 style="margin-bottom:8px">Avisos</h2><ul class="notes" id="avisos"></ul></div>
     <div class="card"><div class="row" style="justify-content:space-between"><h2>Mejor disposición</h2><button class="b pri" id="buscar-dispo">Buscar</button></div>
       <p class="mini" style="margin:4px 0 8px">Lo que el cliente quiere justo en su lugar se marca con 📌 «No mover» en la Planta (o con la casilla en la lista), y aquí no se toca. Si corres un poco una ventana, una puerta o un tabique interior, sus pies derechos pueden caer justo donde ya hay uno (una junta de plancha, por ejemplo) y te ahorras perfiles. La app prueba moverlos hasta 10 cm, uno por uno, y te muestra los que ahorran sin perder el fleje de las esquinas ni dejar uniones sin espacio para el taladro. Revisa que se siga viendo bien y toca «Aplicar».</p><ul class="notes" id="sug"><li class="info">Toca «Buscar» para revisar esta obra.</li></ul></div>
-    <div class="card"><h2>Cada tabique</h2>
+    <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Cada tabique</h2><button class="b" data-dl="tabiques">⬇️ Descargar o imprimir</button></div>
       <div class="legend" style="margin-top:6px"><span><i style="background:var(--steel)"></i>pilar, extremo, unión, jamba, T</span><span><i style="background:var(--osb)"></i>junta OSB (afuera)</span><span><i style="background:var(--vol)"></i>junta forro interior</span><span><i style="background:var(--muted)"></i>grilla</span></div>
       <div id="elevs" style="display:flex;flex-direction:column;gap:18px;margin-top:10px"></div></div>
   </section>
 
   <!-- TECHO -->
-  <section class="s" id="s-techo"><div class="card"><h2 style="margin-bottom:4px">Cerchas y techumbre</h2><div id="techo-out"></div></div></section>
+  <section class="s" id="s-techo"><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin-bottom:4px">Cerchas y techumbre</h2><button class="b" data-dl="techo">⬇️ Descargar o imprimir</button></div><div id="techo-out"></div></div></section>
 
   <!-- MATERIALES -->
   <section class="s" id="s-materiales">
-    <div class="card"><div class="row" style="justify-content:space-between"><h2>Materiales</h2><button class="b pri" id="copiar-lista">Copiar lista</button></div><div id="tiles" style="margin-top:6px"></div><p class="mini" id="msg-lista"></p></div>
+    <div class="card"><div class="row" style="justify-content:space-between"><h2>Materiales</h2><div class="row"><button class="b pri" data-dl="materiales">⬇️ Descargar todo (PDF)</button><button class="b" id="copiar-lista">Copiar lista</button></div></div><div id="tiles" style="margin-top:6px"></div><p class="mini" id="msg-lista"></p></div>
     <div class="card"><h2 style="margin-bottom:6px">Planchas</h2><div id="planchas"></div></div>
     <div class="card"><h2 style="margin-bottom:6px">Despiece en perfiles</h2><div id="cortes" style="display:flex;flex-direction:column;gap:14px"></div></div>
   </section>
 
   <!-- VALOR -->
   <section class="s" id="s-valor">
-    <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Valor de los materiales</h2><button class="b pri" id="copiar-valor">Copiar presupuesto</button></div>
+    <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Valor de los materiales</h2><div class="row"><button class="b" data-dl="valor">⬇️ Descargar</button><button class="b pri" id="copiar-valor">Copiar presupuesto</button></div></div>
       <p class="mini" style="margin:4px 0 10px">Las cantidades salen solas de la cubicación. Escribe el precio unitario de cada cosa (en pesos) y se suma todo. Los precios quedan guardados en el teléfono y sirven para las próximas obras.</p>
       <div class="tw"><table id="tabla-valor"></table></div>
       <div class="row" style="margin-top:10px;align-items:center"><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-iva" style="margin:0">Sumar IVA (19 %)</label><span class="mini" id="msg-valor"></span></div></div>
@@ -2055,7 +2059,7 @@ function materiales(R,p){
   if(!sec.tiles.length) sec.tiles.push(`<div class="tile"><b>—</b><span>Ningún extra marcado.</span></div>`);
   // armar las secciones plegables
   const h=(falta.length?`<div class="hint">Cubicación parcial: ${falta.join('; ')}. Completa los pasos en «Planta» y se suma solo.</div>`:'')+
-    SEC.filter(x=>x.tiles.length).map((x,k)=>`<details class="card sub" ${k<2?'open':''} style="margin-top:10px"><summary>${x.titulo} <span class="mini" style="font-family:var(--body);font-weight:400">· ${x.tiles.length} ítem${x.tiles.length>1?'s':''}</span></summary>${x.nota?`<p class="mini" style="margin:6px 0 0">${x.nota}</p>`:''}<div class="tiles" style="margin-top:8px">${x.tiles.join('')}</div>${x.extra||''}</details>`).join('');
+    SEC.filter(x=>x.tiles.length).map((x,k)=>`<details class="card sub" data-sec="${x.id}" ${k<2?'open':''} style="margin-top:10px"><summary>${x.titulo} <span class="mini" style="font-family:var(--body);font-weight:400">· ${x.tiles.length} ítem${x.tiles.length>1?'s':''}</span></summary>${x.nota?`<p class="mini" style="margin:6px 0 0">${x.nota}</p>`:''}<div class="tiles" style="margin-top:8px">${x.tiles.join('')}</div>${x.extra||''}</details>`).join('');
   $('#tiles').innerHTML=h;
   SEC.forEach(x=>{ const its=IT.filter(i=>i.sec===x.titulo); if(its.length){ L.push(`— ${x.titulo.toUpperCase()} —`); its.forEach(i=>L.push(`${i.cant} ${i.un} · ${i.nombre}`)); } });
   $('#tiles').dataset.lista=(falta.length?'(Parcial: '+falta.join('; ')+')\n':'')+L.join('\n');
@@ -2070,6 +2074,152 @@ function materiales(R,p){
 }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-elegir-techo]'); if(!b) return; const T=J().planta.techo; T.on=true; T.caidas=b.dataset.elegirTecho; guardar(); pintarForms(); calcularLuego(); });
 $('#copiar-lista').onclick=()=>{ const t=`${J().nombre}\n`+$('#tiles').dataset.lista; try{ navigator.clipboard.writeText(t).then(()=>$('#msg-lista').textContent='Lista copiada: pégala en WhatsApp.',()=>$('#msg-lista').textContent=t); }catch(e){ $('#msg-lista').textContent=t; } };
+
+/* ---------- descargar e imprimir (PDF, imagen, impresora) ---------- */
+// Arma un informe con lo que se elija (planta, tabiques, techo, base y suelo, materiales, valor), lo pasa a páginas A4
+// y lo guarda como PDF o imagen. En el teléfono se comparte (WhatsApp, correo, Drive o imprimir); en la web se descarga.
+const DL_SECS=[['plano','Planta (plano)'],['tabiques','Tabiques'],['techo','Techo'],['base','Base y suelo'],['materiales','Materiales y despiece'],['valor','Valor (con precios)']];
+const DL_W=820, DL_PW=1240, DL_PH=1754, DL_M=60;   // ancho del informe en px CSS · hoja A4 a 150 ppp
+const nativo=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+const dlNombre=t=>(J().nombre||'Obra').replace(/[\\/:*?"<>|]+/g,'').trim()+' - '+t;
+function dlCss(){ return [...document.querySelectorAll('style')].map(s=>s.textContent).join('\n')+`
+:root{--display:"Arial Narrow",Arial,sans-serif;--body:Arial,Helvetica,sans-serif;--mono:Consolas,"Courier New",monospace}
+html,body{height:auto;background:#fff;margin:0}
+.dl-b{background:#fff;color:#17222b;padding:8px 6px 14px;font-family:var(--body);font-size:14px;width:${DL_W}px;box-sizing:border-box}
+.dl-h{font:700 24px var(--display);color:#33536b;margin:0 0 6px;border-bottom:2px solid #e46a24;padding-bottom:3px}
+.dl-b .card{box-shadow:none;margin:0} .dl-b details>summary::after{content:""} .dl-b .tw,.dl-b .elev{overflow:visible}
+.dl-b .elev svg,.dl-b .plano svg,.dl-b #techo-out .elev svg{width:100%;height:auto;max-width:100%;min-width:0}
+.dl-b .plano{border:0;cursor:default} .dl-b svg{max-width:100%}
+.dl-portada{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.dl-portada b{display:block;font:700 30px var(--display);color:#17222b} .dl-portada span{color:#5b6a72;font-size:14px}`; }
+
+// copia un trozo de la pantalla sin botones, con los desplegables abiertos y los valores escritos a la vista
+function dlCopia(el){ if(!el) return null; const c=el.cloneNode(true);
+  c.querySelectorAll('details').forEach(d=>d.open=true); if(c.tagName==='DETAILS') c.open=true;
+  // «perfil por perfil» es para cortar en obra mirando la pantalla: en papel ocupa diez hojas, se deja el resumen
+  c.querySelectorAll('details').forEach(d=>{ const s=d.querySelector(':scope>summary'); if(s&&/perfil por perfil/i.test(s.textContent)) d.remove(); });
+  c.querySelectorAll('button,input[type=file],input[type=range],label.b,image').forEach(x=>x.remove());
+  const orig=el.querySelectorAll('input,select,textarea'), copias=c.querySelectorAll('input,select,textarea');
+  copias.forEach((x,k)=>{ const o=orig[k]||x, s=document.createElement('span');
+    s.textContent=o.type==='checkbox'?(o.checked?'✔':'—'):(o.tagName==='SELECT'?(o.options[o.selectedIndex]||{}).text||'':o.value); x.replaceWith(s); });
+  return c; }
+
+// los bloques del informe, en orden; cada bloque es un trozo que no se corta si cabe en una hoja
+function dlBloques(sel){ calcularYMostrar(); try{ pintarValor(); }catch(e){}
+  const B=[], pl=J().planta;
+  const bloque=(titulo,...els)=>{ const d=document.createElement('div'); d.className='dl-b';
+    if(titulo){ const h=document.createElement('h2'); h.className='dl-h'; h.textContent=titulo; d.appendChild(h); }
+    els.filter(Boolean).forEach(e=>d.appendChild(e)); B.push(d); return d; };
+  const envolver=(id,cls,el)=>{ const w=document.createElement('div'); if(id) w.id=id; if(cls) w.className=cls; w.appendChild(el); return w; };
+  const hoy=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const p=document.createElement('div'); p.className='dl-portada';
+  p.innerHTML=`<div><b>${esc(J().nombre||'Obra')}</b><span>${fm(pl.ancho)} × ${fm(pl.fondo)} m · Cubicador Metalcon</span></div><span>${hoy}</span>`;
+  bloque('',p);
+  if(sel.plano){ const s=$('#svg-plano'); if(s) bloque('Planta',envolver('','plano',dlCopia(s))); }
+  // cada tabique a la misma escala que en pantalla (260 px de alto): los cortos no se agrandan
+  const escalaElev=c=>{ c.querySelectorAll('.elev svg').forEach(v=>{ const vb=(v.getAttribute('viewBox')||'').split(/[\s,]+/).map(Number); if(vb.length===4&&vb[3]>0){ const w=Math.min(DL_W-16,220*vb[2]/vb[3]); v.style.width=w+'px'; v.style.height='auto'; v.style.maxWidth='100%'; } }); return c; };
+  if(sel.tabiques){ [...$('#elevs').children].forEach((e,k)=>bloque(k?'':'Tabiques',escalaElev(dlCopia(e))));
+    const av=$('#avisos'); if(av&&av.children.length) bloque('Avisos de tabiques',dlCopia(av)); }
+  if(sel.techo){ [...$('#techo-out').children].forEach((e,k)=>bloque(k?'':'Techo',envolver('techo-out','',dlCopia(e)))); }
+  const secs=[...document.querySelectorAll('#tiles details[data-sec]')];
+  if(sel.base) secs.filter(d=>d.dataset.sec==='base').forEach(d=>{ const c=dlCopia(d), s=c.querySelector('summary'), t=s?s.textContent.split('·')[0].trim():'Base'; if(s) s.remove(); bloque(t,c); });
+  if(sel.materiales){ const h=$('#tiles').querySelector('.hint'); if(h) bloque('Materiales',dlCopia(h));
+    secs.filter(d=>d.dataset.sec!=='base').forEach((d,k)=>{ const c=dlCopia(d), s=c.querySelector('summary'), t=s?s.textContent.split('·')[0].trim():''; if(s) s.remove(); bloque((k||h?'':'Materiales · ')+t,c); });
+    bloque('Planchas por muro y recinto',dlCopia($('#planchas')));
+    [...$('#cortes').children].forEach((e,k)=>bloque(k?'':'Despiece en perfiles',dlCopia(e))); }
+  if(sel.valor){ const t=$('#tabla-valor'); if(t) bloque('Valor de los materiales',envolver('','tw',dlCopia(t)),(()=>{ const m=$('#msg-valor'); const s=document.createElement('p'); s.textContent=(m&&m.textContent)||''; return s; })()); }
+  return B; }
+
+// mide los bloques en un documento aparte (con el mismo estilo) y los pasa a imagen con foreignObject
+function dlMedir(B){ return new Promise(ok=>{ const f=document.createElement('iframe'); f.style.cssText='position:fixed;left:-99999px;top:0;width:'+(DL_W+40)+'px;height:900px;border:0;visibility:hidden';
+  document.body.appendChild(f); const d=f.contentDocument; d.open(); d.write(`<!doctype html><html data-theme="light"><head><meta charset="utf-8"><style>${dlCss()}</style></head><body></body></html>`); d.close();
+  B.forEach(b=>d.body.appendChild(d.importNode(b,true)));
+  setTimeout(()=>{ const out=[...d.body.children].map(b=>({el:b,h:Math.ceil(b.getBoundingClientRect().height)})); ok({f,out}); },60); }); }
+function dlAImagen(el,h,escala){ return new Promise((ok,no)=>{ const css=dlCss();
+  const xhtml=new XMLSerializer().serializeToString(el);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" data-theme="light" width="${DL_W*escala}" height="${h*escala}" viewBox="0 0 ${DL_W} ${h}"><foreignObject x="0" y="0" width="${DL_W}" height="${h}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:${DL_W}px;background:#fff"><style><![CDATA[${css}]]></style>${xhtml}</div></foreignObject></svg>`;
+  const img=new Image(); img.onload=()=>{ const c=document.createElement('canvas'); c.width=Math.round(DL_W*escala); c.height=Math.max(1,Math.round(h*escala));
+    const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height); ok(c); };
+  img.onerror=()=>no(new Error('No se pudo dibujar')); img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); }); }
+
+// reparte los bloques en hojas A4; si un bloque no cabe en lo que queda de la hoja, pasa a la siguiente
+async function dlPaginas(sel,msg){ const B=dlBloques(sel); const {f,out}=await dlMedir(B);
+  const esc2=(DL_PW-2*DL_M)/DL_W, alto=DL_PH-2*DL_M-40, pags=[]; let pag=null, y=0;
+  const nueva=()=>{ pag=document.createElement('canvas'); pag.width=DL_PW; pag.height=DL_PH; const x=pag.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,DL_PW,DL_PH); pags.push(pag); y=0; };
+  try{ for(let i=0;i<out.length;i++){ if(msg) msg(`Preparando ${i+1} de ${out.length}…`); const {el,h}=out[i]; if(!h) continue;
+      const c=await dlAImagen(el,h,esc2), hh=c.height;
+      if(!pag||(y>0&&y+hh>alto)) nueva();
+      if(hh<=alto-y){ pag.getContext('2d').drawImage(c,DL_M,DL_M+y); y+=hh; }
+      else { let o=0; while(o<hh){ if(y>=alto-20) nueva(); const t=Math.min(hh-o,alto-y); pag.getContext('2d').drawImage(c,0,o,c.width,t,DL_M,DL_M+y,c.width,t); o+=t; y+=t; } } }
+  } finally { f.remove(); }
+  pags.forEach((c,k)=>{ const x=c.getContext('2d'); x.fillStyle='#5b6a72'; x.font='20px Arial'; x.textAlign='left';
+    x.fillText((J().nombre||'')+' · Cubicador Metalcon',DL_M,DL_PH-DL_M/2); x.textAlign='right'; x.fillText(`Hoja ${k+1} de ${pags.length}`,DL_PW-DL_M,DL_PH-DL_M/2);
+    x.strokeStyle='#d3dadb'; x.lineWidth=2; x.beginPath(); x.moveTo(DL_M,DL_PH-DL_M/2-26); x.lineTo(DL_PW-DL_M,DL_PH-DL_M/2-26); x.stroke(); });
+  return pags; }
+
+// PDF mínimo: una imagen JPEG por hoja A4 (no necesita librerías y funciona sin internet)
+function dlPdf(cvs){ const enc=new TextEncoder(), partes=[], offs=[]; let len=0;
+  const put=x=>{ const b=typeof x==='string'?enc.encode(x):x; partes.push(b); len+=b.length; };
+  const obj=(id,fn)=>{ offs[id]=len; put(`${id} 0 obj\n`); fn(); put('\nendobj\n'); };
+  const pags=cvs.map(c=>{ const b=atob(c.toDataURL('image/jpeg',0.88).split(',')[1]), u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return {u,w:c.width,h:c.height}; });
+  put('%PDF-1.4\n%âãÏÓ\n');
+  obj(1,()=>put('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2,()=>put(`<< /Type /Pages /Kids [${pags.map((_,i)=>`${3+3*i} 0 R`).join(' ')}] /Count ${pags.length} >>`));
+  pags.forEach((p,i)=>{ const id=3+3*i, cont=`q 595.28 0 0 841.89 0 0 cm /Im${i} Do Q`;
+    obj(id,()=>put(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im${i} ${id+2} 0 R >> >> /Contents ${id+1} 0 R >>`));
+    obj(id+1,()=>put(`<< /Length ${cont.length} >>\nstream\n${cont}\nendstream`));
+    obj(id+2,()=>{ put(`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.u.length} >>\nstream\n`); put(p.u); put('\nendstream'); }); });
+  const xref=len, n=3+3*pags.length;
+  put(`xref\n0 ${n}\n0000000000 65535 f \n`+Array.from({length:n-1},(_,k)=>String(offs[k+1]).padStart(10,'0')+' 00000 n \n').join(''));
+  put(`trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob(partes,{type:'application/pdf'}); }
+
+const dlA64=b=>new Promise(ok=>{ const r=new FileReader(); r.onload=()=>ok(String(r.result).split(',')[1]); r.readAsDataURL(b); });
+const dlBlob=(c,tipo)=>new Promise(ok=>c.toBlob(ok,tipo||'image/png'));
+// en el teléfono se guarda y se abre el menú de compartir; en la web se descarga (y se puede compartir si el navegador deja)
+async function dlEntregar(archivos,compartir){
+  if(nativo()&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem){ const P=Capacitor.Plugins, uris=[];
+    for(const a of archivos){ const r=await P.Filesystem.writeFile({path:a.nombre,data:await dlA64(a.blob),directory:'CACHE'}); uris.push(r.uri); }
+    await P.Share.share({title:archivos[0].nombre,text:J().nombre,files:uris,dialogTitle:'Enviar, guardar o imprimir'}); return 'Listo: elige dónde enviarlo, guardarlo o imprimirlo.'; }
+  const fs=archivos.map(a=>new File([a.blob],a.nombre,{type:a.blob.type}));
+  if(compartir&&navigator.canShare&&navigator.canShare({files:fs})){ await navigator.share({files:fs,title:J().nombre}); return 'Compartido.'; }
+  for(const a of archivos){ const l=document.createElement('a'); l.href=URL.createObjectURL(a.blob); l.download=a.nombre; document.body.appendChild(l); l.click(); setTimeout(()=>{ URL.revokeObjectURL(l.href); l.remove(); },5000); await new Promise(r=>setTimeout(r,400)); }
+  return archivos.length>1?`Descargadas ${archivos.length} imágenes.`:'Descargado: '+archivos[0].nombre; }
+
+// imprimir: en la web va directo a la impresora (o «Guardar como PDF»); en el teléfono se arma el PDF y se comparte
+function dlImprimirWeb(sel){ const B=dlBloques(sel), f=document.createElement('iframe'); f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(f); const d=f.contentDocument; d.open();
+  d.write(`<!doctype html><html data-theme="light"><head><meta charset="utf-8"><title>${esc(dlNombre('cubicación'))}</title><style>${dlCss()}
+@page{size:A4;margin:14mm} .dl-b{width:auto;break-inside:avoid;page-break-inside:avoid}</style></head><body></body></html>`); d.close();
+  B.forEach(b=>d.body.appendChild(d.importNode(b,true)));
+  setTimeout(()=>{ f.contentWindow.focus(); f.contentWindow.print(); setTimeout(()=>f.remove(),60000); },300); }
+
+function dlAbrir(desde){ let dlg=$('#dl-dlg');
+  if(!dlg){ dlg=document.createElement('dialog'); dlg.id='dl-dlg'; document.body.appendChild(dlg); }
+  const pre={plano:['plano'],tabiques:['tabiques'],techo:['techo'],base:['base'],materiales:['plano','tabiques','techo','base','materiales'],valor:['valor'],todo:['plano','tabiques','techo','base','materiales']}[desde]||['plano'];
+  dlg.innerHTML=`<form method="dialog" class="dl-form"><h2 style="margin:0 0 4px">Descargar o imprimir</h2>
+    <p class="mini" style="margin:0 0 10px">Elige qué va en el archivo. Sale en hojas tamaño A4, listo para mandar por WhatsApp o correo, o para imprimir.</p>
+    <div class="dl-ops">${DL_SECS.map(([k,n])=>`<label class="chip"><input type="checkbox" value="${k}"${pre.includes(k)?' checked':''}> ${n}</label>`).join('')}</div>
+    <div class="row" style="margin-top:12px"><button type="button" class="b pri" data-dl-hacer="pdf">📄 PDF</button><button type="button" class="b" data-dl-hacer="png">🖼️ Imagen</button><button type="button" class="b" data-dl-hacer="imp">🖨️ Imprimir</button>${!nativo()&&navigator.canShare?'<button type="button" class="b" data-dl-hacer="share">📤 Compartir</button>':''}<button class="b" value="cerrar">Cerrar</button></div>
+    <p class="mini" id="dl-msg" style="margin:10px 0 0;min-height:1.2em"></p></form>`;
+  dlg.showModal(); }
+document.addEventListener('click',async e=>{ const a=e.target.closest('[data-dl]'); if(a){ dlAbrir(a.dataset.dl); return; }
+  const h=e.target.closest('[data-dl-hacer]'); if(!h) return; const m=$('#dl-msg'), que=h.dataset.dlHacer;
+  const sel={}; document.querySelectorAll('#dl-dlg .dl-ops input:checked').forEach(i=>sel[i.value]=true);
+  if(!Object.keys(sel).length){ m.textContent='Marca al menos una cosa.'; return; }
+  const btns=[...document.querySelectorAll('#dl-dlg [data-dl-hacer]')]; btns.forEach(b=>b.disabled=true);
+  try{
+    if(que==='imp'&&!nativo()){ dlImprimirWeb(sel); m.textContent='Se abrió la impresión. Para PDF, elige «Guardar como PDF».'; return; }
+    const solo=Object.keys(sel), tipo=solo.length===1?(DL_SECS.find(x=>x[0]===solo[0])||[,''])[1].split(' (')[0].toLowerCase():'cubicación';
+    const pags=await dlPaginas(sel,t=>m.textContent=t);
+    if(!pags.length){ m.textContent='No hay nada que descargar todavía.'; return; }
+    let arch;
+    if(que==='png') arch=await Promise.all(pags.map(async(c,k)=>({nombre:dlNombre(tipo)+(pags.length>1?` - hoja ${k+1}`:'')+'.png',blob:await dlBlob(c,'image/png')})));
+    else arch=[{nombre:dlNombre(tipo)+'.pdf',blob:dlPdf(pags)}];
+    m.textContent=await dlEntregar(arch,que==='share');
+    if(que==='imp') m.textContent+=' En el menú elige «Imprimir» o ábrelo con una app de PDF.';
+  }catch(err){ m.textContent='No se pudo: '+(err&&err.message||err); }
+  finally{ btns.forEach(b=>b.disabled=false); } });
 
 function todo(){ pintarLista(); pintarForms(); pintarFotoCtrl(); calcularYMostrar(); }
 todo();
