@@ -36,7 +36,7 @@ h2{font-size:22px} h3{font-size:18px}
 .top small{display:block;font-family:var(--body);font-size:12px;opacity:.8;font-weight:400}
 main{padding:14px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:1100px;margin:0 auto}
 section.s{display:none;flex-direction:column;gap:14px} section.s.on{display:flex}
-nav.navb{position:fixed;left:0;right:0;bottom:0;background:var(--nav);display:grid;grid-template-columns:repeat(7,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav.navb{position:fixed;left:0;right:0;bottom:0;background:var(--nav);display:grid;grid-template-columns:repeat(8,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
 nav.navb button{background:none;border:0;color:var(--navtx);font:600 10.5px var(--body);padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
 nav.navb button svg{width:22px;height:22px}
 nav.navb button.on{color:#fff;box-shadow:inset 0 3px 0 var(--accent)}
@@ -91,7 +91,7 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
 .job b{font-family:var(--display);font-size:19px;display:block}
 .glosa{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 22px;margin:16px 0 0}
 .glosa dt{font-family:var(--display);font-weight:600;font-size:17px} .glosa dd{margin:2px 0 0;font-size:14px;color:var(--muted)}
-@media (min-width:900px){ .top{position:static} nav.navb{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;grid-template-columns:repeat(7,auto);justify-content:center;gap:4px} nav.navb button{flex-direction:row;font-size:15px;padding:12px 18px;gap:8px;min-height:48px;align-items:center} nav.navb button.on{box-shadow:inset 0 -3px 0 var(--accent)} main{padding-bottom:30px} }
+@media (min-width:900px){ .top{position:static} nav.navb{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;grid-template-columns:repeat(8,auto);justify-content:center;gap:4px} nav.navb button{flex-direction:row;font-size:15px;padding:12px 18px;gap:8px;min-height:48px;align-items:center} nav.navb button.on{box-shadow:inset 0 -3px 0 var(--accent)} main{padding-bottom:30px} }
 .paso{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;text-align:left;font:inherit;color:var(--ink)}
 .paso .n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;background:var(--line);color:var(--ink)}
 .paso.ok .n{background:var(--ok);color:#fff} .paso.op .n{background:var(--steel-soft);color:var(--steel)}
@@ -103,6 +103,11 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
 dialog#dl-dlg{border:0;border-radius:14px;padding:18px;max-width:560px;width:calc(100% - 32px);background:var(--panel);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.35)}
 dialog#dl-dlg::backdrop{background:rgba(10,15,20,.55)} .dl-ops{display:flex;flex-wrap:wrap;gap:8px} .dl-ops .chip{display:flex;gap:6px;align-items:center;cursor:pointer}
 .dl-ops input{margin:0;width:18px;height:18px} button.b:disabled{opacity:.5;cursor:wait}
+.ob-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px} .ob-grid .ob-ancho{grid-column:1/-1}
+.ob-item{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel2)} .ob-item.ob-pend{border-left:4px solid var(--warn)}
+.ob-tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--steel-soft);color:var(--steel)} .ob-tag.warn{background:var(--warn-soft);color:var(--warn)} .ob-tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tile.warn{border-left-color:var(--warn)}
+input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%}
 </style>
 </head>
 <body>
@@ -171,6 +176,57 @@ dialog#dl-dlg::backdrop{background:rgba(10,15,20,.55)} .dl-ops{display:flex;flex
       <div class="tw"><table id="tabla-valor"></table></div>
       <div class="row" style="margin-top:10px;align-items:center"><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-iva" style="margin:0">Sumar IVA (19 %)</label><span class="mini" id="msg-valor"></span></div></div>
     <details class="card" style="margin-top:12px"><summary><b>💼 Precio al cliente</b> <span class="mini">· aparte del costo</span></summary><p class="mini" style="margin:6px 0">Materiales a costo más un recargo (35 % como mínimo) y la mano de obra, que se cobra casi lo mismo que cuestan los materiales. Los porcentajes se pueden cambiar.</p><div class="tw" id="precio-cliente"></div></details>
+  </section>
+
+
+  <!-- OBRA: registro de compras, gastos, extras y asistencia (10-oct) -->
+  <section class="s" id="s-obra">
+    <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Registro de obra · <span id="ob-titulo"></span></h2><button class="b" data-dl="obra">⬇️ Descargar o imprimir</button></div>
+      <p class="mini" style="margin:4px 0 10px">Compras, viajes de vertedero y flete, extras que el cliente debe devolver y la asistencia del personal. Queda guardado en este teléfono; los trabajos a trato (precio cerrado, como pintura u hojalatería) se anotan como gasto «Trabajo a trato» y se marcan al pagarlos. Para pasárselo a otra persona usa «Enviar registro» y ella lo carga con «Cargar registro recibido».</p>
+      <div class="row" style="align-items:flex-end"><label class="f" style="max-width:260px">¿Quién anota en este teléfono?<input type="text" id="ob-quien" placeholder="Ej.: Cristian o Pedro" list="ob-personas"></label></div>
+      <div class="row" style="margin-top:10px"><button class="b pri" id="ob-enviar">📤 Enviar registro</button><button class="b" id="ob-excel">📊 Excel</button><label class="b" style="display:inline-flex;align-items:center;cursor:pointer">📥 Cargar registro recibido<input type="file" id="ob-cargar" accept=".json,application/json" style="display:none"></label></div>
+      <p class="mini" id="ob-msg" style="margin:8px 0 0;min-height:1.2em"></p></div>
+
+    <div class="card" id="ob-resumen"></div>
+
+    <div class="card"><details id="ob-form-det" open><summary><b>＋ Anotar compra o gasto</b></summary><div class="body">
+      <div class="ob-grid">
+        <label class="f">Fecha<input type="date" id="oc-fecha"></label>
+        <label class="f">Tipo<select id="oc-tipo"></select></label>
+        <label class="f ob-ancho">Qué se compró o se hizo<input type="text" id="oc-detalle" placeholder="Ej.: 20 perfiles C 90 · 2 viajes al vertedero"></label>
+        <label class="f">Dónde / proveedor<input type="text" id="oc-prov" placeholder="Ej.: Sodimac"></label>
+        <label class="f">Documento<select id="oc-doc"></select></label>
+        <label class="f">N° de documento<input type="text" id="oc-num" inputmode="numeric"></label>
+        <label class="f">Etapa de la obra<select id="oc-etapa"></select></label>
+        <label class="f">Monto total ($)<input type="text" id="oc-monto" inputmode="numeric" placeholder="Ej.: 125.990"></label>
+        <label class="f">Quién lo compró<input type="text" id="oc-compro" list="ob-personas"></label>
+        <label class="f">Quién lo pagó<input type="text" id="oc-pago" list="ob-pagadores" value="La empresa"></label>
+      </div>
+      <div class="row" style="margin-top:8px;align-items:center;gap:14px">
+        <label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="oc-extra" style="margin:0">Es <b>extra</b>: se le cobra al cliente</label>
+        <label class="b" style="display:inline-flex;align-items:center;cursor:pointer">📷 Foto de la boleta<input type="file" id="oc-foto" accept="image/*" capture="environment" style="display:none"></label>
+        <span class="mini" id="oc-foto-ok"></span>
+      </div>
+      <p class="mini" style="margin:6px 0">«Quién lo pagó»: si pagó la empresa o el cliente, no hay nada que devolver. Si lo adelantó otra persona (por ejemplo Pedro), queda como <b>por devolverle</b> hasta que lo marques devuelto.</p>
+      <div class="row"><button class="b pri" id="oc-agregar">Guardar</button><span class="mini" id="oc-msg"></span></div>
+    </div></details></div>
+
+    <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Compras y gastos</h2>
+      <select id="ob-filtro" style="width:auto"><option value="todo">Todo</option><option value="cobrar">Extras por cobrar</option><option value="devolver">Por devolver a quien adelantó</option><option value="viajes">Viajes (vertedero y flete)</option><option value="cliente">Pagado por el cliente</option><option value="trato">Trabajos a trato</option></select></div>
+      <div id="ob-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div></div>
+
+    <div class="card"><h2>Asistencia y parte del día</h2>
+      <div class="row" style="align-items:flex-end"><label class="f" style="max-width:200px">Día<input type="date" id="oa-fecha"></label><button class="b" id="oa-ant">◀ Día anterior</button><button class="b" id="oa-sig">Día siguiente ▶</button></div>
+      <div id="oa-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>
+      <label class="f" style="margin-top:10px">Tareas y novedades del día (libro de obra)<textarea id="oa-nota" rows="3" placeholder="Qué se hizo, qué faltó, visitas, clima, problemas…"></textarea></label>
+      <div id="oa-semana" style="margin-top:12px"></div>
+      <details style="margin-top:10px"><summary><b>Personal</b> <span class="mini">· nombres, oficio y forma de pago</span></summary><div class="body">
+        <div id="oa-gente" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div class="ob-grid" style="margin-top:8px"><label class="f">Nombre<input type="text" id="og-nombre"></label><label class="f">Oficio<input type="text" id="og-oficio" placeholder="Ej.: maestro de 1.ª"></label><label class="f">Forma de pago<select id="og-forma"><option value="dia">Por día</option><option value="trato">A trato (precio por trabajo terminado)</option></select></label><label class="f">Pago por día ($)<input type="text" id="og-pago" inputmode="numeric" placeholder="si es por día"></label></div>
+        <div class="row" style="margin-top:6px"><button class="b" id="og-agregar">+ Agregar persona</button></div>
+      </div></details>
+    </div>
+    <datalist id="ob-personas"></datalist><datalist id="ob-pagadores"></datalist>
   </section>
 
   <!-- GLOSARIO -->
@@ -1552,8 +1608,8 @@ const J=()=>D.trabajos.find(t=>t.id===D.abierto)||D.trabajos[0];
 const PJ=()=>Object.assign({},P,{pegado:true,forroDef:(J().planta.forroBase||'terciado')},J().p||{});
 
 /* ---------- navegación ---------- */
-const ICON={trabajos:'<path d="M4 6h16M4 12h16M4 18h10"/>',planta:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h9M13 4v16"/>',tabiques:'<path d="M5 4v16M10 4v16M15 4v16M20 4v16M3 4h18M3 20h18"/>',techo:'<path d="M3 13 12 5l9 8M6 13h12M9 13l3-5 3 5"/>',materiales:'<rect x="4" y="5" width="16" height="4"/><rect x="4" y="11" width="16" height="4"/><rect x="4" y="17" width="16" height="3"/>',glosario:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 9h7M8 13h7"/>',valor:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c0-1.4-1.3-2.3-3-2.3s-3 .9-3 2.3c0 3 6 1.6 6 4.6 0 1.4-1.3 2.4-3 2.4s-3-1-3-2.4M12 5.5v13"/>'};
-const PANT=[['trabajos','Trabajos'],['planta','Planta'],['tabiques','Tabiques'],['techo','Techo'],['materiales','Materiales'],['valor','Valor'],['glosario','Glosario']];
+const ICON={obra:'<path d="M9 4h6v3H9z"/><path d="M7 5H5v15h14V5h-2"/><path d="M8 11h8M8 15h5"/>',trabajos:'<path d="M4 6h16M4 12h16M4 18h10"/>',planta:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h9M13 4v16"/>',tabiques:'<path d="M5 4v16M10 4v16M15 4v16M20 4v16M3 4h18M3 20h18"/>',techo:'<path d="M3 13 12 5l9 8M6 13h12M9 13l3-5 3 5"/>',materiales:'<rect x="4" y="5" width="16" height="4"/><rect x="4" y="11" width="16" height="4"/><rect x="4" y="17" width="16" height="3"/>',glosario:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 9h7M8 13h7"/>',valor:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c0-1.4-1.3-2.3-3-2.3s-3 .9-3 2.3c0 3 6 1.6 6 4.6 0 1.4-1.3 2.4-3 2.4s-3-1-3-2.4M12 5.5v13"/>'};
+const PANT=[['trabajos','Trabajos'],['planta','Planta'],['tabiques','Tabiques'],['techo','Techo'],['materiales','Materiales'],['valor','Valor'],['obra','Obra'],['glosario','Glosario']];
 $('#nav').innerHTML=PANT.map(([k,n])=>`<button data-ir="${k}" class="${k==='trabajos'?'on':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>${n}</button>`).join('');
 function ir(k){ document.querySelectorAll('section.s').forEach(s=>s.classList.toggle('on',s.id==='s-'+k)); document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.ir===k)); try{ localStorage.setItem('cub-pant',k); }catch(e){} window.scrollTo(0,0); }
 $('#nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) ir(b.dataset.ir); });
@@ -2081,7 +2137,7 @@ $('#copiar-lista').onclick=()=>{ const t=`${J().nombre}\n`+$('#tiles').dataset.l
 /* ---------- descargar e imprimir (PDF, imagen, impresora) ---------- */
 // Arma un informe con lo que se elija (planta, tabiques, techo, base y suelo, materiales, valor), lo pasa a páginas A4
 // y lo guarda como PDF o imagen. En el teléfono se comparte (WhatsApp, correo, Drive o imprimir); en la web se descarga.
-const DL_SECS=[['plano','Planta (plano)'],['tabiques','Tabiques'],['techo','Techo'],['base','Base y suelo'],['materiales','Materiales y despiece'],['valor','Valor (con precios)']];
+const DL_SECS=[['plano','Planta (plano)'],['tabiques','Tabiques'],['techo','Techo'],['base','Base y suelo'],['materiales','Materiales y despiece'],['valor','Valor (con precios)'],['obra','Registro de obra']];
 const DL_W=820, DL_PW=1240, DL_PH=1754, DL_M=60;   // ancho del informe en px CSS · hoja A4 a 150 ppp
 const nativo=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const dlNombre=t=>(J().nombre||'Obra').replace(/[\\/:*?"<>|]+/g,'').trim()+' - '+t;
@@ -2131,6 +2187,11 @@ function dlBloques(sel){ calcularYMostrar(); try{ pintarValor(); }catch(e){}
     bloque('Planchas por muro y recinto',dlCopia($('#planchas')));
     [...$('#cortes').children].forEach((e,k)=>bloque(k?'':'Despiece en perfiles',dlCopia(e))); }
   if(sel.valor){ const t=$('#tabla-valor'); if(t) bloque('Valor de los materiales',envolver('','tw',dlCopia(t)),(()=>{ const m=$('#msg-valor'); const s=document.createElement('p'); s.textContent=(m&&m.textContent)||''; return s; })()); }
+  if(sel.obra){ try{ pintarObra(); }catch(e){} const r=$('#ob-resumen'); if(r) bloque('',dlCopia(r));
+    const l=$('#ob-lista'); if(l&&l.children.length) bloque('Compras y gastos',dlCopia(l));
+    const sm=$('#oa-semana'); if(sm&&sm.innerHTML) bloque('Asistencia',dlCopia(sm));
+    const R=REG(), notas=Object.entries(R.dias).filter(([,v])=>v.nota).sort();
+    if(notas.length){ const d=document.createElement('div'); d.innerHTML=notas.map(([k,v])=>`<p><b>${fechaCorta(k)}</b> · ${esc(v.nota)}${v.por?` <span class="mini">(${esc(v.por)})</span>`:''}</p>`).join(''); bloque('Libro de obra',d); } }
   return B; }
 
 // mide los bloques en un documento aparte (con el mismo estilo) y los pasa a imagen con foreignObject
@@ -2199,7 +2260,7 @@ function dlImprimirWeb(sel){ const B=dlBloques(sel), f=document.createElement('i
 
 function dlAbrir(desde){ let dlg=$('#dl-dlg');
   if(!dlg){ dlg=document.createElement('dialog'); dlg.id='dl-dlg'; document.body.appendChild(dlg); }
-  const pre={plano:['plano'],tabiques:['tabiques'],techo:['techo'],base:['base'],materiales:['plano','tabiques','techo','base','materiales'],valor:['valor'],todo:['plano','tabiques','techo','base','materiales']}[desde]||['plano'];
+  const pre={plano:['plano'],tabiques:['tabiques'],techo:['techo'],base:['base'],materiales:['plano','tabiques','techo','base','materiales'],valor:['valor'],obra:['obra'],todo:['plano','tabiques','techo','base','materiales']}[desde]||['plano'];
   dlg.innerHTML=`<form method="dialog" class="dl-form"><h2 style="margin:0 0 4px">Descargar o imprimir</h2>
     <p class="mini" style="margin:0 0 10px">Elige qué va en el archivo. Sale en hojas tamaño A4, listo para mandar por WhatsApp o correo, o para imprimir.</p>
     <div class="dl-ops">${DL_SECS.map(([k,n])=>`<label class="chip"><input type="checkbox" value="${k}"${pre.includes(k)?' checked':''}> ${n}</label>`).join('')}</div>
@@ -2224,7 +2285,176 @@ document.addEventListener('click',async e=>{ const a=e.target.closest('[data-dl]
   }catch(err){ m.textContent='No se pudo: '+(err&&err.message||err); }
   finally{ btns.forEach(b=>b.disabled=false); } });
 
-function todo(){ pintarLista(); pintarForms(); pintarFotoCtrl(); calcularYMostrar(); }
+
+/* ---------- REGISTRO DE OBRA (10-oct, pedido de Cristian): compras y gastos, foto de la boleta, viajes, extras que el
+   cliente debe devolver, lo que adelantó otra persona, asistencia con hora de entrada y salida, y libro del día.
+   Cada anotación lleva id y hora de cambio (ts): al cargar el registro de otro teléfono se juntan sin duplicar y gana
+   la versión más nueva. Lo borrado queda marcado (del) para que no reaparezca al juntar. Las fotos van en IndexedDB
+   (localStorage es chico) y viajan dentro del archivo que se envía. */
+const OB_TIPOS=['Material','Vertedero','Flete','Herramienta o arriendo','Trabajo a trato','Otro'];
+const OB_DOCS=['Boleta','Factura','Guía de despacho','Sin documento'];
+const OB_ETAPAS=['Base y radier','Estructura','Techo','Revestimientos','Instalaciones','Terminaciones','Herramientas y arriendos','Fletes y vertedero','Otros'];
+const OB_EST=[['v','Vino',1],['m','Medio día',0.5],['n','No vino',0]];
+const OB_NO_DEVOLVER=['la empresa','el cliente','empresa','cliente',''];
+const hoyISO=()=>{ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const nid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pesos=n=>'$'+Math.round(+n||0).toLocaleString('es-CL');
+const montoDe=v=>{ const s=String(v||'').replace(/\$|\s/g,''); const n=+(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s.replace(/\./g,'')); return isNaN(n)?0:n; };
+const fechaCorta=f=>f?f.slice(8,10)+'-'+f.slice(5,7)+'-'+f.slice(0,4):'';
+let QUIEN=''; try{ QUIEN=localStorage.getItem('cub-quien')||''; }catch(e){}
+const REG=()=>{ const t=J(); const R=t.reg=t.reg||{}; R.compras=R.compras||[]; R.asis=R.asis||[]; R.dias=R.dias||{}; return R; };
+const GENTE=()=>{ D.gente=D.gente||[]; return D.gente; };
+const vivos=a=>a.filter(x=>!x.del);
+let obFecha=hoyISO(), ocFoto=null;
+const FOTOS={db:null,
+  abrir(){ return this.db||(this.db=new Promise((ok,ko)=>{ const r=indexedDB.open('cub-fotos',1); r.onupgradeneeded=()=>r.result.createObjectStore('f'); r.onsuccess=()=>ok(r.result); r.onerror=()=>ko(r.error); })); },
+  async put(k,v){ const db=await this.abrir(); return new Promise((ok,ko)=>{ const tx=db.transaction('f','readwrite'); tx.objectStore('f').put(v,k); tx.oncomplete=()=>ok(); tx.onerror=()=>ko(tx.error); }); },
+  async get(k){ const db=await this.abrir(); return new Promise((ok,ko)=>{ const r=db.transaction('f').objectStore('f').get(k); r.onsuccess=()=>ok(r.result); r.onerror=()=>ko(r.error); }); } };
+// la foto se achica a 1100 px y JPEG: una boleta queda en ~100 KB y se sigue leyendo
+const achicarFoto=f=>new Promise((ok,ko)=>{ const img=new Image(); img.onload=()=>{ const k=Math.min(1,1100/Math.max(img.width,img.height)), c=document.createElement('canvas');
+  c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(img.src); ok(c.toDataURL('image/jpeg',0.62)); };
+  img.onerror=()=>ko(new Error('no se pudo leer la imagen')); img.src=URL.createObjectURL(f); });
+const minutos=(e,x)=>{ if(!e||!x) return 0; const [h1,m1]=e.split(':').map(Number), [h2,m2]=x.split(':').map(Number); let d=(h2*60+m2)-(h1*60+m1); if(d<0) d+=1440; return d; };
+const hhmm=m=>m?Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0')+' min':''):'';
+const esTrato=p=>!!p&&p.forma==='trato';
+const devolver=c=>!OB_NO_DEVOLVER.includes(String(c.pago||'').trim().toLowerCase());
+
+function obResumen(){ const C=vivos(REG().compras), sum=a=>a.reduce((s,x)=>s+(+x.monto||0),0);
+  const empresa=C.filter(c=>String(c.pago).trim().toLowerCase()!=='el cliente'&&String(c.pago).trim().toLowerCase()!=='cliente');
+  const cliente=C.filter(c=>!empresa.includes(c));
+  const exP=C.filter(c=>c.extra&&!c.cobrado), exC=C.filter(c=>c.extra&&c.cobrado);
+  const dev=C.filter(c=>devolver(c)&&!c.devuelto), viajes=C.filter(c=>c.tipo==='Vertedero'||c.tipo==='Flete');
+  const tr=C.filter(c=>c.tipo==='Trabajo a trato'), trP=tr.filter(c=>!c.pagadoEl);
+  const porEtapa={}; empresa.forEach(c=>porEtapa[c.etapa||'Otros']=(porEtapa[c.etapa||'Otros']||0)+(+c.monto||0));
+  const porQuien={}; dev.forEach(c=>porQuien[c.pago]=(porQuien[c.pago]||0)+(+c.monto||0));
+  $('#ob-resumen').innerHTML=`<h2>Resumen de la obra</h2><div class="tiles" style="margin-top:8px">
+    <div class="tile f"><b>${pesos(sum(empresa))}</b><span>gastado por la empresa (${empresa.length} ${empresa.length===1?'anotación':'anotaciones'})</span></div>
+    <div class="tile ${exP.length?'warn':''}"><b>${pesos(sum(exP))}</b><span>extras que el cliente debe devolver (${exP.length})${exC.length?` · ya pagó ${pesos(sum(exC))}`:''}</span></div>
+    <div class="tile"><b>${pesos(sum(dev))}</b><span>por devolver a quien adelantó${Object.keys(porQuien).length?': '+Object.entries(porQuien).map(([k,v])=>esc(k)+' '+pesos(v)).join(' · '):''}</span></div>
+    <div class="tile"><b>${viajes.length} · ${pesos(sum(viajes))}</b><span>viajes de vertedero y flete</span></div>
+    ${tr.length?`<div class="tile ${trP.length?'warn':''}"><b>${pesos(sum(trP))}</b><span>trabajos a trato por pagar (${trP.length}) · acordado en total ${pesos(sum(tr))}</span></div>`:''}
+    ${cliente.length?`<div class="tile"><b>${pesos(sum(cliente))}</b><span>pagado directo por el cliente (${cliente.length})</span></div>`:''}</div>
+    ${Object.keys(porEtapa).length?`<div class="tw" style="margin-top:10px"><table><tr><th>Etapa</th><th style="text-align:right">Gastado</th></tr>${Object.entries(porEtapa).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td style="text-align:right">${pesos(v)}</td></tr>`).join('')}</table></div>`:''}`; }
+
+function obLista(){ const f=$('#ob-filtro').value, C=vivos(REG().compras).filter(c=>f==='cobrar'?c.extra&&!c.cobrado:f==='devolver'?devolver(c)&&!c.devuelto:f==='viajes'?(c.tipo==='Vertedero'||c.tipo==='Flete'):f==='cliente'?/cliente/i.test(c.pago||''):f==='trato'?c.tipo==='Trabajo a trato':f.startsWith('q:')?(c.compro||'').toLowerCase()===f.slice(2).toLowerCase():true)
+    .sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')||(b.ts-a.ts));
+  $('#ob-lista').innerHTML=C.map(c=>`<div class="ob-item${c.extra&&!c.cobrado?' ob-pend':''}">
+    <div class="row" style="justify-content:space-between;gap:6px"><b>${fechaCorta(c.fecha)} · ${esc(c.tipo||'')}</b><b>${pesos(c.monto)}</b></div>
+    <div>${esc(c.detalle||'')}</div>
+    <div class="mini">${[c.prov&&esc(c.prov),c.doc&&esc(c.doc)+(c.num?' N° '+esc(c.num):''),c.etapa&&esc(c.etapa),c.compro&&'compró '+esc(c.compro),c.pago&&'pagó '+esc(c.pago),c.por&&'anotó '+esc(c.por)].filter(Boolean).join(' · ')}</div>
+    <div class="row" style="gap:6px;margin-top:4px;align-items:center">
+      ${c.extra?(c.cobrado?`<span class="ob-tag ok">EXTRA · cobrado ${fechaCorta(c.cobrado)}</span><button class="b" data-oc-des="cobrado" data-id="${c.id}">deshacer</button>`:`<span class="ob-tag warn">EXTRA · por cobrar al cliente</span><button class="b" data-oc-marca="cobrado" data-id="${c.id}">✓ El cliente pagó</button>`):''}
+      ${devolver(c)?(c.devuelto?`<span class="ob-tag ok">devuelto a ${esc(c.pago)} ${fechaCorta(c.devuelto)}</span><button class="b" data-oc-des="devuelto" data-id="${c.id}">deshacer</button>`:`<span class="ob-tag">por devolver a ${esc(c.pago)}</span><button class="b" data-oc-marca="devuelto" data-id="${c.id}">✓ Devuelto</button>`):''}
+      ${c.tipo==='Trabajo a trato'?(c.pagadoEl?`<span class="ob-tag ok">trato pagado ${fechaCorta(c.pagadoEl)}</span><button class="b" data-oc-des="pagadoEl" data-id="${c.id}">deshacer</button>`:`<span class="ob-tag warn">trato por pagar</span><button class="b" data-oc-marca="pagadoEl" data-id="${c.id}">✓ Pagado</button>`):''}
+      ${c.foto?`<button class="b" data-oc-foto="${c.id}">📷 Ver boleta</button>`:''}
+      <button class="b del" data-oc-del="${c.id}" title="Borrar">✕</button></div></div>`).join('')||'<p class="mini">Nada anotado todavía.</p>'; }
+
+function obAsis(){ const R=REG(), G=vivos(GENTE()), f=obFecha;
+  $('#oa-fecha').value=f;
+  const reg=k=>R.asis.find(a=>a.id===f+'|'+k&&!a.del);
+  $('#oa-lista').innerHTML=G.map(p=>{ const a=reg(p.id)||{}; return `<div class="ob-item" data-asis="${p.id}">
+    <div class="row" style="justify-content:space-between"><b>${esc(p.nombre)}</b><span class="mini">${esc(p.oficio||'')}${esTrato(p)?' · a trato':p.pago?' · '+pesos(p.pago)+' por día':''}${a.entra&&a.sale?' · <b>'+hhmm(minutos(a.entra,a.sale))+'</b>':''}</span></div>
+    <div class="row" style="gap:6px;margin-top:4px">${OB_EST.map(([k,n])=>`<label class="chip" style="display:flex;gap:4px;align-items:center"><input type="radio" name="oa-${p.id}" value="${k}"${a.estado===k?' checked':''} style="margin:0">${n}</label>`).join('')}</div>
+    <div class="ob-grid" style="margin-top:6px"><label class="f">Entrada<input type="time" data-oa="entra" value="${a.entra||''}"></label><label class="f">Salida<input type="time" data-oa="sale" value="${a.sale||''}"></label>
+      ${esTrato(p)?'':`<label class="f">Pago del día ($)<input type="text" inputmode="numeric" data-oa="pagoDia" value="${a.pagoDia!=null?Math.round(a.pagoDia).toLocaleString('es-CL'):''}"></label>`}<label class="f ob-ancho">Qué hizo<input type="text" data-oa="tarea" value="${esc(a.tarea||'')}"></label></div></div>`; }).join('')
+    ||'<p class="mini">Primero agrega al personal (abajo, en «Personal»).</p>';
+  $('#oa-nota').value=(R.dias[f]&&R.dias[f].nota)||'';
+  // semana (lunes a domingo) del día elegido
+  const d=new Date(f+'T12:00:00'), lun=new Date(d); lun.setDate(d.getDate()-((d.getDay()+6)%7));
+  const dias=[...Array(7)].map((_,i)=>{ const x=new Date(lun); x.setDate(lun.getDate()+i); x.setMinutes(x.getMinutes()-x.getTimezoneOffset()); return x.toISOString().slice(0,10); });
+  const filas=G.map(p=>{ const A=dias.map(di=>R.asis.find(a=>a.id===di+'|'+p.id&&!a.del)); const n=A.reduce((s,a)=>s+(a?(OB_EST.find(e=>e[0]===a.estado)||[,,0])[2]:0),0), t=esTrato(p)?0:A.reduce((s,a)=>s+(a&&+a.pagoDia||0),0), h=A.reduce((s,a)=>s+(a?minutos(a.entra,a.sale):0),0);
+    return {p,A,n,t,h}; });
+  $('#oa-semana').innerHTML=G.length?`<h3 style="margin:0 0 6px">Semana del ${fechaCorta(dias[0])} al ${fechaCorta(dias[6])}</h3><div class="tw"><table><tr><th>Persona</th>${dias.map(di=>`<th>${['L','M','M','J','V','S','D'][dias.indexOf(di)]} ${di.slice(8)}</th>`).join('')}<th>Días</th><th>Horas</th><th style="text-align:right">A pagar</th></tr>
+    ${filas.map(r=>`<tr><td>${esc(r.p.nombre)}</td>${r.A.map(a=>`<td>${a?(a.estado==='v'?'✓':a.estado==='m'?'½':'✗'):''}</td>`).join('')}<td>${String(r.n).replace('.',',')}</td><td>${hhmm(r.h)}</td><td style="text-align:right">${esTrato(r.p)?'a trato':pesos(r.t)}</td></tr>`).join('')}
+    <tr><td><b>Total</b></td>${dias.map(()=>'<td></td>').join('')}<td></td><td></td><td style="text-align:right"><b>${pesos(filas.reduce((s,r)=>s+r.t,0))}</b></td></tr></table></div>`:'';
+  $('#oa-gente').innerHTML=G.map(p=>`<div class="row" style="justify-content:space-between;align-items:center;gap:6px"><span><b>${esc(p.nombre)}</b> <span class="mini">${esc(p.oficio||'')}</span></span><span class="row" style="gap:6px;align-items:center"><select data-og-forma="${p.id}" style="width:auto"><option value="dia"${esTrato(p)?'':' selected'}>Por día</option><option value="trato"${esTrato(p)?' selected':''}>A trato</option></select>${esTrato(p)?'':`<input type="text" inputmode="numeric" data-og-pago="${p.id}" value="${p.pago?Math.round(p.pago).toLocaleString('es-CL'):''}" placeholder="pago día" style="width:110px">`}<button class="b del" data-og-del="${p.id}">✕</button></span></div>`).join('')||'<p class="mini">Sin personal anotado.</p>'; }
+
+function filtroQuien(){ const s=$('#ob-filtro'), v=s.value, q=[...new Set(vivos(REG().compras).map(c=>c.compro).filter(Boolean))];
+  [...s.querySelectorAll('option[data-q]')].forEach(o=>o.remove()); q.forEach(n=>{ const o=document.createElement('option'); o.value='q:'+n; o.dataset.q='1'; o.textContent='Compró '+n; s.appendChild(o); }); s.value=[...s.options].some(o=>o.value===v)?v:'todo'; }
+function pintarObra(){ $('#ob-titulo').textContent=J().nombre||'Obra'; $('#ob-quien').value=QUIEN;
+  const opt=(id,arr)=>{ const s=$(id); if(!s.options.length) s.innerHTML=arr.map(x=>`<option>${esc(x)}</option>`).join(''); };
+  opt('#oc-tipo',OB_TIPOS); opt('#oc-doc',OB_DOCS); opt('#oc-etapa',OB_ETAPAS);
+  if(!$('#oc-fecha').value) $('#oc-fecha').value=hoyISO();
+  const G=vivos(GENTE()); $('#ob-personas').innerHTML=[...new Set([QUIEN,...G.map(p=>p.nombre)].filter(Boolean))].map(n=>`<option value="${esc(n)}">`).join('');
+  $('#ob-pagadores').innerHTML=['La empresa','El cliente',...new Set([QUIEN,...G.map(p=>p.nombre)].filter(Boolean))].map(n=>`<option value="${esc(n)}">`).join('');
+  filtroQuien(); obResumen(); obLista(); obAsis(); }
+
+const obMsg=t=>{ $('#ob-msg').textContent=t; };
+$('#ob-quien').onchange=e=>{ QUIEN=e.target.value.trim(); try{ localStorage.setItem('cub-quien',QUIEN); }catch(err){} pintarObra(); };
+$('#ob-filtro').onchange=obLista;
+$('#oc-foto').onchange=async e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; $('#oc-foto-ok').textContent='Leyendo la foto…';
+  try{ ocFoto=await achicarFoto(f); $('#oc-foto-ok').textContent='✓ Foto lista ('+Math.round(ocFoto.length*0.75/1024)+' KB)'; }catch(err){ ocFoto=null; $('#oc-foto-ok').textContent='No se pudo leer la foto.'; } e.target.value=''; };
+$('#oc-agregar').onclick=async()=>{ const m=$('#oc-msg'), monto=montoDe($('#oc-monto').value), detalle=$('#oc-detalle').value.trim();
+  if(!detalle||!(monto>0)){ m.textContent='Falta qué se compró o el monto.'; return; }
+  if(!QUIEN){ m.textContent='Escribe arriba quién anota en este teléfono.'; $('#ob-quien').focus(); return; }
+  const c={id:nid(),ts:Date.now(),por:QUIEN,fecha:$('#oc-fecha').value||hoyISO(),tipo:$('#oc-tipo').value,detalle,prov:$('#oc-prov').value.trim(),doc:$('#oc-doc').value,num:$('#oc-num').value.trim(),
+    etapa:$('#oc-etapa').value,monto,compro:$('#oc-compro').value.trim(),pago:$('#oc-pago').value.trim()||'La empresa',extra:$('#oc-extra').checked,foto:!!ocFoto};
+  if(c.tipo==='Vertedero'||c.tipo==='Flete') c.etapa='Fletes y vertedero';
+  try{ if(ocFoto) await FOTOS.put(c.id,ocFoto); }catch(err){ c.foto=false; m.textContent='Se guardó, pero sin la foto (el teléfono no dejó guardarla).'; }
+  REG().compras.push(c); guardar(); ocFoto=null; $('#oc-foto-ok').textContent='';
+  ['#oc-detalle','#oc-prov','#oc-num','#oc-monto'].forEach(s=>$(s).value=''); $('#oc-extra').checked=false; $('#oc-pago').value='La empresa';
+  if(!m.textContent.startsWith('Se guardó, pero')) m.textContent='✓ Guardado: '+detalle+' · '+pesos(monto); pintarObra(); };
+$('#ob-lista').addEventListener('click',async e=>{ const b=e.target.closest('button'); if(!b) return; const C=REG().compras;
+  if(b.dataset.ocDel){ const c=C.find(x=>x.id===b.dataset.ocDel); if(c&&confirm('¿Borrar «'+c.detalle+'»?')){ c.del=true; c.ts=Date.now(); guardar(); pintarObra(); } return; }
+  if(b.dataset.ocMarca){ const c=C.find(x=>x.id===b.dataset.id); if(c){ c[b.dataset.ocMarca]=hoyISO(); c.ts=Date.now(); guardar(); pintarObra(); } return; }
+  if(b.dataset.ocDes){ const c=C.find(x=>x.id===b.dataset.id); if(c){ c[b.dataset.ocDes]=''; c.ts=Date.now(); guardar(); pintarObra(); } return; }
+  if(b.dataset.ocFoto){ let src=null; try{ src=await FOTOS.get(b.dataset.ocFoto); }catch(err){}
+    if(!src){ obMsg('Esa foto no está en este teléfono.'); return; }
+    let dlg=$('#ob-ver'); if(!dlg){ dlg=document.createElement('dialog'); dlg.id='ob-ver'; dlg.style.cssText='border:0;border-radius:12px;padding:8px;max-width:96vw;background:var(--panel)'; document.body.appendChild(dlg); }
+    dlg.innerHTML=`<form method="dialog"><img src="${src}" style="max-width:92vw;max-height:80vh;display:block"><div class="row" style="justify-content:flex-end;margin-top:6px"><button class="b">Cerrar</button></div></form>`; dlg.showModal(); } });
+
+// asistencia: un registro por persona y día (id = fecha|persona), así dos teléfonos no lo duplican
+const asisDe=pid=>{ const R=REG(), id=obFecha+'|'+pid; let a=R.asis.find(x=>x.id===id); if(!a){ a={id,fecha:obFecha,persona:pid}; R.asis.push(a); } a.del=false; a.ts=Date.now(); a.por=QUIEN; const p=GENTE().find(x=>x.id===pid); if(p) a.nombre=p.nombre; return a; };
+$('#oa-lista').addEventListener('change',e=>{ const w=e.target.closest('[data-asis]'); if(!w) return; const pid=w.dataset.asis, a=asisDe(pid), p=GENTE().find(x=>x.id===pid)||{};
+  if(e.target.type==='radio'){ a.estado=e.target.value; const fac=(OB_EST.find(x=>x[0]===a.estado)||[,,0])[2]; a.pagoDia=esTrato(p)?0:Math.round((+p.pago||0)*fac);
+    if(a.estado==='n'){ a.entra=''; a.sale=''; } }
+  else if(e.target.dataset.oa==='pagoDia') a.pagoDia=montoDe(e.target.value);
+  else if(e.target.dataset.oa) a[e.target.dataset.oa]=e.target.value;
+  if(!a.estado&&(a.entra||a.sale)){ a.estado='v'; if(a.pagoDia==null) a.pagoDia=esTrato(p)?0:+p.pago||0; }
+  guardar(); obAsis(); });
+$('#oa-fecha').onchange=e=>{ obFecha=e.target.value||hoyISO(); obAsis(); };
+const moverDia=k=>{ const d=new Date(obFecha+'T12:00:00'); d.setDate(d.getDate()+k); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); obFecha=d.toISOString().slice(0,10); obAsis(); };
+$('#oa-ant').onclick=()=>moverDia(-1); $('#oa-sig').onclick=()=>moverDia(1);
+$('#oa-nota').onchange=e=>{ REG().dias[obFecha]={nota:e.target.value,ts:Date.now(),por:QUIEN}; guardar(); };
+$('#og-agregar').onclick=()=>{ const n=$('#og-nombre').value.trim(); if(!n) return; GENTE().push({id:nid(),ts:Date.now(),nombre:n,oficio:$('#og-oficio').value.trim(),forma:$('#og-forma').value,pago:montoDe($('#og-pago').value)});
+  ['#og-nombre','#og-oficio','#og-pago'].forEach(s=>$(s).value=''); guardar(); pintarObra(); };
+$('#oa-gente').addEventListener('change',e=>{ const fo=e.target.dataset.ogForma; if(fo){ const p=GENTE().find(x=>x.id===fo); if(p){ p.forma=e.target.value; p.ts=Date.now(); guardar(); obAsis(); pintarObra(); } return; }
+  const id=e.target.dataset.ogPago; if(!id) return; const p=GENTE().find(x=>x.id===id); if(p){ p.pago=montoDe(e.target.value); p.ts=Date.now(); guardar(); obAsis(); } });
+$('#oa-gente').addEventListener('click',e=>{ const id=e.target.dataset&&e.target.dataset.ogDel; if(!id) return; const p=GENTE().find(x=>x.id===id); if(p&&confirm('¿Quitar a '+p.nombre+' de la lista? (lo ya anotado se mantiene)')){ p.del=true; p.ts=Date.now(); guardar(); pintarObra(); } });
+
+// enviar y cargar el registro: un archivo con la obra completa, el personal y las fotos de las boletas
+const nombreArch=s=>s.replace(/[\\/:*?"<>|]+/g,'-');
+$('#ob-enviar').onclick=async()=>{ const t=J(), R=REG(); obMsg('Armando el archivo…');
+  try{ const fotos={}; for(const c of R.compras) if(c.foto&&!c.del){ try{ const v=await FOTOS.get(c.id); if(v) fotos[c.id]=v; }catch(err){} }
+    const data={tipo:'cubicador-registro',v:1,enviado:new Date().toISOString(),por:QUIEN,trabajo:t,gente:GENTE(),fotos};
+    obMsg(await dlEntregar([{nombre:nombreArch(`Registro ${t.nombre} ${hoyISO()}.json`),blob:new Blob([JSON.stringify(data)],{type:'application/json'})}],true)); }
+  catch(err){ obMsg('No se pudo: '+(err&&err.message||err)); } };
+const juntar=(dest,src)=>{ let n=0; const m=new Map(dest.map(x=>[x.id,x])); (src||[]).forEach(x=>{ const a=m.get(x.id); if(!a){ dest.push(x); m.set(x.id,x); n++; } else if((x.ts||0)>(a.ts||0)){ Object.assign(a,x); n++; } }); return n; };
+$('#ob-cargar').onchange=async e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
+  try{ const d=JSON.parse(await f.text()); if(d.tipo!=='cubicador-registro'||!d.trabajo||!d.trabajo.planta) throw new Error('no es un registro del Cubicador');
+    let t=D.trabajos.find(x=>x.id===d.trabajo.id), n=0, nueva=false;
+    if(!t){ t=JSON.parse(JSON.stringify(d.trabajo)); D.trabajos.unshift(t); nueva=true; }
+    else { t.reg=t.reg||{}; const R=t.reg, S=d.trabajo.reg||{}; R.compras=R.compras||[]; R.asis=R.asis||[]; R.dias=R.dias||{};
+      n+=juntar(R.compras,S.compras)+juntar(R.asis,S.asis);
+      Object.entries(S.dias||{}).forEach(([k,v])=>{ if(!R.dias[k]||(v.ts||0)>(R.dias[k].ts||0)){ R.dias[k]=v; n++; } }); }
+    n+=juntar(GENTE(),d.gente);
+    for(const [k,v] of Object.entries(d.fotos||{})){ try{ await FOTOS.put(k,v); }catch(err){} }
+    D.abierto=t.id; guardar(); todo(); ir('obra');
+    obMsg(nueva?`✓ Obra nueva cargada: ${t.nombre}.`:`✓ Registro de ${d.por||'otro teléfono'} juntado: ${n} ${n===1?'cambio':'cambios'}.`); }
+  catch(err){ obMsg('No se pudo cargar: '+(err&&err.message||err)); } };
+// Excel: dos archivos CSV (separados por punto y coma, como los abre Excel en Chile)
+const csv=filas=>'﻿'+filas.map(f=>f.map(v=>{ const s=String(v==null?'':v); return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }).join(';')).join('\r\n');
+$('#ob-excel').onclick=async()=>{ const t=J(), R=REG(), G=GENTE();
+  const comp=[['Fecha','Tipo','Detalle','Proveedor','Documento','N°','Etapa','Compró','Pagó','Monto','Extra (cobrar al cliente)','Cobrado el','Devuelto el','Trato pagado el','Anotó']]
+    .concat(vivos(R.compras).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')).map(c=>[fechaCorta(c.fecha),c.tipo,c.detalle,c.prov,c.doc,c.num,c.etapa,c.compro,c.pago,Math.round(+c.monto||0),c.extra?'Sí':'',fechaCorta(c.cobrado),devolver(c)?fechaCorta(c.devuelto)||'pendiente':'',c.tipo==='Trabajo a trato'?fechaCorta(c.pagadoEl)||'pendiente':'',c.por]));
+  const asis=[['Fecha','Persona','Estado','Entrada','Salida','Horas','Pago del día','Qué hizo','Anotó']]
+    .concat(vivos(R.asis).sort((a,b)=>a.id.localeCompare(b.id)).map(a=>[fechaCorta(a.fecha),(G.find(p=>p.id===a.persona)||{}).nombre||a.nombre||'',(OB_EST.find(e=>e[0]===a.estado)||[,''])[1],a.entra,a.sale,hhmm(minutos(a.entra,a.sale)),Math.round(+a.pagoDia||0),a.tarea,a.por]));
+  const libro=[['Fecha','Tareas y novedades','Anotó']].concat(Object.entries(R.dias).sort().filter(([,v])=>v.nota).map(([k,v])=>[fechaCorta(k),v.nota,v.por]));
+  const base=nombreArch(`${t.nombre} ${hoyISO()}`);
+  try{ obMsg(await dlEntregar([{nombre:`Compras - ${base}.csv`,blob:new Blob([csv(comp)],{type:'text/csv'})},{nombre:`Asistencia - ${base}.csv`,blob:new Blob([csv(asis)],{type:'text/csv'})},{nombre:`Libro de obra - ${base}.csv`,blob:new Blob([csv(libro)],{type:'text/csv'})}],true)); }
+  catch(err){ obMsg('No se pudo: '+(err&&err.message||err)); } };
+
+function todo(){ pintarLista(); pintarForms(); pintarFotoCtrl(); calcularYMostrar(); pintarObra(); }
 todo();
 try{ const k=localStorage.getItem('cub-pant'); if(k) ir(k); }catch(e){}
 })();
