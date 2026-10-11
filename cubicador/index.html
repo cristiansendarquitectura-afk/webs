@@ -628,7 +628,7 @@ function frame(w,perim,p,forcedU){
   const det=[];
   vanos.forEach(v=>{
     const door=v.t==='puerta';
-    const head=door?(v.h||p.doorH):p.winHead;
+    const head=door?(v.h||p.doorH):(v.cab||p.winHead);
     const n=[]; for(let q=v.x+p.puntal;q<v.x+v.w-5;q+=p.puntal) n.push(q);
     const nP=Math.max(1,n.length);
     // dintel: hasta 1,20 un perfil; sobre 1,20 dintel compuesto en cajón (2 C enfrentados + 2 U) y jambas dobles con
@@ -659,7 +659,7 @@ function frame(w,perim,p,forcedU){
     // el internit exterior va HORIZONTAL (al revés de la OSB, que va vertical): así cruza las juntas y no quedan aperturas
     if(w.intExt){ let n=0; const hw=p.volH, hh=p.vol;
       for(let y=0;y<p.H-0.5;y+=hh) for(let x=0;x<L-0.5;x+=hw){ const x1=Math.min(x+hw,L), y1=Math.min(y+hh,p.H);
-        const tapado=vanos.some(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):p.winHead, sill=door?0:head-v.h; return x>=v.x-0.5&&x1<=v.x+v.w+0.5&&y>=sill-0.5&&y1<=head+0.5; });
+        const tapado=vanos.some(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h; return x>=v.x-0.5&&x1<=v.x+v.w+0.5&&y>=sill-0.5&&y1<=head+0.5; });
         if(!tapado) n++; }
       pl.intExt=n; pl.caras.push({lab:'Internit exterior horizontal',r0:0,r1:L,n,mat:'intext'}); } }
   caras.forEach(c=>{ const n=cols(c.r0,c.r1,c.m.w)*Math.ceil(p.H/c.m.h); pl.int[c.mat]=(pl.int[c.mat]||0)+n; pl.caras.push({lab:c.lab,r0:c.r0,r1:c.r1,n,mat:c.mat,key:c.key}); });
@@ -1114,7 +1114,7 @@ function extras(state,res){
   // 1) AISLACIÓN: todo el perímetro (contrato), muro por dentro descontando los vanos
   // ojo: el rollo se vende por ancho × largo (m²), no por metros lineales. Un rollo de 2,40 de ancho cubre el alto
   // del muro y su largo son los metros lineales de muro que alcanza.
-  let m2=0, ml=0; res.walls.forEach(r=>{ const largo=r.a1-r.a0; ml+=largo; let a=largo*p.H; r.vanos.forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):p.winHead; a-=v.w*(door?head:v.h); }); m2+=a; });
+  let m2=0, ml=0; res.walls.forEach(r=>{ const largo=r.a1-r.a0; ml+=largo; let a=largo*p.H; r.vanos.forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead); a-=v.w*(door?head:v.h); }); m2+=a; });
   m2/=10000; ml/=100; const m2Rollo=(p.lanaAncho||240)*(p.lanaLargo||1500)/10000;
   out.aislacion={m2, ml, m2Rollo, ancho:(p.lanaAncho||240)/100, largo:(p.lanaLargo||1500)/100, rollos:Math.ceil(m2/m2Rollo-0.001)};
   // 2) JOTAS Y BOTAGUAS: por cada vano exterior. Jota: arriba y a los costados; botagua: bajo la ventana, 5 cm más por lado
@@ -1223,7 +1223,7 @@ function sugerencias(state){
      ancho, fondo,                        // contorno exterior (rectángulo que la envuelve)
      recorte: {esquina, ancho, fondo},    // CASA EN L: se le saca este rectángulo en una esquina ('NE','SE','SW','NW')
      tabiques: [{nombre, perfil, x1, y1, x2, y2}],   // EJE de cada tabique interior (horizontal o vertical)
-     vanos: [{muro, desde, ancho, alto, tipo}],      // muro = 'A'..'D' o nombre del tabique; «desde» en el muro
+     vanos: [{muro, desde, ancho, alto, tipo, cab}],   // cab = altura del dintel de una ventana (si no, la general)      // muro = 'A'..'D' o nombre del tabique; «desde» en el muro
      recintos: [{nombre, tipo, x, y}],               // un punto dentro de cada habitación
      zonas: [{tipo, x0, y0, x1, y1}],                // zona húmeda dentro de un recinto mayor (ej. cocina)
      intExt: ['C','D'],                              // muros con internit exterior
@@ -1324,7 +1324,7 @@ function plantaAEstado(pl, p) {
     const k = muros.findIndex(m => m.letra === v.muro);
     const dest = k >= 0 ? muros[k] : ints.find(m => m.name === v.muro);
     if (!dest) { avisos.push(`El vano «${v.tipo} ${v.ancho}» apunta a un muro que no existe (${v.muro}).`); return; }
-    dest.vanos.push({t: v.tipo, x: v.desde + (k >= 0 ? off(k) : 0), w: v.ancho, h: v.alto || (v.tipo === 'puerta' ? p.doorH : 100)});
+    dest.vanos.push(Object.assign({t: v.tipo, x: v.desde + (k >= 0 ? off(k) : 0), w: v.ancho, h: v.alto || (v.tipo === 'puerta' ? p.doorH : 100)}, v.tipo === 'ventana' && v.cab > 0 ? {cab: v.cab} : {}));
   });
 
   // ---- recintos: celdas libres entre caras de muros, unidas por contacto ----
@@ -1421,7 +1421,7 @@ function svgWall(r,fl,p){
   let g='';
   g+=`<rect x="${r.s0}" y="0" width="${r.e0-r.s0}" height="${H}" fill="var(--tab)"/>`;
   r.vanos.forEach(v=>{
-    const door=v.t==='puerta', head=door?(v.h||p.doorH):p.winHead, sill=door?0:head-v.h;
+    const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h;
     g+=`<rect x="${v.x}" y="${Y(head)}" width="${v.w}" height="${head-sill}" fill="var(--vano)" stroke="var(--steel)" stroke-width="1.2"/>`;
     g+=`<line x1="${v.x}" x2="${v.x+v.w}" y1="${Y(head)}" y2="${Y(head)}" stroke="var(--steel)" stroke-width="4"/>`;
     if(!door) g+=`<line x1="${v.x}" x2="${v.x+v.w}" y1="${Y(sill)}" y2="${Y(sill)}" stroke="var(--steel)" stroke-width="4"/>`;
@@ -1474,7 +1474,7 @@ function cotasHTML(r){
     if(i===r.segs.length-1&&!r.pil.some(([,x1])=>Math.abs(x1-b)<0.05)&&r.perim) lleva.push(`Termina sin pilar: llega al pilar del muro vecino`);
     r.vanos.filter(v=>v.x>=a-0.05&&v.x+v.w<=b+0.05).forEach(v=>{
       if(v.t==='puerta') lleva.push(`<b>Puerta</b> ${fm(v.w)} × ${fm(v.h||p.doorH)}: vano de ${z(v.x)} a ${z(v.x+v.w)}`);
-      else { const sill=p.winHead-v.h; lleva.push(`<b>Ventana</b> ${fm(v.w)} × ${fm(v.h)}: vano de ${z(v.x)} a ${z(v.x+v.w)}, alféizar a ${fm(sill)} del piso y dintel a ${fm(p.winHead)}`); }
+      else { const cab=v.cab||p.winHead, sill=cab-v.h; lleva.push(`<b>Ventana</b> ${fm(v.w)} × ${fm(v.h)}: vano de ${z(v.x)} a ${z(v.x+v.w)}, alféizar a ${fm(sill)} del piso y dintel a ${fm(cab)}`); }
     });
     r.ts.filter(t=>t.x>=a-0.05&&t.x+t.w<=b+0.05).forEach(t=>lleva.push(`<b>Llega un tabique interior</b> (${Math.round(t.w)} cm) entre ${z(t.x)} y ${z(t.x+t.w)}: un pie derecho a cada costado`));
     if(i>0) lleva.push(`Parte uniéndose con ${r.codes?r.codes[i-1]:'el tabique anterior'}, espalda con espalda`);
@@ -1534,7 +1534,7 @@ function agrupar(xs){ const m=new Map(); xs.forEach(x=>m.set(fm(x),(m.get(fm(x))
 
 /* ---------- trabajos guardados ---------- */
 const KT='cubicador-trabajos-v1';
-const SYL={"id":"sylvana","nombre":"Casa de ejemplo 9 × 6,70","fecha":"2026-10-02","planta":{"ancho":900,"fondo":670,"forroBase":"terciado","intExt":["C","D"],"tabiques":[{"nombre":"Tabique central","perfil":90,"o":"h","eje":315,"desde":0,"hasta":900,"fijo":true},{"nombre":"T1 dormitorio 1 / baños","perfil":60,"o":"v","eje":385,"desde":0,"hasta":315},{"nombre":"T2 baños / dormitorio 2","perfil":60,"o":"v","eje":577,"desde":0,"hasta":315},{"nombre":"T3 entre baños","perfil":60,"o":"h","eje":175,"desde":385,"hasta":577},{"nombre":"T4 muro corto cocina","perfil":60,"o":"v","eje":287,"desde":561,"hasta":670}],"vanos":[{"muro":"A","tipo":"ventana","desde":269.9,"ancho":60,"alto":140},{"muro":"A","tipo":"ventana","desde":502.9,"ancho":60,"alto":60},{"muro":"B","tipo":"ventana","desde":100,"ancho":120,"alto":100},{"muro":"B","tipo":"ventana","desde":410.3,"ancho":160,"alto":140,"fijo":true},{"muro":"C","tipo":"puerta","desde":122,"ancho":160,"alto":210,"fijo":true},{"muro":"C","tipo":"ventana","desde":427.9,"ancho":60,"alto":140},{"muro":"C","tipo":"puerta","desde":522.8,"ancho":85,"alto":205},{"muro":"C","tipo":"ventana","desde":732.8,"ancho":120,"alto":100},{"muro":"D","tipo":"puerta","desde":245.4,"ancho":75,"alto":205},{"muro":"D","tipo":"ventana","desde":450.3,"ancho":120,"alto":100},{"muro":"T0","tipo":"puerta","desde":283.9,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":482,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":593.3,"ancho":75,"alto":205},{"muro":"T1","tipo":"puerta","desde":11.7,"ancho":75,"alto":205}],"recintos":[{"nombre":"Dormitorio 1","tipo":"dormitorio","x":200,"y":150},{"nombre":"Baño 1","tipo":"baño","x":480,"y":90},{"nombre":"Baño 2","tipo":"baño","x":480,"y":250},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":740,"y":150},{"nombre":"Living - comedor - cocina","tipo":"living","x":600,"y":500}],"zonas":[{"tipo":"cocina","x0":0,"y0":319.5,"x1":295,"y1":670}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":90}},"p":{}};
+const SYL={"id":"sylvana","nombre":"Casa de ejemplo 9 × 6,70","fecha":"2026-10-02","planta":{"ancho":900,"fondo":670,"forroBase":"terciado","intExt":["C","D"],"tabiques":[{"nombre":"Tabique central","perfil":90,"o":"h","eje":315,"desde":0,"hasta":900,"fijo":true},{"nombre":"T1 dormitorio 1 / baños","perfil":60,"o":"v","eje":385,"desde":0,"hasta":315},{"nombre":"T2 baños / dormitorio 2","perfil":60,"o":"v","eje":577,"desde":0,"hasta":315},{"nombre":"T3 entre baños","perfil":60,"o":"h","eje":175,"desde":385,"hasta":577},{"nombre":"T4 muro corto cocina","perfil":60,"o":"v","eje":287,"desde":561,"hasta":670}],"vanos":[{"muro":"A","tipo":"ventana","desde":269.9,"ancho":60,"alto":140},{"muro":"A","tipo":"ventana","desde":502.9,"ancho":60,"alto":60},{"muro":"B","tipo":"ventana","desde":100,"ancho":120,"alto":100},{"muro":"B","tipo":"ventana","desde":410.3,"ancho":160,"alto":140,"fijo":true},{"muro":"C","tipo":"puerta","desde":122,"ancho":160,"alto":210,"fijo":true},{"muro":"C","tipo":"ventana","desde":427.9,"ancho":60,"alto":140},{"muro":"C","tipo":"puerta","desde":522.8,"ancho":85,"alto":205},{"muro":"C","tipo":"ventana","desde":722.8,"ancho":140,"alto":60,"cab":180},{"muro":"D","tipo":"puerta","desde":245.4,"ancho":75,"alto":205},{"muro":"D","tipo":"ventana","desde":450.3,"ancho":120,"alto":100},{"muro":"T0","tipo":"puerta","desde":283.9,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":482,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":593.3,"ancho":75,"alto":205},{"muro":"T1","tipo":"puerta","desde":11.7,"ancho":75,"alto":205}],"recintos":[{"nombre":"Dormitorio 1","tipo":"dormitorio","x":200,"y":150},{"nombre":"Baño 1","tipo":"baño","x":480,"y":90},{"nombre":"Baño 2","tipo":"baño","x":480,"y":250},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":740,"y":150},{"nombre":"Living - comedor - cocina","tipo":"living","x":600,"y":500}],"zonas":[{"tipo":"cocina","x0":0,"y0":319.5,"x1":295,"y1":670}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":90}},"p":{}};
 function casaVacia(nombre,ancho,fondo){ return {id:Date.now().toString(36),nombre,fecha:new Date().toISOString().slice(0,10),
   planta:{ancho,fondo,forroBase:'terciado',intExt:[],tabiques:[],vanos:[],recintos:[{nombre:'Casa',tipo:'living',x:ancho/2,y:fondo/2}],zonas:[],
   techo:{on:false,alto:120,sep:100,alero:30,aleroAtras:0,aleroLat:30,cost:55,trasl:40,panos:5,webs:90,cumb:12}},p:{}}; }
@@ -1545,6 +1545,9 @@ const guardar=()=>{ try{ localStorage.setItem(KT,JSON.stringify(D)); }catch(e){}
 // plano, y la base de casa de ejemplo fija en «lado corto» (los 33 pollos que definió Cristian)
 D.trabajos.forEach(t=>{ if(t.id!=='sylvana'||t.fix0410) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='D'&&v.tipo==='puerta'&&v.ancho===85) v.ancho=75; });
   t.planta.base=Object.assign({dirPiso:'corto',entramado:'metalcon',perfilPiso:90},t.planta.base||{}); t.fix0410=true; guardar(); });
+// 10-oct (Cristian): la ventana del lavaplatos (muro C, frente) es horizontal 1,40 × 0,60, alféizar a 1,20 y dintel a 1,80
+D.trabajos.forEach(t=>{ if(t.id!=='sylvana'||t.fix1010) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='C'&&v.tipo==='ventana'&&v.ancho===120&&v.alto===100){ v.desde-=10; v.ancho=140; v.alto=60; v.cab=180; } });
+  t.fix1010=true; guardar(); });
 const J=()=>D.trabajos.find(t=>t.id===D.abierto)||D.trabajos[0];
 const PJ=()=>Object.assign({},P,{pegado:true,forroDef:(J().planta.forroBase||'terciado')},J().p||{});
 
@@ -1613,7 +1616,7 @@ function pintarForms(){ pintarPasos();
     <div class="row">${'ABCD'.split('').map(k=>`<label class="chip${(pl.intExt||[]).includes(k)?' on':''}" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-int="${k}"${(pl.intExt||[]).includes(k)?' checked':''} style="margin:0">internit exterior ${k}</label>`).join('')}</div>`;
   $('#f-tabiques').innerHTML=pl.tabiques.map((t,i)=>`<div class="item">${TXT(`planta.tabiques.${i}.nombre`,t.nombre,'Nombre')}${SEL(`planta.tabiques.${i}.perfil`,t.perfil,'Perfil',[[90,'C 90'],[60,'C 60'],[40,'C 40']])}${SEL(`planta.tabiques.${i}.o`,t.o,'Dirección',[['h','horizontal (←→)'],['v','vertical (↑↓)']])}${F(`planta.tabiques.${i}.eje`,t.eje,t.o==='h'?'Eje a (m) del fondo':'Eje a (m) de la izquierda')}${F(`planta.tabiques.${i}.desde`,t.desde,'Desde (m)')}${F(`planta.tabiques.${i}.hasta`,t.hasta,'Hasta (m)')}<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fijo="${i}"${t.fijo?' checked':''} style="margin:0">no mover</label><button class="x" data-del="planta.tabiques.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin tabiques interiores.</p>';
   const muros=[...(pl.recorte&&pl.recorte.esquina?[['E','E · entrante'],['F','F · entrante']]:[]),['A','A · fondo'],['B','B · derecha'],['C','C · frente'],['D','D · izquierda'],...pl.tabiques.map((t,i)=>['T'+i,t.nombre])];
-  $('#f-vanos').innerHTML=pl.vanos.map((v,i)=>`<div class="item">${SEL(`planta.vanos.${i}.muro`,v.muro,'Muro',muros)}${SEL(`planta.vanos.${i}.tipo`,v.tipo,'Tipo',[['ventana','Ventana'],['puerta','Puerta']])}${F(`planta.vanos.${i}.desde`,v.desde,'Desde (m)')}${F(`planta.vanos.${i}.ancho`,v.ancho,'Ancho')}${F(`planta.vanos.${i}.alto`,v.alto,'Alto')}<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fijov="${i}"${v.fijo?' checked':''} style="margin:0">no mover</label><button class="x" data-del="planta.vanos.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin vanos.</p>';
+  $('#f-vanos').innerHTML=pl.vanos.map((v,i)=>`<div class="item">${SEL(`planta.vanos.${i}.muro`,v.muro,'Muro',muros)}${SEL(`planta.vanos.${i}.tipo`,v.tipo,'Tipo',[['ventana','Ventana'],['puerta','Puerta']])}${F(`planta.vanos.${i}.desde`,v.desde,'Desde (m)')}${F(`planta.vanos.${i}.ancho`,v.ancho,'Ancho')}${F(`planta.vanos.${i}.alto`,v.alto,'Alto')}${v.tipo==='ventana'?F(`planta.vanos.${i}.cab`,v.cab||PJ().winHead,'Dintel a (desde el piso)'):''}<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fijov="${i}"${v.fijo?' checked':''} style="margin:0">no mover</label><button class="x" data-del="planta.vanos.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin vanos.</p>';
   $('#f-recintos').innerHTML=pl.recintos.map((r,i)=>`<div class="item">${TXT(`planta.recintos.${i}.nombre`,r.nombre,'Nombre')}${SEL(`planta.recintos.${i}.tipo`,r.tipo,'Tipo',[['dormitorio','Dormitorio'],['baño','Baño'],['cocina','Cocina'],['living','Living / comedor'],['otro','Otro']])}${F(`planta.recintos.${i}.x`,r.x,'x (m)')}${F(`planta.recintos.${i}.y`,r.y,'y (m)')}<button class="x" data-del="planta.recintos.${i}" title="Quitar">✕</button></div>`).join('');
   $('#f-zonas').innerHTML=(pl.zonas||[]).map((z,i)=>`<div class="item">${SEL(`planta.zonas.${i}.tipo`,z.tipo,'Tipo',[['cocina','Cocina'],['baño','Baño']])}${F(`planta.zonas.${i}.x0`,z.x0,'x desde')}${F(`planta.zonas.${i}.x1`,z.x1,'x hasta')}${F(`planta.zonas.${i}.y0`,z.y0,'y desde')}${F(`planta.zonas.${i}.y1`,z.y1,'y hasta')}<button class="x" data-del="planta.zonas.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin zonas.</p>';
   const T=pl.techo; const tipoTecho=T.on===false?'no':(T.caidas||'');
