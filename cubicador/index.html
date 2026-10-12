@@ -217,10 +217,12 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
 
     <div class="card"><h2>Asistencia y parte del día</h2>
       <div class="row" style="align-items:flex-end"><label class="f" style="max-width:200px">Día<input type="date" id="oa-fecha"></label><button class="b" id="oa-ant">◀ Día anterior</button><button class="b" id="oa-sig">Día siguiente ▶</button></div>
+      <div class="row" style="margin-top:8px"><button class="b pri" id="oa-parte">📤 Enviar parte del día (imagen)</button><button class="b" id="oa-parte-pdf">📄 Parte en PDF</button></div>
+      <p class="mini" style="margin:4px 0 0">El parte junta <b>todas las obras</b> de ese día: quién vino, quién no, entrada, salida, horas y qué hizo.</p>
       <div id="oa-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>
       <label class="f" style="margin-top:10px">Tareas y novedades del día (libro de obra)<textarea id="oa-nota" rows="3" placeholder="Qué se hizo, qué faltó, visitas, clima, problemas…"></textarea></label>
       <div id="oa-semana" style="margin-top:12px"></div>
-      <details style="margin-top:10px"><summary><b>Personal</b> <span class="mini">· nombres, oficio y forma de pago</span></summary><div class="body">
+      <details id="oa-personal" style="margin-top:10px"><summary><b>Personal</b> <span class="mini">· nombres, oficio y forma de pago</span></summary><div class="body">
         <div id="oa-gente" style="display:flex;flex-direction:column;gap:6px"></div>
         <div class="ob-grid" style="margin-top:8px"><label class="f">Nombre<input type="text" id="og-nombre"></label><label class="f">Oficio<input type="text" id="og-oficio" placeholder="Ej.: maestro de 1.ª"></label><label class="f">Forma de pago<select id="og-forma"><option value="dia">Por día</option><option value="trato">A trato (precio por trabajo terminado)</option></select></label><label class="f">Pago por día ($)<input type="text" id="og-pago" inputmode="numeric" placeholder="si es por día"></label></div>
         <div class="row" style="margin-top:6px"><button class="b" id="og-agregar">+ Agregar persona</button></div>
@@ -1588,6 +1590,9 @@ function techoHTML(T,p){
 function agrupar(xs){ const m=new Map(); xs.forEach(x=>m.set(fm(x),(m.get(fm(x))||0)+1)); return [...m].map(([k,n])=>n>1?`${k} × ${n}`:k).join(' · '); }
 
 
+/* ---------- modo de la app ---------- */
+const MODO_OBRA=/*MODO_OBRA*/false;   // true en la app «Registro de Obra» (armar_app.js)
+
 /* ---------- trabajos guardados ---------- */
 const KT='cubicador-trabajos-v1';
 const SYL={"id":"sylvana","nombre":"Casa de ejemplo 9 × 6,70","fecha":"2026-10-02","planta":{"ancho":900,"fondo":670,"forroBase":"terciado","intExt":["C","D"],"tabiques":[{"nombre":"Tabique central","perfil":90,"o":"h","eje":315,"desde":0,"hasta":900,"fijo":true},{"nombre":"T1 dormitorio 1 / baños","perfil":60,"o":"v","eje":385,"desde":0,"hasta":315},{"nombre":"T2 baños / dormitorio 2","perfil":60,"o":"v","eje":577,"desde":0,"hasta":315},{"nombre":"T3 entre baños","perfil":60,"o":"h","eje":175,"desde":385,"hasta":577},{"nombre":"T4 muro corto cocina","perfil":60,"o":"v","eje":287,"desde":561,"hasta":670}],"vanos":[{"muro":"A","tipo":"ventana","desde":269.9,"ancho":60,"alto":140},{"muro":"A","tipo":"ventana","desde":502.9,"ancho":60,"alto":60},{"muro":"B","tipo":"ventana","desde":100,"ancho":120,"alto":100},{"muro":"B","tipo":"ventana","desde":410.3,"ancho":160,"alto":140,"fijo":true},{"muro":"C","tipo":"puerta","desde":122,"ancho":160,"alto":210,"fijo":true},{"muro":"C","tipo":"ventana","desde":427.9,"ancho":60,"alto":140},{"muro":"C","tipo":"puerta","desde":522.8,"ancho":85,"alto":205},{"muro":"C","tipo":"ventana","desde":722.8,"ancho":140,"alto":60,"cab":180},{"muro":"D","tipo":"puerta","desde":245.4,"ancho":75,"alto":205},{"muro":"D","tipo":"ventana","desde":450.3,"ancho":120,"alto":100},{"muro":"T0","tipo":"puerta","desde":283.9,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":482,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":593.3,"ancho":75,"alto":205},{"muro":"T1","tipo":"puerta","desde":11.7,"ancho":75,"alto":205}],"recintos":[{"nombre":"Dormitorio 1","tipo":"dormitorio","x":200,"y":150},{"nombre":"Baño 1","tipo":"baño","x":480,"y":90},{"nombre":"Baño 2","tipo":"baño","x":480,"y":250},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":740,"y":150},{"nombre":"Living - comedor - cocina","tipo":"living","x":600,"y":500}],"zonas":[{"tipo":"cocina","x0":0,"y0":319.5,"x1":295,"y1":670}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":90}},"p":{}};
@@ -1609,7 +1614,7 @@ const PJ=()=>Object.assign({},P,{pegado:true,forroDef:(J().planta.forroBase||'te
 
 /* ---------- navegación ---------- */
 const ICON={obra:'<path d="M9 4h6v3H9z"/><path d="M7 5H5v15h14V5h-2"/><path d="M8 11h8M8 15h5"/>',trabajos:'<path d="M4 6h16M4 12h16M4 18h10"/>',planta:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h9M13 4v16"/>',tabiques:'<path d="M5 4v16M10 4v16M15 4v16M20 4v16M3 4h18M3 20h18"/>',techo:'<path d="M3 13 12 5l9 8M6 13h12M9 13l3-5 3 5"/>',materiales:'<rect x="4" y="5" width="16" height="4"/><rect x="4" y="11" width="16" height="4"/><rect x="4" y="17" width="16" height="3"/>',glosario:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 9h7M8 13h7"/>',valor:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c0-1.4-1.3-2.3-3-2.3s-3 .9-3 2.3c0 3 6 1.6 6 4.6 0 1.4-1.3 2.4-3 2.4s-3-1-3-2.4M12 5.5v13"/>'};
-const PANT=[['trabajos','Trabajos'],['planta','Planta'],['tabiques','Tabiques'],['techo','Techo'],['materiales','Materiales'],['valor','Valor'],['obra','Obra'],['glosario','Glosario']];
+const PANT=MODO_OBRA?[['trabajos','Obras'],['obra','Registro']]:[['trabajos','Trabajos'],['planta','Planta'],['tabiques','Tabiques'],['techo','Techo'],['materiales','Materiales'],['valor','Valor'],['obra','Obra'],['glosario','Glosario']];
 $('#nav').innerHTML=PANT.map(([k,n])=>`<button data-ir="${k}" class="${k==='trabajos'?'on':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>${n}</button>`).join('');
 function ir(k){ document.querySelectorAll('section.s').forEach(s=>s.classList.toggle('on',s.id==='s-'+k)); document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.ir===k)); try{ localStorage.setItem('cub-pant',k); }catch(e){} window.scrollTo(0,0); }
 $('#nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) ir(b.dataset.ir); });
@@ -1622,7 +1627,7 @@ document.addEventListener('click',e=>{ if(!e.target.closest('[data-ir-base]')) r
 function pintarLista(){
   $('#lista').innerHTML=D.trabajos.map(t=>`<div class="job${t.id===D.abierto?' on':''}" data-job="${t.id}"><div class="ic">${fm(t.planta.ancho).split(',')[0]}×${fm(t.planta.fondo).split(',')[0]}</div><div><b>${esc(t.nombre)}</b><span class="mini">${fm(t.planta.ancho)} × ${fm(t.planta.fondo)} m · ${t.planta.tabiques.length} tabiques interiores · ${t.fecha}</span></div></div>`).join('');
 }
-$('#lista').addEventListener('click',e=>{ const d=e.target.closest('[data-job]'); if(!d) return; D.abierto=d.dataset.job; guardar(); todo(); ir('planta'); });
+$('#lista').addEventListener('click',e=>{ const d=e.target.closest('[data-job]'); if(!d) return; D.abierto=d.dataset.job; guardar(); todo(); ir(MODO_OBRA?'obra':'planta'); });
 let pideNuevo=false;
 $('#nuevo').onclick=()=>{ const m=$('#msg-trab'); m.innerHTML=`Nombre <input type="text" id="nv-n" value="Obra nueva" style="width:180px"> Ancho (m) <input type="text" class="n" id="nv-a" value="9"> Fondo (m) <input type="text" class="n" id="nv-f" value="6,7"> <button class="b pri" id="nv-ok">Crear</button>`;
   $('#nv-ok').onclick=()=>{ const a=m2cm($('#nv-a').value), f=m2cm($('#nv-f').value); if(!(a>0&&f>0)) return; const t=casaVacia($('#nv-n').value||'Obra nueva',a,f); D.trabajos.unshift(t); D.abierto=t.id; guardar(); m.textContent=''; todo(); ir('planta'); }; };
@@ -1663,7 +1668,7 @@ $('#pasos').addEventListener('click',e=>{ const b=e.target.closest('[data-paso]'
   const det=$('#'+id).closest('details'); if(det) det.open=true; $('#'+id).scrollIntoView({behavior:'smooth',block:'start'}); });
 function pintarForms(){ pintarPasos();
   const pl=J().planta;
-  $('#titulo').innerHTML=`${esc(J().nombre)}<small>${fm(pl.ancho)} × ${fm(pl.fondo)} m</small>`;
+  $('#titulo').innerHTML=MODO_OBRA?esc(J().nombre):`${esc(J().nombre)}<small>${fm(pl.ancho)} × ${fm(pl.fondo)} m</small>`;
   const RC=pl.recorte||{};
   $('#f-contorno').innerHTML=`<div class="row">${TXT('nombre',J().nombre,'Nombre de la obra')}${F('planta.ancho',pl.ancho,RC.esquina?'Ancho total (m)':'Ancho (m)')}${F('planta.fondo',pl.fondo,RC.esquina?'Fondo total (m)':'Fondo (m)')}`+
     `${SEL('planta.recorte.esquina',RC.esquina||'','Forma',[['','Rectángulo'],['SE','En L · falta la esquina de abajo a la derecha'],['SW','En L · falta la esquina de abajo a la izquierda'],['NE','En L · falta la esquina de arriba a la derecha'],['NW','En L · falta la esquina de arriba a la izquierda']])}`+
@@ -2164,7 +2169,8 @@ function dlCopia(el){ if(!el) return null; const c=el.cloneNode(true);
   return c; }
 
 // los bloques del informe, en orden; cada bloque es un trozo que no se corta si cabe en una hoja
-function dlBloques(sel){ calcularYMostrar(); try{ pintarValor(); }catch(e){}
+function dlBloques(sel){ if(sel.parte) return parteBloques(obFecha);
+  calcularYMostrar(); try{ pintarValor(); }catch(e){}
   const B=[], pl=J().planta;
   const bloque=(titulo,...els)=>{ const d=document.createElement('div'); d.className='dl-b';
     if(titulo){ const h=document.createElement('h2'); h.className='dl-h'; h.textContent=titulo; d.appendChild(h); }
@@ -2172,7 +2178,7 @@ function dlBloques(sel){ calcularYMostrar(); try{ pintarValor(); }catch(e){}
   const envolver=(id,cls,el)=>{ const w=document.createElement('div'); if(id) w.id=id; if(cls) w.className=cls; w.appendChild(el); return w; };
   const hoy=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
   const p=document.createElement('div'); p.className='dl-portada';
-  p.innerHTML=`<div><b>${esc(J().nombre||'Obra')}</b><span>${fm(pl.ancho)} × ${fm(pl.fondo)} m · Cubicador Metalcon</span></div><span>${hoy}</span>`;
+  p.innerHTML=`<div><b>${esc(J().nombre||'Obra')}</b><span>${MODO_OBRA?'Registro de Obra':fm(pl.ancho)+' × '+fm(pl.fondo)+' m · Cubicador Metalcon'}</span></div><span>${hoy}</span>`;
   bloque('',p);
   if(sel.plano){ const s=$('#svg-plano'); if(s) bloque('Planta',envolver('','plano',dlCopia(s))); }
   // cada tabique a la misma escala que en pantalla (260 px de alto): los cortos no se agrandan
@@ -2217,7 +2223,7 @@ async function dlPaginas(sel,msg){ const B=dlBloques(sel); const {f,out}=await d
       else { let o=0; while(o<hh){ if(y>=alto-20) nueva(); const t=Math.min(hh-o,alto-y); pag.getContext('2d').drawImage(c,0,o,c.width,t,DL_M,DL_M+y,c.width,t); o+=t; y+=t; } } }
   } finally { f.remove(); }
   pags.forEach((c,k)=>{ const x=c.getContext('2d'); x.fillStyle='#5b6a72'; x.font='20px Arial'; x.textAlign='left';
-    x.fillText((J().nombre||'')+' · Cubicador Metalcon',DL_M,DL_PH-DL_M/2); x.textAlign='right'; x.fillText(`Hoja ${k+1} de ${pags.length}`,DL_PW-DL_M,DL_PH-DL_M/2);
+    x.fillText((sel&&sel.parte?'Parte del día':(J().nombre||''))+' · '+(MODO_OBRA?'Registro de Obra':'Cubicador Metalcon'),DL_M,DL_PH-DL_M/2); x.textAlign='right'; x.fillText(`Hoja ${k+1} de ${pags.length}`,DL_PW-DL_M,DL_PH-DL_M/2);
     x.strokeStyle='#d3dadb'; x.lineWidth=2; x.beginPath(); x.moveTo(DL_M,DL_PH-DL_M/2-26); x.lineTo(DL_PW-DL_M,DL_PH-DL_M/2-26); x.stroke(); });
   return pags; }
 
@@ -2371,7 +2377,7 @@ function obAsis(){ const R=REG(), G=vivos(GENTE()), f=obFecha;
 
 function filtroQuien(){ const s=$('#ob-filtro'), v=s.value, q=[...new Set(vivos(REG().compras).map(c=>c.compro).filter(Boolean))];
   [...s.querySelectorAll('option[data-q]')].forEach(o=>o.remove()); q.forEach(n=>{ const o=document.createElement('option'); o.value='q:'+n; o.dataset.q='1'; o.textContent='Compró '+n; s.appendChild(o); }); s.value=[...s.options].some(o=>o.value===v)?v:'todo'; }
-function pintarObra(){ $('#ob-titulo').textContent=J().nombre||'Obra'; $('#ob-quien').value=QUIEN;
+function pintarObra(){ $('#ob-titulo').textContent=J().nombre||'Obra'; if(!vivos(GENTE()).length) $('#oa-personal').open=true; $('#ob-quien').value=QUIEN;
   const opt=(id,arr)=>{ const s=$(id); if(!s.options.length) s.innerHTML=arr.map(x=>`<option>${esc(x)}</option>`).join(''); };
   opt('#oc-tipo',OB_TIPOS); opt('#oc-doc',OB_DOCS); opt('#oc-etapa',OB_ETAPAS);
   if(!$('#oc-fecha').value) $('#oc-fecha').value=hoyISO();
@@ -2429,6 +2435,28 @@ $('#ob-enviar').onclick=async()=>{ const t=J(), R=REG(); obMsg('Armando el archi
     const data={tipo:'cubicador-registro',v:1,enviado:new Date().toISOString(),por:QUIEN,trabajo:t,gente:GENTE(),fotos};
     obMsg(await dlEntregar([{nombre:nombreArch(`Registro ${t.nombre} ${hoyISO()}.json`),blob:new Blob([JSON.stringify(data)],{type:'application/json'})}],true)); }
   catch(err){ obMsg('No se pudo: '+(err&&err.message||err)); } };
+function parteBloques(f){
+  const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const dia=DIAS[new Date(f+'T12:00:00').getDay()];
+  const B=[], G=GENTE(), nom=a=>(G.find(p=>p.id===a.persona)||{}).nombre||a.nombre||'';
+  const caja=html=>{ const d=document.createElement('div'); d.className='dl-b'; d.innerHTML=html; B.push(d); };
+  caja(`<div class="dl-portada"><div><b>Parte del día</b><span>${dia} ${fechaCorta(f)}${QUIEN?' · anotó '+esc(QUIEN):''}</span></div><span>Registro de Obra</span></div>`);
+  let vinieron=0, noVinieron=0, minTot=0, hay=false;
+  D.trabajos.forEach(t=>{ const R=t.reg||{}; const A=(R.asis||[]).filter(a=>!a.del&&a.fecha===f&&a.estado); const nota=R.dias&&R.dias[f]&&R.dias[f].nota;
+    if(!A.length&&!nota) return; hay=true;
+    const filas=A.sort((a,b)=>nom(a).localeCompare(nom(b))).map(a=>{ const m=minutos(a.entra,a.sale); minTot+=m; if(a.estado==='n') noVinieron++; else vinieron++;
+      const est=a.estado==='v'?'✅ Vino':a.estado==='m'?'🌓 Medio día':'❌ No vino';
+      return `<tr><td><b>${esc(nom(a))}</b></td><td>${est}</td><td>${a.entra||''}</td><td>${a.sale||''}</td><td>${hhmm(m)}</td><td>${esc(a.tarea||'')}</td></tr>`; }).join('');
+    caja(`<h2 class="dl-h">${esc(t.nombre||'Obra')}</h2>${filas?`<table><tr><th>Persona</th><th>Asistencia</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Qué hizo</th></tr>${filas}</table>`:''}${nota?`<p><b>Novedades:</b> ${esc(nota)}</p>`:''}`); });
+  caja(hay?`<p><b>Total del día:</b> ${vinieron} ${vinieron===1?'persona vino':'personas vinieron'} · ${noVinieron} no ${noVinieron===1?'vino':'vinieron'} · ${hhmm(minTot)||'0 h'} trabajadas.</p>`:`<p>No hay asistencia anotada para este día.</p>`);
+  return B; }
+async function enviarParte(que){ const m=$('#ob-msg'); m.textContent='Armando el parte…';
+  try{ const pags=await dlPaginas({parte:true},t=>m.textContent=t); const base=`Parte del día ${fechaCorta(obFecha)}`;
+    const arch=que==='pdf'?[{nombre:base+'.pdf',blob:dlPdf(pags)}]:await Promise.all(pags.map(async(c,k)=>({nombre:base+(pags.length>1?` - hoja ${k+1}`:'')+'.png',blob:await dlBlob(c,'image/png')})));
+    m.textContent=await dlEntregar(arch,true); }
+  catch(err){ m.textContent='No se pudo: '+(err&&err.message||err); } }
+$('#oa-parte').onclick=()=>enviarParte('png');
+$('#oa-parte-pdf').onclick=()=>enviarParte('pdf');
 const juntar=(dest,src)=>{ let n=0; const m=new Map(dest.map(x=>[x.id,x])); (src||[]).forEach(x=>{ const a=m.get(x.id); if(!a){ dest.push(x); m.set(x.id,x); n++; } else if((x.ts||0)>(a.ts||0)){ Object.assign(a,x); n++; } }); return n; };
 $('#ob-cargar').onchange=async e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
   try{ const d=JSON.parse(await f.text()); if(d.tipo!=='cubicador-registro'||!d.trabajo||!d.trabajo.planta) throw new Error('no es un registro del Cubicador');
@@ -2454,9 +2482,24 @@ $('#ob-excel').onclick=async()=>{ const t=J(), R=REG(), G=GENTE();
   try{ obMsg(await dlEntregar([{nombre:`Compras - ${base}.csv`,blob:new Blob([csv(comp)],{type:'text/csv'})},{nombre:`Asistencia - ${base}.csv`,blob:new Blob([csv(asis)],{type:'text/csv'})},{nombre:`Libro de obra - ${base}.csv`,blob:new Blob([csv(libro)],{type:'text/csv'})}],true)); }
   catch(err){ obMsg('No se pudo: '+(err&&err.message||err)); } };
 
+if(MODO_OBRA){
+  document.title='Registro de Obra';
+  $('#titulo').firstChild.nodeValue='Registro de Obra';
+  const lg=document.querySelector('.top .logo'); if(lg) lg.textContent='RO';
+  const st=document.createElement('style');
+  st.textContent='#subtitulo,.job .ic,.job .mini{display:none!important} nav.navb{grid-template-columns:repeat(2,1fr)!important} @media (min-width:900px){nav.navb{grid-template-columns:repeat(2,auto)!important}}';
+  document.head.appendChild(st);
+  const h=$('#s-trabajos h2'); if(h) h.textContent='Mis obras';
+  ['#nuevo-foto','#duplicar','#s-trabajos [data-ir2="materiales"]'].forEach(s=>{ const e=$(s); if(e) e.style.display='none'; });
+  document.querySelectorAll('#s-trabajos details').forEach(d=>{ const c=d.closest('.card'); if(c) c.style.display='none'; });
+  $('#nuevo').textContent='+ Obra nueva';
+  // obra nueva: solo el nombre (la planta queda de ejemplo; la cubicación se hace en el Cubicador)
+  $('#nuevo').onclick=()=>{ const m=$('#msg-trab'); m.innerHTML=`Nombre de la obra <input type="text" id="nv-n" placeholder="Ej.: Casa casa de ejemplo" style="width:220px"> <button class="b pri" id="nv-ok">Crear</button>`;
+    $('#nv-ok').onclick=()=>{ const n=$('#nv-n').value.trim(); if(!n) return; const t=casaVacia(n,900,670); t.soloRegistro=true; D.trabajos.unshift(t); D.abierto=t.id; guardar(); m.textContent=''; todo(); ir('obra'); }; };
+}
 function todo(){ pintarLista(); pintarForms(); pintarFotoCtrl(); calcularYMostrar(); pintarObra(); }
 todo();
-try{ const k=localStorage.getItem('cub-pant'); if(k) ir(k); }catch(e){}
+try{ const k=localStorage.getItem('cub-pant'); if(k&&PANT.some(x=>x[0]===k)) ir(k); else if(MODO_OBRA) ir('obra'); }catch(e){}
 })();
 </script>
 
