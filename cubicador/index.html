@@ -105,6 +105,8 @@ dialog#dl-dlg::backdrop{background:rgba(10,15,20,.55)} .dl-ops{display:flex;flex
 .dl-ops input{margin:0;width:18px;height:18px} button.b:disabled{opacity:.5;cursor:wait}
 .ob-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px} .ob-grid .ob-ancho{grid-column:1/-1}
 .ob-item{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel2)} .ob-item.ob-pend{border-left:4px solid var(--warn)}
+.oa-dia{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:5px 0;font-size:12px;line-height:1.25;cursor:pointer;color:var(--ink);text-align:center} .oa-dia.on{background:var(--accent);border-color:var(--accent);color:#fff} .oa-dia small{display:block;font-size:11px;opacity:.75}
+.oa-pag{border:0;background:none;padding:0 2px;font-size:15px;cursor:pointer;line-height:1} .oa-cel{text-align:center;white-space:nowrap}
 .ob-tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--steel-soft);color:var(--steel)} .ob-tag.warn{background:var(--warn-soft);color:var(--warn)} .ob-tag.ok{background:var(--ok-soft);color:var(--ok)}
 .tile.warn{border-left-color:var(--warn)}
 input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%}
@@ -215,13 +217,19 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
       <select id="ob-filtro" style="width:auto"><option value="todo">Todo</option><option value="cobrar">Extras por cobrar</option><option value="devolver">Por devolver a quien adelantó</option><option value="viajes">Viajes (vertedero y flete)</option><option value="cliente">Pagado por el cliente</option><option value="trato">Trabajos a trato</option></select></div>
       <div id="ob-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div></div>
 
-    <div class="card"><h2>Asistencia y parte del día</h2>
-      <div class="row" style="align-items:flex-end"><label class="f" style="max-width:200px">Día<input type="date" id="oa-fecha"></label><button class="b" id="oa-ant">◀ Día anterior</button><button class="b" id="oa-sig">Día siguiente ▶</button></div>
-      <div class="row" style="margin-top:8px"><button class="b pri" id="oa-parte">📤 Enviar parte del día (imagen)</button><button class="b" id="oa-parte-pdf">📄 Parte en PDF</button></div>
+    <div class="card"><h2>Asistencia de la semana</h2>
+      <div class="row" style="align-items:center;justify-content:space-between;gap:6px"><button class="b" id="oa-sem-ant">◀ Semana</button><b id="oa-sem-tit" style="text-align:center"></b><button class="b" id="oa-sem-sig">Semana ▶</button></div>
+      <div id="oa-dias" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px"></div>
+      <div id="oa-atrasado"></div>
+      <div class="row" style="align-items:flex-end;margin-top:6px"><label class="f" style="max-width:200px">Ir a otra fecha<input type="date" id="oa-fecha"></label></div>
+      <h3 id="oa-dia-tit" style="margin:12px 0 0"></h3>
+      <div class="row" style="margin-top:8px"><button class="b pri" id="oa-parte">📤 Parte del día (imagen)</button><button class="b" id="oa-parte-pdf">📄 Parte del día en PDF</button></div>
       <p class="mini" style="margin:4px 0 0">El parte junta <b>todas las obras</b> de ese día: quién vino, quién no, entrada, salida, horas y qué hizo.</p>
       <div id="oa-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div>
       <label class="f" style="margin-top:10px">Tareas y novedades del día (libro de obra)<textarea id="oa-nota" rows="3" placeholder="Qué se hizo, qué faltó, visitas, clima, problemas…"></textarea></label>
       <div id="oa-semana" style="margin-top:12px"></div>
+      <div class="row" style="margin-top:8px"><button class="b pri" id="oa-sem-parte">📅 Enviar semana (imagen)</button><button class="b" id="oa-sem-pdf">📄 Semana en PDF</button></div>
+      <p class="mini" style="margin:4px 0 0">La semana va de lunes a domingo, con todas las obras: días, horas, lo pagado y lo que falta pagar.</p>
       <details id="oa-personal" style="margin-top:10px"><summary><b>Personal</b> <span class="mini">· nombres, oficio y forma de pago</span></summary><div class="body">
         <div id="oa-gente" style="display:flex;flex-direction:column;gap:6px"></div>
         <div class="ob-grid" style="margin-top:8px"><label class="f">Nombre<input type="text" id="og-nombre"></label><label class="f">Oficio<input type="text" id="og-oficio" placeholder="Ej.: maestro de 1.ª"></label><label class="f">Forma de pago<select id="og-forma"><option value="dia">Por día</option><option value="trato">A trato (precio por trabajo terminado)</option></select></label><label class="f">Pago por día ($)<input type="text" id="og-pago" inputmode="numeric" placeholder="si es por día"></label></div>
@@ -2169,7 +2177,7 @@ function dlCopia(el){ if(!el) return null; const c=el.cloneNode(true);
   return c; }
 
 // los bloques del informe, en orden; cada bloque es un trozo que no se corta si cabe en una hoja
-function dlBloques(sel){ if(sel.parte) return parteBloques(obFecha);
+function dlBloques(sel){ if(sel.semana) return semanaBloques(obFecha); if(sel.parte) return parteBloques(obFecha);
   calcularYMostrar(); try{ pintarValor(); }catch(e){}
   const B=[], pl=J().planta;
   const bloque=(titulo,...els)=>{ const d=document.createElement('div'); d.className='dl-b';
@@ -2223,7 +2231,7 @@ async function dlPaginas(sel,msg){ const B=dlBloques(sel); const {f,out}=await d
       else { let o=0; while(o<hh){ if(y>=alto-20) nueva(); const t=Math.min(hh-o,alto-y); pag.getContext('2d').drawImage(c,0,o,c.width,t,DL_M,DL_M+y,c.width,t); o+=t; y+=t; } } }
   } finally { f.remove(); }
   pags.forEach((c,k)=>{ const x=c.getContext('2d'); x.fillStyle='#5b6a72'; x.font='20px Arial'; x.textAlign='left';
-    x.fillText((sel&&sel.parte?'Parte del día':(J().nombre||''))+' · '+(MODO_OBRA?'Registro de Obra':'Cubicador Metalcon'),DL_M,DL_PH-DL_M/2); x.textAlign='right'; x.fillText(`Hoja ${k+1} de ${pags.length}`,DL_PW-DL_M,DL_PH-DL_M/2);
+    x.fillText((sel&&sel.semana?'Parte de la semana':sel&&sel.parte?'Parte del día':(J().nombre||''))+' · '+(MODO_OBRA?'Registro de Obra':'Cubicador Metalcon'),DL_M,DL_PH-DL_M/2); x.textAlign='right'; x.fillText(`Hoja ${k+1} de ${pags.length}`,DL_PW-DL_M,DL_PH-DL_M/2);
     x.strokeStyle='#d3dadb'; x.lineWidth=2; x.beginPath(); x.moveTo(DL_M,DL_PH-DL_M/2-26); x.lineTo(DL_PW-DL_M,DL_PH-DL_M/2-26); x.stroke(); });
   return pags; }
 
@@ -2312,6 +2320,12 @@ const REG=()=>{ const t=J(); const R=t.reg=t.reg||{}; R.compras=R.compras||[]; R
 const GENTE=()=>{ D.gente=D.gente||[]; return D.gente; };
 const vivos=a=>a.filter(x=>!x.del);
 let obFecha=hoyISO(), ocFoto=null;
+const isoDe=x=>{ const y=new Date(x); y.setMinutes(y.getMinutes()-y.getTimezoneOffset()); return y.toISOString().slice(0,10); };
+function semanaDe(f){ const d=new Date(f+'T12:00:00'), lun=new Date(d); lun.setDate(d.getDate()-((d.getDay()+6)%7));
+  return [...Array(7)].map((_,i)=>{ const x=new Date(lun); x.setDate(lun.getDate()+i); return isoDe(x); }); }
+const DIA_L=['L','M','M','J','V','S','D'], DIA_N=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+// se le paga ese día: vino o medio día, no es a trato y tiene monto
+const cobraDia=(a,p)=>a&&!a.del&&(a.estado==='v'||a.estado==='m')&&!esTrato(p||{})&&(+a.pagoDia||0)>0;
 const FOTOS={db:null,
   abrir(){ return this.db||(this.db=new Promise((ok,ko)=>{ const r=indexedDB.open('cub-fotos',1); r.onupgradeneeded=()=>r.result.createObjectStore('f'); r.onsuccess=()=>ok(r.result); r.onerror=()=>ko(r.error); })); },
   async put(k,v){ const db=await this.abrir(); return new Promise((ok,ko)=>{ const tx=db.transaction('f','readwrite'); tx.objectStore('f').put(v,k); tx.oncomplete=()=>ok(); tx.onerror=()=>ko(tx.error); }); },
@@ -2362,17 +2376,28 @@ function obAsis(){ const R=REG(), G=vivos(GENTE()), f=obFecha;
     <div class="row" style="justify-content:space-between"><b>${esc(p.nombre)}</b><span class="mini">${esc(p.oficio||'')}${esTrato(p)?' · a trato':p.pago?' · '+pesos(p.pago)+' por día':''}${a.entra&&a.sale?' · <b>'+hhmm(minutos(a.entra,a.sale))+'</b>':''}</span></div>
     <div class="row" style="gap:6px;margin-top:4px">${OB_EST.map(([k,n])=>`<label class="chip" style="display:flex;gap:4px;align-items:center"><input type="radio" name="oa-${p.id}" value="${k}"${a.estado===k?' checked':''} style="margin:0">${n}</label>`).join('')}</div>
     <div class="ob-grid" style="margin-top:6px"><label class="f">Entrada<input type="time" data-oa="entra" value="${a.entra||''}"></label><label class="f">Salida<input type="time" data-oa="sale" value="${a.sale||''}"></label>
-      ${esTrato(p)?'':`<label class="f">Pago del día ($)<input type="text" inputmode="numeric" data-oa="pagoDia" value="${a.pagoDia!=null?Math.round(a.pagoDia).toLocaleString('es-CL'):''}"></label>`}<label class="f ob-ancho">Qué hizo<input type="text" data-oa="tarea" value="${esc(a.tarea||'')}"></label></div></div>`; }).join('')
+      ${esTrato(p)?'':`<label class="f">Pago del día ($)<input type="text" inputmode="numeric" data-oa="pagoDia" value="${a.pagoDia!=null?Math.round(a.pagoDia).toLocaleString('es-CL'):''}"></label>`}<label class="f ob-ancho">Qué hizo<input type="text" data-oa="tarea" value="${esc(a.tarea||'')}"></label></div>
+    ${cobraDia(a,p)?`<label class="row" style="gap:6px;align-items:center;margin-top:6px;font-weight:700;color:${a.pagado?'var(--ok)':'var(--warn)'}"><input type="checkbox" data-oa-pagado${a.pagado?' checked':''} style="margin:0;width:20px;height:20px"> ${a.pagado?'💲 Pagado el '+fechaCorta(a.pagado):'⏳ No pagado todavía'}</label>`:''}</div>`; }).join('')
     ||'<p class="mini">Primero agrega al personal (abajo, en «Personal»).</p>';
   $('#oa-nota').value=(R.dias[f]&&R.dias[f].nota)||'';
-  // semana (lunes a domingo) del día elegido
-  const d=new Date(f+'T12:00:00'), lun=new Date(d); lun.setDate(d.getDate()-((d.getDay()+6)%7));
-  const dias=[...Array(7)].map((_,i)=>{ const x=new Date(lun); x.setDate(lun.getDate()+i); x.setMinutes(x.getMinutes()-x.getTimezoneOffset()); return x.toISOString().slice(0,10); });
-  const filas=G.map(p=>{ const A=dias.map(di=>R.asis.find(a=>a.id===di+'|'+p.id&&!a.del)); const n=A.reduce((s,a)=>s+(a?(OB_EST.find(e=>e[0]===a.estado)||[,,0])[2]:0),0), t=esTrato(p)?0:A.reduce((s,a)=>s+(a&&+a.pagoDia||0),0), h=A.reduce((s,a)=>s+(a?minutos(a.entra,a.sale):0),0);
-    return {p,A,n,t,h}; });
-  $('#oa-semana').innerHTML=G.length?`<h3 style="margin:0 0 6px">Semana del ${fechaCorta(dias[0])} al ${fechaCorta(dias[6])}</h3><div class="tw"><table><tr><th>Persona</th>${dias.map(di=>`<th>${['L','M','M','J','V','S','D'][dias.indexOf(di)]} ${di.slice(8)}</th>`).join('')}<th>Días</th><th>Horas</th><th style="text-align:right">A pagar</th></tr>
-    ${filas.map(r=>`<tr><td>${esc(r.p.nombre)}</td>${r.A.map(a=>`<td>${a?(a.estado==='v'?'✓':a.estado==='m'?'½':'✗'):''}</td>`).join('')}<td>${String(r.n).replace('.',',')}</td><td>${hhmm(r.h)}</td><td style="text-align:right">${esTrato(r.p)?'a trato':pesos(r.t)}</td></tr>`).join('')}
-    <tr><td><b>Total</b></td>${dias.map(()=>'<td></td>').join('')}<td></td><td></td><td style="text-align:right"><b>${pesos(filas.reduce((s,r)=>s+r.t,0))}</b></td></tr></table></div>`:'';
+  // la semana (lunes a domingo) del día elegido: solo esa semana, no se acumula
+  const dias=semanaDe(f), hoy=hoyISO();
+  $('#oa-sem-tit').textContent=`Semana del ${fechaCorta(dias[0])} al ${fechaCorta(dias[6])}`;
+  $('#oa-dia-tit').textContent=`${DIA_N[dias.indexOf(f)]} ${fechaCorta(f)}`;
+  $('#oa-dias').innerHTML=dias.map((di,i)=>{ const n=R.asis.filter(a=>!a.del&&a.fecha===di&&(a.estado==='v'||a.estado==='m')).length;
+    return `<button class="oa-dia${di===f?' on':''}" data-dia="${di}"><b>${DIA_L[i]}</b><small>${+di.slice(8)}${di===hoy?' · hoy':''}</small><small>${n?n+' 👷':'·'}</small></button>`; }).join('');
+  // lo que quedó sin pagar de semanas anteriores (para que no se pierda al cambiar de semana)
+  const atr=R.asis.filter(a=>a.fecha<dias[0]&&cobraDia(a,G.find(p=>p.id===a.persona))&&!a.pagado).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  $('#oa-atrasado').innerHTML=atr.length?`<p class="ob-tag warn" style="display:block;margin:8px 0 0;padding:8px 10px;border-radius:10px">⚠️ De semanas anteriores quedan ${pesos(atr.reduce((s,a)=>s+(+a.pagoDia||0),0))} sin pagar (${atr.length} ${atr.length===1?'día':'días'}). <button class="b" data-ir-dia="${atr[0].fecha}" style="margin-left:6px">Ver semana del ${fechaCorta(semanaDe(atr[0].fecha)[0])}</button></p>`:'';
+  const filas=G.map(p=>{ const A=dias.map(di=>R.asis.find(a=>a.id===di+'|'+p.id&&!a.del)); const n=A.reduce((s,a)=>s+(a?(OB_EST.find(e=>e[0]===a.estado)||[,,0])[2]:0),0), h=A.reduce((s,a)=>s+(a?minutos(a.entra,a.sale):0),0);
+    const pag=A.reduce((s,a)=>s+(cobraDia(a,p)&&a.pagado?+a.pagoDia:0),0), falta=A.reduce((s,a)=>s+(cobraDia(a,p)&&!a.pagado?+a.pagoDia:0),0);
+    return {p,A,n,h,pag,falta}; }).filter(r=>r.A.some(Boolean)||vivos([r.p]).length);
+  const celda=(a,p)=>!a?'':(a.estado==='v'?'✓':a.estado==='m'?'½':'✗')+(cobraDia(a,p)?`<br><button class="oa-pag" data-pag="${a.id}" title="${a.pagado?'Pagado el '+fechaCorta(a.pagado)+' (toca para desmarcar)':'No pagado (toca para marcar pagado)'}">${a.pagado?'💲':'⏳'}</button>`:'');
+  $('#oa-semana').innerHTML=G.length?`<h3 style="margin:0 0 6px">Resumen de la semana</h3><div class="tw"><table><tr><th>Persona</th>${dias.map((di,i)=>`<th class="oa-cel">${DIA_L[i]} ${di.slice(8)}</th>`).join('')}<th>Días</th><th>Horas</th><th style="text-align:right">Pagado</th><th style="text-align:right">Falta pagar</th></tr>
+    ${filas.map(r=>`<tr><td>${esc(r.p.nombre)}</td>${r.A.map(a=>`<td class="oa-cel">${celda(a,r.p)}</td>`).join('')}<td>${String(r.n).replace('.',',')}</td><td>${hhmm(r.h)}</td>${esTrato(r.p)?'<td colspan="2" style="text-align:right">a trato</td>':`<td style="text-align:right">${r.pag?pesos(r.pag):''}</td><td style="text-align:right">${r.falta?'<b>'+pesos(r.falta)+'</b>':''}</td>`}</tr>`).join('')}
+    <tr><td><b>Total</b></td>${dias.map(()=>'<td></td>').join('')}<td></td><td></td><td style="text-align:right"><b>${pesos(filas.reduce((s,r)=>s+r.pag,0))}</b></td><td style="text-align:right"><b>${pesos(filas.reduce((s,r)=>s+r.falta,0))}</b></td></tr></table></div>
+    ${filas.some(r=>r.falta)?`<div style="margin-top:8px"><b>Falta pagar esta semana:</b>${filas.filter(r=>r.falta).map(r=>`<div class="row" style="justify-content:space-between"><span>${esc(r.p.nombre)}</span><b>${pesos(r.falta)}</b></div>`).join('')}</div>`:(filas.some(r=>r.pag)?'<p style="margin:8px 0 0;color:var(--ok);font-weight:700">✓ Todo lo de esta semana está pagado.</p>':'')}
+    <p class="mini" style="margin:4px 0 0">✓ vino · ½ medio día · ✗ no vino · 💲 pagado · ⏳ no pagado (toca 💲/⏳ para cambiarlo).</p>`:'';
   $('#oa-gente').innerHTML=G.map(p=>`<div class="row" style="justify-content:space-between;align-items:center;gap:6px"><span><b>${esc(p.nombre)}</b> <span class="mini">${esc(p.oficio||'')}</span></span><span class="row" style="gap:6px;align-items:center"><select data-og-forma="${p.id}" style="width:auto"><option value="dia"${esTrato(p)?'':' selected'}>Por día</option><option value="trato"${esTrato(p)?' selected':''}>A trato</option></select>${esTrato(p)?'':`<input type="text" inputmode="numeric" data-og-pago="${p.id}" value="${p.pago?Math.round(p.pago).toLocaleString('es-CL'):''}" placeholder="pago día" style="width:110px">`}<button class="b del" data-og-del="${p.id}">✕</button></span></div>`).join('')||'<p class="mini">Sin personal anotado.</p>'; }
 
 function filtroQuien(){ const s=$('#ob-filtro'), v=s.value, q=[...new Set(vivos(REG().compras).map(c=>c.compro).filter(Boolean))];
@@ -2415,12 +2440,17 @@ $('#oa-lista').addEventListener('change',e=>{ const w=e.target.closest('[data-as
   if(e.target.type==='radio'){ a.estado=e.target.value; const fac=(OB_EST.find(x=>x[0]===a.estado)||[,,0])[2]; a.pagoDia=esTrato(p)?0:Math.round((+p.pago||0)*fac);
     if(a.estado==='n'){ a.entra=''; a.sale=''; } }
   else if(e.target.dataset.oa==='pagoDia') a.pagoDia=montoDe(e.target.value);
+  else if('oaPagado' in e.target.dataset) a.pagado=e.target.checked?hoyISO():'';
   else if(e.target.dataset.oa) a[e.target.dataset.oa]=e.target.value;
   if(!a.estado&&(a.entra||a.sale)){ a.estado='v'; if(a.pagoDia==null) a.pagoDia=esTrato(p)?0:+p.pago||0; }
   guardar(); obAsis(); });
 $('#oa-fecha').onchange=e=>{ obFecha=e.target.value||hoyISO(); obAsis(); };
-const moverDia=k=>{ const d=new Date(obFecha+'T12:00:00'); d.setDate(d.getDate()+k); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); obFecha=d.toISOString().slice(0,10); obAsis(); };
-$('#oa-ant').onclick=()=>moverDia(-1); $('#oa-sig').onclick=()=>moverDia(1);
+const moverDia=k=>{ const d=new Date(obFecha+'T12:00:00'); d.setDate(d.getDate()+k); obFecha=isoDe(d); obAsis(); };
+$('#oa-sem-ant').onclick=()=>moverDia(-7); $('#oa-sem-sig').onclick=()=>moverDia(7);
+$('#oa-dias').addEventListener('click',e=>{ const b=e.target.closest('[data-dia]'); if(b){ obFecha=b.dataset.dia; obAsis(); } });
+$('#oa-atrasado').addEventListener('click',e=>{ const b=e.target.closest('[data-ir-dia]'); if(b){ obFecha=b.dataset.irDia; obAsis(); } });
+$('#oa-semana').addEventListener('click',e=>{ const b=e.target.closest('[data-pag]'); if(!b) return; const a=REG().asis.find(x=>x.id===b.dataset.pag); if(!a) return;
+  a.pagado=a.pagado?'':hoyISO(); a.ts=Date.now(); a.por=QUIEN; guardar(); obAsis(); });
 $('#oa-nota').onchange=e=>{ REG().dias[obFecha]={nota:e.target.value,ts:Date.now(),por:QUIEN}; guardar(); };
 $('#og-agregar').onclick=()=>{ const n=$('#og-nombre').value.trim(); if(!n) return; GENTE().push({id:nid(),ts:Date.now(),nombre:n,oficio:$('#og-oficio').value.trim(),forma:$('#og-forma').value,pago:montoDe($('#og-pago').value)});
   ['#og-nombre','#og-oficio','#og-pago'].forEach(s=>$(s).value=''); guardar(); pintarObra(); };
@@ -2450,13 +2480,40 @@ function parteBloques(f){
     caja(`<h2 class="dl-h">${esc(t.nombre||'Obra')}</h2>${filas?`<table><tr><th>Persona</th><th>Asistencia</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Qué hizo</th></tr>${filas}</table>`:''}${nota?`<p><b>Novedades:</b> ${esc(nota)}</p>`:''}`); });
   caja(hay?`<p><b>Total del día:</b> ${vinieron} ${vinieron===1?'persona vino':'personas vinieron'} · ${noVinieron} no ${noVinieron===1?'vino':'vinieron'} · ${hhmm(minTot)||'0 h'} trabajadas.</p>`:`<p>No hay asistencia anotada para este día.</p>`);
   return B; }
-async function enviarParte(que){ const m=$('#ob-msg'); m.textContent='Armando el parte…';
+function semanaBloques(f){
+  const dias=semanaDe(f), B=[], G=GENTE(), nom=a=>(G.find(p=>p.id===a.persona)||{}).nombre||a.nombre||'';
+  const caja=html=>{ const d=document.createElement('div'); d.className='dl-b'; d.innerHTML=html; B.push(d); };
+  caja(`<div class="dl-portada"><div><b>Parte de la semana</b><span>lunes ${fechaCorta(dias[0])} al domingo ${fechaCorta(dias[6])}${QUIEN?' · anotó '+esc(QUIEN):''}</span></div><span>Registro de Obra</span></div>`);
+  let totPag=0, totFalta=0, totMin=0, hay=false;
+  D.trabajos.forEach(t=>{ const R=t.reg||{}, A=(R.asis||[]).filter(a=>!a.del&&a.estado&&dias.includes(a.fecha)); const notas=dias.filter(di=>R.dias&&R.dias[di]&&R.dias[di].nota);
+    if(!A.length&&!notas.length) return; hay=true;
+    const ids=[...new Set(A.map(a=>a.persona))].sort((x,y)=>nom({persona:x}).localeCompare(nom({persona:y})));
+    let oPag=0, oFalta=0;
+    const filas=ids.map(pid=>{ const p=G.find(x=>x.id===pid)||{}, fila=dias.map(di=>A.find(a=>a.fecha===di&&a.persona===pid));
+      let n=0, m=0, pag=0, falta=0;
+      const cel=fila.map(a=>{ if(!a) return '<td></td>'; n+=(OB_EST.find(e=>e[0]===a.estado)||[,,0])[2]; m+=minutos(a.entra,a.sale);
+        if(cobraDia(a,p)){ if(a.pagado) pag+=+a.pagoDia; else falta+=+a.pagoDia; }
+        return `<td style="text-align:center">${a.estado==='v'?'✓':a.estado==='m'?'½':'✗'}${cobraDia(a,p)?(a.pagado?' 💲':' ⏳'):''}</td>`; }).join('');
+      oPag+=pag; oFalta+=falta; totMin+=m;
+      return `<tr><td><b>${esc(nom({persona:pid}))}</b></td>${cel}<td>${String(n).replace('.',',')}</td><td>${hhmm(m)}</td>${esTrato(p)?'<td colspan="2">a trato</td>':`<td style="text-align:right">${pag?pesos(pag):''}</td><td style="text-align:right">${falta?'<b>'+pesos(falta)+'</b>':''}</td>`}</tr>`; }).join('');
+    totPag+=oPag; totFalta+=oFalta;
+    caja(`<h2 class="dl-h">${esc(t.nombre||'Obra')}</h2>${filas?`<table><tr><th>Persona</th>${dias.map((di,i)=>`<th>${DIA_L[i]} ${di.slice(8)}</th>`).join('')}<th>Días</th><th>Horas</th><th>Pagado</th><th>Falta</th></tr>${filas}</table>`:''}`
+      +(notas.length?`<p><b>Novedades:</b><br>${notas.map(di=>`<b>${DIA_N[dias.indexOf(di)]} ${+di.slice(8)}:</b> ${esc(R.dias[di].nota)}`).join('<br>')}</p>`:'')); });
+  caja(hay?`<p><b>Total de la semana:</b> ${hhmm(totMin)||'0 h'} trabajadas · pagado ${pesos(totPag)} · <b>falta pagar ${pesos(totFalta)}</b>.</p><p class="mini">✓ vino · ½ medio día · ✗ no vino · 💲 pagado · ⏳ no pagado</p>`:`<p>No hay asistencia anotada esta semana.</p>`);
+  return B; }
+async function enviarParte(que,semana){ if(semana){ const m=$('#ob-msg'); m.textContent='Armando la semana…';
+    try{ const pags=await dlPaginas({semana:true},t=>m.textContent=t), s=semanaDe(obFecha), base=`Semana ${fechaCorta(s[0])} al ${fechaCorta(s[6])}`.replace(/\//g,'-');
+      const arch=que==='pdf'?[{nombre:base+'.pdf',blob:dlPdf(pags)}]:await Promise.all(pags.map(async(c,k)=>({nombre:base+(pags.length>1?` - hoja ${k+1}`:'')+'.png',blob:await dlBlob(c,'image/png')})));
+      m.textContent=await dlEntregar(arch,true); }
+    catch(err){ m.textContent='No se pudo: '+(err&&err.message||err); } return; } const m=$('#ob-msg'); m.textContent='Armando el parte…';
   try{ const pags=await dlPaginas({parte:true},t=>m.textContent=t); const base=`Parte del día ${fechaCorta(obFecha)}`;
     const arch=que==='pdf'?[{nombre:base+'.pdf',blob:dlPdf(pags)}]:await Promise.all(pags.map(async(c,k)=>({nombre:base+(pags.length>1?` - hoja ${k+1}`:'')+'.png',blob:await dlBlob(c,'image/png')})));
     m.textContent=await dlEntregar(arch,true); }
   catch(err){ m.textContent='No se pudo: '+(err&&err.message||err); } }
 $('#oa-parte').onclick=()=>enviarParte('png');
 $('#oa-parte-pdf').onclick=()=>enviarParte('pdf');
+$('#oa-sem-parte').onclick=()=>enviarParte('png',true);
+$('#oa-sem-pdf').onclick=()=>enviarParte('pdf',true);
 const juntar=(dest,src)=>{ let n=0; const m=new Map(dest.map(x=>[x.id,x])); (src||[]).forEach(x=>{ const a=m.get(x.id); if(!a){ dest.push(x); m.set(x.id,x); n++; } else if((x.ts||0)>(a.ts||0)){ Object.assign(a,x); n++; } }); return n; };
 $('#ob-cargar').onchange=async e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
   try{ const d=JSON.parse(await f.text()); if(d.tipo!=='cubicador-registro'||!d.trabajo||!d.trabajo.planta) throw new Error('no es un registro del Cubicador');
@@ -2475,8 +2532,8 @@ const csv=filas=>'﻿'+filas.map(f=>f.map(v=>{ const s=String(v==null?'':v); ret
 $('#ob-excel').onclick=async()=>{ const t=J(), R=REG(), G=GENTE();
   const comp=[['Fecha','Tipo','Detalle','Proveedor','Documento','N°','Etapa','Compró','Pagó','Monto','Extra (cobrar al cliente)','Cobrado el','Devuelto el','Trato pagado el','Anotó']]
     .concat(vivos(R.compras).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')).map(c=>[fechaCorta(c.fecha),c.tipo,c.detalle,c.prov,c.doc,c.num,c.etapa,c.compro,c.pago,Math.round(+c.monto||0),c.extra?'Sí':'',fechaCorta(c.cobrado),devolver(c)?fechaCorta(c.devuelto)||'pendiente':'',c.tipo==='Trabajo a trato'?fechaCorta(c.pagadoEl)||'pendiente':'',c.por]));
-  const asis=[['Fecha','Persona','Estado','Entrada','Salida','Horas','Pago del día','Qué hizo','Anotó']]
-    .concat(vivos(R.asis).sort((a,b)=>a.id.localeCompare(b.id)).map(a=>[fechaCorta(a.fecha),(G.find(p=>p.id===a.persona)||{}).nombre||a.nombre||'',(OB_EST.find(e=>e[0]===a.estado)||[,''])[1],a.entra,a.sale,hhmm(minutos(a.entra,a.sale)),Math.round(+a.pagoDia||0),a.tarea,a.por]));
+  const asis=[['Fecha','Persona','Estado','Entrada','Salida','Horas','Pago del día','Pagado el','Qué hizo','Anotó']]
+    .concat(vivos(R.asis).sort((a,b)=>a.id.localeCompare(b.id)).map(a=>[fechaCorta(a.fecha),(G.find(p=>p.id===a.persona)||{}).nombre||a.nombre||'',(OB_EST.find(e=>e[0]===a.estado)||[,''])[1],a.entra,a.sale,hhmm(minutos(a.entra,a.sale)),Math.round(+a.pagoDia||0),cobraDia(a,G.find(p=>p.id===a.persona))?(fechaCorta(a.pagado)||'no pagado'):'',a.tarea,a.por]));
   const libro=[['Fecha','Tareas y novedades','Anotó']].concat(Object.entries(R.dias).sort().filter(([,v])=>v.nota).map(([k,v])=>[fechaCorta(k),v.nota,v.por]));
   const base=nombreArch(`${t.nombre} ${hoyISO()}`);
   try{ obMsg(await dlEntregar([{nombre:`Compras - ${base}.csv`,blob:new Blob([csv(comp)],{type:'text/csv'})},{nombre:`Asistencia - ${base}.csv`,blob:new Blob([csv(asis)],{type:'text/csv'})},{nombre:`Libro de obra - ${base}.csv`,blob:new Blob([csv(libro)],{type:'text/csv'})}],true)); }
