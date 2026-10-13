@@ -2285,14 +2285,17 @@ function dlAImagen(el,h,escala){ return new Promise((ok,no)=>{ const css=dlCss()
   img.onerror=()=>no(new Error('No se pudo dibujar')); img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); }); }
 
 // reparte los bloques en hojas A4; si un bloque no cabe en lo que queda de la hoja, pasa a la siguiente
+// ¿esa franja del bloque está en blanco? (muestrea los píxeles)
+function dlBlanco(c,o,t){ try{ const d=c.getContext('2d').getImageData(0,o,c.width,t).data; for(let i=0;i<d.length;i+=4*7) if(d[i]<240||d[i+1]<240||d[i+2]<240) return false; return true; }catch(e){ return false; } }
 async function dlPaginas(sel,msg){ const B=dlBloques(sel); const {f,out}=await dlMedir(B);
   const esc2=(DL_PW-2*DL_M)/DL_W, alto=DL_PH-2*DL_M-40, pags=[]; let pag=null, y=0;
   const nueva=()=>{ pag=document.createElement('canvas'); pag.width=DL_PW; pag.height=DL_PH; const x=pag.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,DL_PW,DL_PH); pags.push(pag); y=0; };
-  try{ for(let i=0;i<out.length;i++){ if(msg) msg(`Preparando ${i+1} de ${out.length}…`); const {el,h}=out[i]; if(!h) continue;
+  try{ for(let i=0;i<out.length;i++){ if(msg) msg(`Preparando ${i+1} de ${out.length}…`); const {el,h}=out[i]; if(!h) continue; if(!el.textContent.trim()&&!el.querySelector('svg,img,canvas')) continue;   // bloque vacío: no abre hoja
       const c=await dlAImagen(el,h,esc2), hh=c.height;
       if(!pag||(y>0&&y+hh>alto)) nueva();
       if(hh<=alto-y){ pag.getContext('2d').drawImage(c,DL_M,DL_M+y); y+=hh; }
-      else { let o=0; while(o<hh){ if(y>=alto-20) nueva(); const t=Math.min(hh-o,alto-y); pag.getContext('2d').drawImage(c,0,o,c.width,t,DL_M,DL_M+y,c.width,t); o+=t; y+=t; } } }
+      else { let o=0; while(o<hh){ if(hh-o<30||dlBlanco(c,o,hh-o)) break;   // lo que sobra es solo blanco: no abre una hoja vacía
+        if(y>=alto-20) nueva(); const t=Math.min(hh-o,alto-y); pag.getContext('2d').drawImage(c,0,o,c.width,t,DL_M,DL_M+y,c.width,t); o+=t; y+=t; } } }
   } finally { f.remove(); }
   pags.forEach((c,k)=>{ const x=c.getContext('2d'); x.fillStyle='#5b6a72'; x.font='20px Arial'; x.textAlign='left';
     x.fillText((sel&&sel.semana?'Parte de la semana':sel&&sel.parte?'Parte del día':(J().nombre||''))+' · '+(MODO_OBRA?'Registro de Obra':'Cubicador Metalcon'),DL_M,DL_PH-DL_M/2); x.textAlign='right'; x.fillText(`Hoja ${k+1} de ${pags.length}`,DL_PW-DL_M,DL_PH-DL_M/2);
