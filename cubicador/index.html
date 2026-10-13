@@ -2152,7 +2152,7 @@ function materiales(R,p){
     sec.tiles.push(`<div class="tile"><b>${k1(BA.m3Exc)}</b><span>m³ de excavación de zanjas</span></div>`);
     sec.tiles.push(`<div class="tile"><b>${String(Math.round(BA.presion*100)/100).replace('.',',')}</b><span>kg/cm² que el muro perimetral le pasa al suelo (aguanta ${String(BA.suelo).replace('.',',')})</span></div>`);
     sec.tiles.push(`<div class="tile"><b>${BA.obra.sacos}</b><span>sacos de cemento de 25 kg si se hace en obra, con ${String(BA.obra.arena).replace('.',',')} m³ de arena y ${String(BA.obra.ripio).replace('.',',')} m³ de ripio (en vez del premezclado)</span></div>`);
-    anclar(); sec.extra=radierHTML(BA);
+    anclar(); sec.extra=`<div class="row" style="margin-top:10px"><button class="b pri" data-dl="base">⬇️ Descargar solo la base para armar</button><span class="mini no-dl" style="align-self:center">pollos, distancias y entrepiso · sin materiales (para mandar al grupo)</span></div>`+radierHTML(BA);
   } else if(BA){ abrir('base','Base (pollos y fierros)',`${BA.nPollos} pollos de hormigón en ${BA.filas.length} filas. La base de cada pollo se calcula con la carga que le llega y lo que aguanta el suelo (${String(BA.suelo).replace('.',',')} kg/cm²). El pollo debe apoyar en suelo natural firme, nunca en relleno. ⚠️ Las alturas (y con ellas las patas y las diagonales) son estimadas: el cálculo queda exacto cuando se ponen las cotas del topógrafo.`);
     item('pollo|unidad','Pollos de hormigón',BA.nPollos,'un',BA.enL?`pollos (cuerpo ${BA.filas.map(f=>f.n).join(' + ')} · ala ${BA.filasAla.map(f=>f.n).join(' + ')})`:`pollos (${BA.filas.map(f=>f.n).join(' + ')})`,'f');
     cuts.filter(([k])=>/^Perfil cuadrado/.test(k)).forEach(([k,c])=>item(`perfil|${k}|${c.B}`,`${k} de ${fm(c.B)} m`,c.bars.length,'un',`${k.toLowerCase()} de ${fm(c.B)} m`));
@@ -2169,7 +2169,7 @@ function materiales(R,p){
         item('tornillo-hex-zap|unidad','Tornillo hexagonal para zapatilla',EP.hexZap,'un',`tornillos hexagonales para las zapatillas (${EP.hexZap/EP.zapatillas} por zapatilla)`); }
       item('terciado-estructural|122x244','Terciado estructural 1,22 × 2,44 (piso)',EP.planchas,'un',`terciados estructurales para el piso (${fm(EP.W)} × ${fm(EP.S)} = ${(EP.W*EP.S/1e4).toFixed(1).replace('.',',')} m² ÷ 2,98 m² por plancha)`,'o');
       if(!EP.sirve) sec.tiles.push(`<div class="tile"><b>⚠️</b><span>Las vigas quedan con ${fm(EP.luz)} entre apoyos y ${EP.kC} aguanta hasta ${fm(EP.luzMax)}: agrega apoyos o cambia de dirección o de perfil.</span></div>`); }
-    anclar(); sec.extra=baseHTML(BA)+(EP?pisoHTML(EP):'');
+    anclar(); sec.extra=`<div class="row" style="margin-top:10px"><button class="b pri" data-dl="base">⬇️ Descargar solo la base para armar</button><span class="mini no-dl" style="align-self:center">pollos, distancias y entrepiso · sin materiales (para mandar al grupo)</span></div>`+baseHTML(BA)+(EP?pisoHTML(EP):'');
   }
   abrir('techo','Techo','Cerchas, cubierta, caballete, frontones y aleros. Los perfiles de cerchas, costaneras y frontones ya están sumados en «Estructura».');
   if(R.techo){
@@ -2214,7 +2214,7 @@ $('#copiar-lista').onclick=()=>{ const t=`${J().nombre}\n`+$('#tiles').dataset.l
 /* ---------- descargar e imprimir (PDF, imagen, impresora) ---------- */
 // Arma un informe con lo que se elija (planta, tabiques, techo, base y suelo, materiales, valor), lo pasa a páginas A4
 // y lo guarda como PDF o imagen. En el teléfono se comparte (WhatsApp, correo, Drive o imprimir); en la web se descarga.
-const DL_SECS=[['plano','Planta (plano)'],['tabiques','Tabiques'],['techo','Techo'],['base','Base y suelo'],['materiales','Materiales y despiece'],['valor','Valor (con precios)'],['obra','Registro de obra']];
+const DL_SECS=[['plano','Planta (plano)'],['tabiques','Tabiques'],['techo','Techo'],['base','Base para armar (pollos y entrepiso)'],['materiales','Materiales y despiece'],['valor','Valor (con precios)'],['obra','Registro de obra']];
 const DL_W=820, DL_PW=1240, DL_PH=1754, DL_M=60;   // ancho del informe en px CSS · hoja A4 a 150 ppp
 const nativo=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const dlNombre=t=>(J().nombre||'Obra').replace(/[\\/:*?"<>|]+/g,'').trim()+' - '+t;
@@ -2259,9 +2259,15 @@ function dlBloques(sel){ if(sel.semana) return semanaBloques(obFecha); if(sel.pa
     const av=$('#avisos'); if(av&&av.children.length) bloque('Avisos de tabiques',dlCopia(av)); }
   if(sel.techo){ [...$('#techo-out').children].forEach((e,k)=>bloque(k?'':'Techo',envolver('techo-out','',dlCopia(e)))); }
   const secs=[...document.querySelectorAll('#tiles details[data-sec]')];
-  if(sel.base) secs.filter(d=>d.dataset.sec==='base').forEach(d=>{ const c=dlCopia(d), s=c.querySelector('summary'), t=s?s.textContent.split('·')[0].trim():'Base'; if(s) s.remove(); bloque(t,c); });
+  let bloques0=0;
+  if(sel.base) secs.filter(d=>d.dataset.sec==='base').forEach(d=>{ const c=dlCopia(d), s=c.querySelector('summary'), t=s?s.textContent.split('·')[0].trim():'Base'; if(s) s.remove(); c.querySelectorAll('.tiles,.no-dl').forEach(x=>x.remove());
+    // cada parte (dibujo de pollos, tabla, cada paño de piso) es un bloque: no se corta entre hojas
+    const partes=[]; const juntar=el=>{ [...el.children].forEach(k=>{ if(k.tagName==='DETAILS'||(k.tagName==='DIV'&&k.children.length>3&&!k.querySelector(':scope>svg')&&!k.classList.contains('tw'))) juntar(k); else partes.push(k); }); }; juntar(c);
+    let pend=[]; partes.forEach(k=>{ if(/^(H3|P)$/.test(k.tagName)&&!k.querySelector('svg')){ pend.push(k); return; } bloque(bloques0++?'':t+' · para armar',...pend,k); pend=[]; }); if(pend.length) bloque('',...pend); });
   if(sel.materiales){ const h=$('#tiles').querySelector('.hint'); if(h) bloque('Materiales',dlCopia(h));
-    secs.filter(d=>d.dataset.sec!=='base').forEach((d,k)=>{ const c=dlCopia(d), s=c.querySelector('summary'), t=s?s.textContent.split('·')[0].trim():''; if(s) s.remove(); bloque((k||h?'':'Materiales · ')+t,c); });
+    secs.forEach((d,k)=>{ const c=dlCopia(d), s=c.querySelector('summary'), t=s?s.textContent.split('·')[0].trim():''; if(s) s.remove();
+      if(d.dataset.sec==='base'){ const ti=c.querySelector('.tiles'); if(!ti) return; const w=document.createElement('div'); w.appendChild(ti); bloque((k||h?'':'Materiales · ')+t+' (materiales)',w); return; }
+      bloque((k||h?'':'Materiales · ')+t,c); });
     bloque('Planchas por muro y recinto',dlCopia($('#planchas')));
     [...$('#cortes').children].forEach((e,k)=>bloque(k?'':'Despiece en perfiles',dlCopia(e))); }
   if(sel.valor){ const t=$('#tabla-valor'); if(t) bloque('Valor de los materiales',envolver('','tw',dlCopia(t)),(()=>{ const m=$('#msg-valor'); const s=document.createElement('p'); s.textContent=(m&&m.textContent)||''; return s; })()); }
