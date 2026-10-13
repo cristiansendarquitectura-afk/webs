@@ -1508,6 +1508,54 @@ function svgWall(r,fl,p){
   g+=`<text x="${L/2}" y="${H+62}" text-anchor="middle" font-size="14" fill="var(--ink)" font-family="IBM Plex Mono,monospace">${fm(L)} m</text>`;
   return `<svg viewBox="${-pad} -34 ${L+pad*2} ${H+104}" role="img" aria-label="Elevación de ${esc(r.w.name)}">${g}</svg>`;
 }
+// LENTEJAS (Cristian, 12-oct): tornillo cabeza lenteja de 1/2". Cada pie derecho o pieza del tabique lleva 4
+// (2 arriba y 2 abajo); el pilar completo no se cuenta. Piezas: pies derechos (incluye jambas, uniones, T, pegado),
+// dintel (el dintel cajón cuenta como una pieza), puntales de jamba, puntales, alféizar y muchachos.
+function piezasTab(r,a,b,nPies){ const p=S.p; let n=nPies;
+  r.vanos.filter(v=>v.x>=a-0.05&&v.x+v.w<=b+0.05).forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead);
+    let q=0; for(let x=v.x+p.puntal;x<v.x+v.w-5;x+=p.puntal) q++; const nP=Math.max(1,q);
+    n+=1; if(v.w>(p.dintelCajon||120)) n+=2;
+    if(p.H-head>4) n+=nP;
+    if(!door){ n+=1; if(head-v.h>4) n+=nP; } else if(v.alf) n+=1; });
+  return n; }
+const LENTEJAS_POR_PIEZA=4, LENTEJAS_PILAR=32;   // pilar: 2 C juntos amarrados con las U por cada lado, 8 por lado × 4 = 32 (Cristian, 12-oct)
+function lentejasTotal(muros){ let n=0; muros.forEach(r=>r.segs.forEach(([a,b],i)=>{
+    const ss=r.st.filter(s=>s.x>=a-0.05&&s.x<=b+0.05&&!(i>0&&s.k==='uni'&&Math.abs(s.x-a)<0.05&&r.st.filter(q=>q.k==='uni'&&Math.abs(q.x-a)<0.05).indexOf(s)===0)&&!(s.k==='uni'&&Math.abs(s.x-b)<0.05&&r.st.filter(q=>q.k==='uni'&&Math.abs(q.x-b)<0.05).indexOf(s)===1));
+    n+=piezasTab(r,a,b,ss.length)*LENTEJAS_POR_PIEZA+r.pil.filter(([x0])=>x0>=a-0.05&&x0<b).length*LENTEJAS_PILAR; })); return n; }
+// dibujo del pilar de esquina (Cristian, 12-oct): 2 C abiertos hacia adentro + 2 U abrazando por fuera = cajón cerrado
+function pilarHTML(prof,H){
+  // en mm. Caja de w × w: C1 a la izquierda y C2 a la derecha (abiertos hacia adentro), U1 arriba y U2 abajo (abrazan por fuera)
+  const k=parseInt(prof.C.slice(2)), w=k, fl=w/2-2, lip=10, uf=30, t=4, AZ='#1f6fb2', NA='#e07b00', mono='font-family="IBM Plex Mono,monospace"';
+  const cC=(x,s,dx=0)=>`<path d="M${x+dx+s*fl} ${lip} L${x+dx+s*fl} 0 L${x+dx} 0 L${x+dx} ${w} L${x+dx+s*fl} ${w} L${x+dx+s*fl} ${w-lip}" fill="none" stroke="${AZ}" stroke-width="${t}" stroke-linejoin="round"/>`;
+  const cU=(y,s,dy=0)=>`<path d="M${-t} ${y+dy+s*uf} L${-t} ${y+dy} L${w+t} ${y+dy} L${w+t} ${y+dy+s*uf}" fill="none" stroke="${NA}" stroke-width="${t}" stroke-linejoin="round"/>`;
+  const et=(x,y,txt,c,anc)=>`<text x="${x}" y="${y}" text-anchor="${anc||'middle'}" font-size="12" font-weight="700" fill="${c}" ${mono}>${txt}</text>`;
+  // 1) despiece: las 4 piezas separadas, con flechas hacia donde van
+  const sep=34, flecha=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--muted)" stroke-width="2" marker-end="url(#fl)"/>`;
+  const desp=`<svg viewBox="${-sep-80} ${-sep-50} ${w+2*sep+160} ${w+2*sep+100}" style="width:100%;max-width:340px;height:auto" role="img" aria-label="Las 4 piezas del pilar">
+    <defs><marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--muted)"/></marker></defs>
+    ${cC(0,1,-sep)}${cC(w,-1,sep)}${cU(-t-1,1,-sep)}${cU(w+t+1,-1,sep)}
+    ${flecha(-sep-30,w/2+26,-sep-4,w/2+26)}${flecha(w+sep+30,w/2+26,w+sep+4,w/2+26)}${flecha(w/2,-sep-6,w/2,-sep+26)}${flecha(w/2,w+sep+6,w/2,w+sep-26)}
+    ${et(-sep-8,w/2+4,'1 · '+prof.C,AZ,'end')}${et(w+sep+8,w/2+4,'2 · '+prof.C,AZ,'start')}
+    ${et(w/2,-sep-14,'3 · '+prof.U,NA)}${et(w/2,w+sep+26,'4 · '+prof.U,NA)}</svg>`;
+  // 2) armado: el cajón cerrado
+  const armado=`<svg viewBox="-80 -50 ${w+160} ${w+100}" style="width:100%;max-width:340px;height:auto" role="img" aria-label="El pilar armado">
+    ${cC(0,1)}${cC(w,-1)}${cU(-t-1,1)}${cU(w+t+1,-1)}
+    ${et(-12,w/2+4,'C',AZ,'end')}${et(w+12,w/2+4,'C',AZ,'start')}${et(w/2,-16,'U',NA)}${et(w/2,w+30,'U',NA)}
+    ${[[-t-2,14],[-t-2,w-14],[w+t+2,14],[w+t+2,w-14]].map(([x,y])=>`<path d="M${x+(x<0?-12:12)} ${y} L${x+(x<0?16:-16)} ${y}" stroke="var(--bad)" stroke-width="3"/><circle cx="${x+(x<0?-12:12)}" cy="${y}" r="4" fill="var(--bad)"/>`).join('')}
+    <text x="${w/2}" y="${w/2+4}" text-anchor="middle" font-size="10" fill="var(--muted)" ${mono}>${fm(w/10)} × ${fm(w/10)}</text></svg>`;
+  return `<h3 style="margin:0 0 4px">Así va el pilar de esquina</h3>
+    <p class="mini" style="margin:0 0 6px">${perfilBadge(prof)} · Va <b>solo en las esquinas</b>, uno por esquina, y es de uno solo de los dos muros. Al lado va un pie derecho pegado y desde ahí parte la grilla.</p>
+    <p style="margin:0 0 6px;font-size:15px"><b style="color:var(--bad)">Lentejas: 8 por lado</b> (donde cada U abraza a una C, a lo alto) × 4 lados = <b>${LENTEJAS_PILAR} por pilar</b>.</p>
+    <p style="margin:0 0 6px;font-size:15px"><b style="color:${AZ}">2 perfiles ${prof.C}</b> de ${fm(H)}, <b>abiertos uno hacia el otro</b> &nbsp;+&nbsp; <b style="color:${NA}">2 perfiles ${prof.U}</b> de ${fm(H)}, que los <b>abrazan por fuera</b> = un cajón cerrado.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;align-items:start">
+      <figure style="margin:0">${desp}<figcaption class="mini">Las 4 piezas, vistas desde arriba: 1 y 2 son las C (azul), 3 y 4 las U (naranjo).</figcaption></figure>
+      <figure style="margin:0">${armado}<figcaption class="mini">Armado: las C juntas, amarradas con las U por cada lado. En rojo, dónde van las lentejas (8 en cada uno de los 4 lados).</figcaption></figure></div>`; }
+// cómo sale una solera: si es más larga que la U, se sobrepone otra pieza (traslapo) atornillada
+function soleraPartes(len,LU,tr){ const parts=[]; let x=len; while(x>LU+0.01){ parts.push(LU); x=x-LU+tr; } parts.push(x); return parts; }
+function soleraTxt(len,LU,tr){ if(len<=LU+0.01) return fm(len); const parts=soleraPartes(len,LU,tr);
+  return `${fm(len)} = ${parts.map(fm).join(' + ')} <span style="color:var(--bad)">(la U viene de ${fm(LU)}: traslapar ${tr} cm y atornillar)</span>`; }
+const PERF_COLOR={90:'#2b485e',60:'#c45a1a',40:'#6b5b95'};
+function perfilBadge(prof){ const k=parseInt(prof.C.slice(2)); return `<b style="display:inline-block;background:${PERF_COLOR[k]||'#555'};color:#fff;border-radius:6px;padding:2px 8px;font-size:14px;letter-spacing:.3px">PERFIL ${prof.C} · solera ${prof.U}</b>`; }
 function cotasHTML(r){
   const K={osb:'k-osb',vol:'k-vol',ext:'k-ext',peg:'k-peg',uni:'k-uni',jam:'k-jam',T:'k-T',gri:'k-gri'};
   return r.segs.map(([a,b],i)=>{
@@ -1535,7 +1583,7 @@ function cotasHTML(r){
       else if(r.perim) out.push(tag('termina sin pilar'));
       return out.join(' · ');
     };
-    r.pil.filter(([x0])=>x0>=a-0.05&&x0<b).forEach(([x0,x1])=>lleva.push(`<b>Pilar</b> (2 C + 2 U) de ${z(x0)} a ${z(x1)}, en la esquina`));
+    r.pil.filter(([x0])=>x0>=a-0.05&&x0<b).forEach(([x0,x1])=>lleva.push(`<b>Pilar</b> (2 C + 2 U, ${LENTEJAS_PILAR} lentejas) de ${z(x0)} a ${z(x1)}, en la esquina`));
     if(i===0&&!r.pil.some(([x0])=>Math.abs(x0-a)<0.05)&&r.perim) lleva.push(`Parte sin pilar: llega al pilar del muro vecino`);
     if(i===r.segs.length-1&&!r.pil.some(([,x1])=>Math.abs(x1-b)<0.05)&&r.perim) lleva.push(`Termina sin pilar: llega al pilar del muro vecino`);
     r.vanos.filter(v=>v.x>=a-0.05&&v.x+v.w<=b+0.05).forEach(v=>{
@@ -1545,7 +1593,13 @@ function cotasHTML(r){
     r.ts.filter(t=>t.x>=a-0.05&&t.x+t.w<=b+0.05).forEach(t=>lleva.push(`<b>Llega un tabique interior</b> (${Math.round(t.w)} cm) entre ${z(t.x)} y ${z(t.x+t.w)}: un pie derecho a cada costado`));
     if(i>0) lleva.push(`Parte uniéndose con ${r.codes?r.codes[i-1]:'el tabique anterior'}, espalda con espalda`);
     if(i<r.segs.length-1) lleva.push(`Termina uniéndose con ${r.codes?r.codes[i+1]:'el tabique siguiente'}, espalda con espalda`);
-    return `<div style="margin-bottom:10px"><b>Tabique ${r.codes?r.codes[i]:i+1}</b> <span class="mini">${r.prof.C}</span> · ${fm(a)} → ${fm(b)} = <b>${fm(b-a)} m</b> · ${ss.length} pies derechos${pil?` + ${pil} pilar${pil>1?'es':''}`:''}
+    // soleras: arriba entera; abajo se corta en las puertas
+    const LU=largoPerfil(r.prof.U,p), tr=p.trSol||50, inf=[]; let x0=a;
+    r.vanos.filter(v=>v.t==='puerta'&&v.x>=a-0.05&&v.x+v.w<=b+0.05).sort((u,v)=>u.x-v.x).forEach(v=>{ if(v.x-x0>0.5) inf.push(v.x-x0); x0=v.x+v.w; }); if(b-x0>0.5) inf.push(b-x0);
+    lleva.push(`<b>Soleras ${r.prof.U}</b>: arriba ${soleraTxt(b-a,LU,tr)} · abajo ${inf.length>1?inf.map(l=>soleraTxt(l,LU,tr)).join(' y ')+' (cortada en la puerta)':soleraTxt(inf[0]||0,LU,tr)}`);
+    const nPz=piezasTab(r,a,b,ss.length);
+    lleva.push(`<b>Lentejas</b>: ${nPz*LENTEJAS_POR_PIEZA+pil*LENTEJAS_PILAR} (${nPz} piezas × ${LENTEJAS_POR_PIEZA}${pil?` + ${pil} pilar${pil>1?'es':''} × ${LENTEJAS_PILAR}`:''})`);
+    return `<div style="margin-bottom:10px"><b>Tabique ${r.codes?r.codes[i]:i+1}</b> ${perfilBadge(r.prof)} · ${fm(a)} → ${fm(b)} = <b>${fm(b-a)} m</b> · ${ss.length} pies derechos${pil?` + ${pil} pilar${pil>1?'es':''}`:''}
       <ul class="lleva">${lleva.map(x=>`<li>${x}</li>`).join('')}</ul>
       <span class="mini"><b>Para armar</b> · medido desde el 0 de este tabique:</span><br>${linea(x=>fm(x-a),true)}
       <div class="mini" style="margin-top:3px">En el muro (desde la esquina exterior), el tabique va de ${fm(a)} a ${fm(b)}: ${linea(x=>fm(x),false)}</div></div>`;
@@ -1881,6 +1935,11 @@ function calcularYMostrar(){
   $('#elevs').innerHTML=R.walls.map((r,i)=>{ const f=fl.filter(x=>x.w===i); const ftxt=f.map(x=>`${x.lado==='ini'?'inicio':'final'}: ${x.ancho?`X de ${fm(x.ancho)} = ${(x.m/100).toFixed(2).replace('.',',')} m`:`sin fleje (quedan ${fm(x.lib)} m)`}`).join(' · ');
     return `<div><h3>${r.letra} · ${esc(r.w.name)}<span class="pill">perimetral · ${r.prof.C} · ${r.codes.join(', ')}</span></h3><div class="elev">${svgWall(r,f,p)}</div><div class="mini">Fleje · ${ftxt}</div><div class="cotas">${cotasHTML(r)}</div></div>`; }).join('')+
     R.ints.map(r=>`<div><h3>${r.letra} · ${esc(r.w.name)}<span class="pill">interior · ${r.prof.C} · ${r.codes.join(', ')}</span></h3><div class="elev">${svgWall(r,null,p)}</div><div class="cotas">${cotasHTML(r)}</div></div>`).join('');
+  // Cristian, 12-oct: el pilar dibujado (para que los chicos digan «ahh, así va») y las lentejas de todo en una línea
+  const conPil=R.walls.find(r=>r.pil&&r.pil.length);
+  if(conPil) $('#elevs').insertAdjacentHTML('afterbegin',`<div>${pilarHTML(conPil.prof,p.H)}</div>`);
+  const nLen=lentejasTotal([...R.walls,...R.ints]);
+  $('#elevs').insertAdjacentHTML('beforeend',`<div><p style="font-size:17px;margin:0;padding:10px 12px;border-radius:10px;background:var(--panel2)"><b>Lentejas para todos los tabiques: ${nLen.toLocaleString('es-CL')}</b> <span class="mini">(tornillo cabeza lenteja ½": 4 por cada pie derecho o pieza + ${LENTEJAS_PILAR} por cada pilar)</span></p></div>`);
   if(R.techo) $('#techo-out').innerHTML=techoHTML(R.techo,p);
   else { // sin techo elegido: mostrar las opciones lado a lado para decidir
     const ops=[['frente','Dos aguas · caen hacia el frente y el fondo'],['costados','Dos aguas · caen hacia los costados']].map(([k,n])=>{
@@ -1992,10 +2051,15 @@ function pisoHTML(EP){
     for(let x=122;x<W;x+=122) g+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="var(--accent)" stroke-width="3" stroke-dasharray="14 10"/>`;
     for(let y=244;y<H;y+=244) g+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="var(--accent)" stroke-width="3" stroke-dasharray="14 10"/>`;
     EP.pos.forEach(x=>g+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="var(--steel)" stroke-width="5"/>`);
-    if(EP.kU) g+=`<rect x="0" y="-6" width="${W}" height="8" fill="var(--steel)"/><rect x="0" y="${H-2}" width="${W}" height="8" fill="var(--steel)"/>`;
+    if(EP.kU){ const LU=largoPerfil(EP.kU,PJ()), tr=PJ().trSol||50, pz=[]; let x=0, rest=W;
+      while(rest>LU+0.01){ pz.push([x,LU]); x+=LU-tr; rest=W-x; } pz.push([x,W-x]);
+      pz.forEach(([x0,l],k)=>{ const dy=k%2?-7:0; g+=`<rect x="${x0}" y="${-6+dy}" width="${l}" height="8" fill="${k%2?'#5d7f99':'var(--steel)'}"/><rect x="${x0}" y="${H-2-dy}" width="${l}" height="8" fill="${k%2?'#5d7f99':'var(--steel)'}"/><text x="${x0+l/2}" y="${H+26}" text-anchor="middle" font-size="20" font-weight="700" fill="var(--ink)" ${mono}>${EP.kU} de ${fm(l)}</text>`;
+        if(k>0){ const tx=x0; g+=`<rect x="${tx}" y="-18" width="${tr}" height="26" fill="none" stroke="var(--bad)" stroke-width="3"/><rect x="${tx}" y="${H-10}" width="${tr}" height="26" fill="none" stroke="var(--bad)" stroke-width="3"/><text x="${tx+tr/2}" y="${H+48}" text-anchor="middle" font-size="20" font-weight="700" fill="var(--bad)" ${mono}>traslapo ${tr} cm</text>`; } }); }
     g+=`<text x="${W/2}" y="${-16}" text-anchor="middle" font-size="22" fill="var(--ink)" ${mono}>Paño ${n.join(' y ')} · ${fm(W)} × ${fm(H)} · ${EP.pos.length} vigas de ${fm(H)}</text>`;
     g+=`<text x="${W+12}" y="${H/2}" font-size="20" fill="var(--muted)" ${mono}>${fm(H)}</text>`;
-    return `<svg viewBox="${-pad} ${-pad-20} ${W+2*pad+90} ${H+2*pad+20}" style="width:100%;max-width:640px;height:auto;margin-top:8px" role="img" aria-label="Paño de piso">${g}</svg>`; }).join('');
+    const LU=EP.kU?largoPerfil(EP.kU,PJ()):0, tr=PJ().trSol||50;
+    const sol=EP.kU&&W>LU+0.01?`<p class="mini" style="margin:4px 0 0;color:var(--bad)"><b>Soleras ${EP.kU}:</b> el paño mide ${fm(W)} y la U viene de ${fm(LU)}. Cada solera (arriba y abajo) es ${soleraPartes(W,LU,tr).map(fm).join(' + ')}, <b>traslapadas ${tr} cm y atornilladas</b> (en rojo).</p>`:'';
+    return `<svg viewBox="${-pad} ${-pad-20} ${W+2*pad+90} ${H+2*pad+40}" style="width:100%;max-width:640px;height:auto;margin-top:8px" role="img" aria-label="Paño de piso">${g}</svg>${sol}`; }).join('');
   return `<h3 style="margin-top:14px">Entramado de piso («tabique de piso»)</h3>
     <p class="mini">Cada paño se arma como un tabique acostado${EP.kU?` (${EP.kC} entre soleras ${EP.kU})`:' (50×50 soldados al nivel del 100×100)'}. Las vigas cruzan ${EP.dir==='corto'?'el lado corto':'el lado largo'}${EP.auto?(EP.otra.sirve?', porque rinde más el material':', porque en la otra dirección faltarían apoyos'):''}; luz entre apoyos ${fm(EP.luz)} (máximo ${fm(EP.luzMax)}). En naranja punteado las juntas del terciado: siempre caen sobre una viga.</p>
     <p class="mini"><b>Para armar</b>, desde la orilla (0): ${cot}. Desde la cara interior del fierro son 0,40 · 0,80 · 1,12 y se repite cada 1,22.</p>${dib}
