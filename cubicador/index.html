@@ -2540,6 +2540,31 @@ $('#ob-excel').onclick=async()=>{ const t=J(), R=REG(), G=GENTE();
   catch(err){ obMsg('No se pudo: '+(err&&err.message||err)); } };
 
 if(MODO_OBRA){
+  // ---- clave de 4 números (solo esta app) ----
+  const hRO=s=>{ let h=2166136261>>>0; for(let k=0;k<5000;k++) for(const ch of 'obra·'+s+'·draeger'){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619)>>>0; } return h.toString(16).padStart(8,'0'); };
+  const HUELLA_RO='4facb185';
+  const cand=document.createElement('div'); cand.id='ro-candado';
+  cand.style.cssText='position:fixed;inset:0;z-index:9999;background:var(--bg,#f4f1ea);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px';
+  cand.innerHTML=`<div style="width:64px;height:64px;border-radius:16px;background:#D66624;color:#fff;display:flex;align-items:center;justify-content:center;font:700 26px system-ui">RO</div>
+    <b style="font-size:22px">Registro de Obra</b><span id="ro-msg" style="font-size:16px">Escribe la clave</span>
+    <div id="ro-puntos" style="display:flex;gap:14px;margin:4px 0 6px"></div>
+    <div id="ro-tecla" style="display:grid;grid-template-columns:repeat(3,76px);gap:12px"></div>`;
+  document.body.appendChild(cand);
+  let roIn='';
+  const roPintar=()=>{ $('#ro-puntos').innerHTML=[0,1,2,3].map(i=>`<span style="width:18px;height:18px;border-radius:50%;border:2px solid #2b485e;background:${i<roIn.length?'#2b485e':'transparent'}"></span>`).join(''); };
+  $('#ro-tecla').innerHTML=['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>k?`<button class="b" data-k="${k}" style="height:64px;font-size:26px;font-weight:700;border-radius:14px">${k}</button>`:'<span></span>').join('');
+  const roAbrir=()=>{ cand.style.display='none'; try{ sessionStorage.setItem('ro-ok','1'); }catch(e){} };
+  $('#ro-tecla').addEventListener('click',e=>{ const b=e.target.closest('[data-k]'); if(!b) return; const k=b.dataset.k;
+    if(k==='⌫') roIn=roIn.slice(0,-1); else if(roIn.length<4) roIn+=k;
+    roPintar(); $('#ro-msg').textContent='Escribe la clave'; $('#ro-msg').style.color='';
+    if(roIn.length===4){ if(hRO(roIn)===HUELLA_RO){ roIn=''; roPintar(); roAbrir(); } else { $('#ro-msg').textContent='Clave incorrecta'; $('#ro-msg').style.color='#b3261e'; roIn=''; setTimeout(roPintar,250); } } });
+  roPintar();
+  let roOk=false; try{ roOk=sessionStorage.getItem('ro-ok')==='1'; }catch(e){}
+  if(roOk) cand.style.display='none';
+  // si el teléfono la deja en segundo plano más de 5 minutos, vuelve a pedirla
+  let roOculta=0;
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) roOculta=Date.now(); else if(roOculta&&Date.now()-roOculta>5*60*1000){ try{ sessionStorage.removeItem('ro-ok'); }catch(e){} cand.style.display='flex'; } });
+
   document.title='Registro de Obra';
   $('#titulo').firstChild.nodeValue='Registro de Obra';
   const lg=document.querySelector('.top .logo'); if(lg) lg.textContent='RO';
