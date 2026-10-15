@@ -110,6 +110,8 @@ dialog#dl-dlg::backdrop{background:rgba(10,15,20,.55)} .dl-ops{display:flex;flex
 .ob-tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--steel-soft);color:var(--steel)} .ob-tag.warn{background:var(--warn-soft);color:var(--warn)} .ob-tag.ok{background:var(--ok-soft);color:var(--ok)}
 .tile.warn{border-left-color:var(--warn)}
 input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%}
+/* plantilla de armado de la cercha (14-oct) */
+.pla{overflow-x:auto;margin-top:6px;border:1px solid var(--line);border-radius:8px} .pla svg{display:block;width:100%;height:auto;min-width:680px} .dl-b .pla{overflow:visible} .dl-b .pla svg{min-width:0}
 </style>
 </head>
 <body>
@@ -800,12 +802,24 @@ function techo(state,res){
   for(let k=2;k<=N;k++){ const xo=(k-1)*dx, xi=k*dx; webs.push(['diagonal',[xo,yTop(xo)],[xi,0]],['diagonal',[L-xo,yTop(xo)],[L-xi,0]]); }
   const ap=t.apoyo>0&&t.apoyo<L?t.apoyo:null;
   if(ap!==null&&!webs.some(w=>w[0].startsWith('montante')&&Math.abs(w[1][0]-ap)<8)) webs.push(['montante sobre apoyo',[ap,0],[ap,yTop(ap)]]);
+  // Cristian, 14-oct (v0.18b): una diagonal que cruza el montante del apoyo chocaría con él; se lleva al PIE de ese montante, sobre el tabique.
+  // Así el tabique recibe la carga en un nudo y coincide con el empalme del cordón inferior.
+  if(ap!==null) webs.forEach(w=>{ if(w[0]!=='diagonal') return; const lo=w[1][1]<w[2][1]?w[1]:w[2], hi=lo===w[1]?w[2]:w[1];
+    if((hi[0]-ap)*(lo[0]-ap)<0&&Math.abs(lo[0]-ap)>1&&Math.abs(hi[0]-ap)>1){ lo[0]=ap; lo[1]=0; } });
   const piezasW=webs.map(([lab,a,b])=>({lab,len:r1(D(a,b)),a,b}));
+  // UNIONES (nudos) de una cercha: cada punto donde se juntan piezas (talones, cumbrera y cada punta de montante o diagonal).
+  // Cristian, 14-oct: 5 tornillos hexagonales por unión (confirmado). El empalme del cordón inferior va aparte (lentejas).
+  const nds=[[0,0],[L,0],[half,h]]; webs.forEach(w=>[w[1],w[2]].forEach(q=>{ if(!nds.some(r=>Math.abs(r[0]-q[0])<0.5&&Math.abs(r[1]-q[1])<0.5)) nds.push(q); }));
+  const hexUnion=t.hexUnion??5;
   // Empalme del cordón inferior (Cristian): dos tramos traslapados SOBRE el tabique de apoyo, y a un lado del traslape
   // tienen que quedar 30 cm libres de montantes y diagonales para que entre el taladro y se puedan juntar.
   let inf, empalme=null;
-  if(L<=largoPerfil('C 90',p)) inf=[{lab:'cordón inferior',len:r1(L)}];
-  else {
+  if(L<=largoPerfil('C 90',p)) inf=[{lab:'cordón inferior',len:r1(L),x0:0,x1:L}];
+  else if(t.empTope!==false){   // Cristian, 14-oct (v0.18b): A TOPE sobre el tabique, con un trozo de U del mismo ancho (U 92) de 1,00 y 20 lentejas
+    const c=ap!==null?ap:half, uL=t.empU??100;
+    empalme={c,z0:c-uL/2,z1:c+uL/2,tope:true,uL,lent:t.empLent??20};
+    inf=[{lab:'cordón inferior (tramo 1)',len:r1(c),x0:0,x1:c},{lab:'cordón inferior (tramo 2)',len:r1(L-c),x0:c,x1:L}];
+  } else {
     const c0=ap!==null?ap:half, tr=t.trasl, eA=9;
     const nodosInf=webs.flatMap(w=>[w[1],w[2]]).filter(q=>q[1]<0.5).map(q=>q[0]);
     let best=null;
@@ -817,7 +831,7 @@ function techo(state,res){
     }
     if(!best){ const c=c0; best={c,z0:c-tr/2,z1:c+tr/2,izq:0,der:0,falla:true}; }
     empalme=best;
-    inf=[{lab:'cordón inferior (tramo 1)',len:r1(best.z1)},{lab:'cordón inferior (tramo 2)',len:r1(L-best.z0)}];
+    inf=[{lab:'cordón inferior (tramo 1)',len:r1(best.z1),x0:0,x1:best.z1},{lab:'cordón inferior (tramo 2)',len:r1(L-best.z0),x0:best.z0,x1:L}];
   }
   const sup=[{lab:'pierna atrás',len:r1(piernaB)},{lab:'pierna frente',len:r1(piernaF)}];
   const n=Math.ceil(t.largo/t.sep-0.001)+1;   // nunca más separadas que «sep» (1,00 m)
@@ -827,6 +841,7 @@ function techo(state,res){
   for(let i=0;i<n;i++){
     [...sup,...inf].forEach(z=>g(C90).push({len:z.len,lab:z.lab,w:'Cercha '+(i+1)}));
     piezasW.forEach(z=>g(CW).push({len:z.len,lab:z.lab,w:'Cercha '+(i+1)}));
+    if(empalme&&empalme.tope) g(PERF[90].U).push({len:empalme.uL,lab:'empalme cordón inferior',w:'Cercha '+(i+1)});
   }
   // la costanera más alta va a 12 cm de la cumbrera por cada lado (para atornillar el caballete); de ahí cada «cost» hasta el alero
   const filasB=Math.ceil((piernaB-(t.cumb??12))/t.cost-0.001)+1, filasF=Math.ceil((piernaF-(t.cumb??12))/t.cost-0.001)+1, filas=filasB+filasF, largoC=t.largo+2*t.aleroLat;
@@ -865,7 +880,9 @@ function techo(state,res){
   return {t,L,h,half,pierna,piernaB,piernaF,aB,aF,filasB,filasF,nodos,webs:piezasW,inf,sup,n,sepReal,filas,largoC,pend,ang:Math.atan(h/half)*180/Math.PI,
     porCercha:{C90:[...sup,...inf].reduce((a,z)=>a+z.len,0),W:piezasW.reduce((a,z)=>a+z.len,0)},
     cubierta:(piernaB+piernaF)*largoC/10000,
-    planchas:cubierta(piernaB,piernaF,largoC,p),al,empalme,flejeX,nVanosX};
+    planchas:cubierta(piernaB,piernaF,largoC,p),al,empalme,flejeX,nVanosX,
+    empU:empalme&&empalme.tope?[{lab:'empalme cordón inferior ('+PERF[90].U+')',len:empalme.uL}]:[], lentEmp:empalme&&empalme.tope?n*empalme.lent:0,
+    nudos:nds.length, hexUnion, hexCercha:nds.length*hexUnion, hexTotal:nds.length*hexUnion*n};
 }
 
 function calcular(state){
@@ -889,7 +906,7 @@ function calcular(state){
   // CASA EN L: el ala lleva su propio techo (misma pendiente). Se suman cerchas, cubierta, planchas y fleje; los perfiles
   // ya caen en los mismos grupos. El encuentro de los dos techos (limahoya) es pendiente de lección.
   if(res.techo&&state.techoAla){ const r2=techo(Object.assign({},state,{techo:state.techoAla}),res);
-    if(r2){ const T1=res.techo; T1.ala=r2; T1.n+=r2.n; T1.cubierta+=r2.cubierta; T1.flejeX+=r2.flejeX;
+    if(r2){ const T1=res.techo; T1.ala=r2; T1.n+=r2.n; T1.cubierta+=r2.cubierta; T1.flejeX+=r2.flejeX; T1.lentEmp=(T1.lentEmp||0)+(r2.lentEmp||0); T1.hexTotal=(T1.hexTotal||0)+(r2.hexTotal||0);
       T1.planchas=Object.assign({},T1.planchas,{lados:[...T1.planchas.lados.map(l=>Object.assign({},l,{cols:T1.planchas.cols})),...r2.planchas.lados.map(l=>Object.assign({},l,{cols:r2.planchas.cols,ala:true}))]});
       T1.al=Object.assign({},T1.al,{planchas:(T1.al.planchas||0)+(r2.al.planchas||0)}); } }
   res.cielos=(state.cielos||[]).filter(c=>c.l>0&&c.a>0).map(c=>{
@@ -929,7 +946,12 @@ function panosPiso(S,apoyos,maxL){
     const clave=[ls.length,-Math.min(...ls)]; if(!mejor||clave[0]<mejor.clave[0]||(clave[0]===mejor.clave[0]&&clave[1]<mejor.clave[1])) mejor={clave,ls,cortes}; }
   return mejor?mejor:{ls:[S],cortes:[0,S]};
 }
-const LUZ_VIGA_PISO={'C 90':200,'C 150':330,'Perfil cuadrado 50×50×2':230};
+const LUZ_VIGA_PISO={'C 90':200,'C 150':330,'Perfil cuadrado 50×50×3':210};   // 14-oct revisor: 50×50×3 cada 40 cm, flecha L/360 → 205-210 (el 230 de 2 mm tampoco cumplía)
+// Cristian, 14-oct-2026: los perfiles cuadrados son de 3 mm. Momento que resiste cada viga (kg·m) = módulo resistente × 1.500 kg/cm²
+// [inferido, acero A270ES con margen]: 100×100×3 → W 36,5 cm³ → 548 · 50×50×3 → W 8,34 cm³ → 125 (con 2 mm eran 377 y 89).
+// Revisor de obras 14-oct (sección con esquinas redondeadas r=2t): 100×100×3 W 35,4 cm³ I 177 cm⁴ · 50×50×3 W 7,79 cm³ I 19,5 cm⁴.
+const RESISTE_KGM={'Perfil cuadrado 100×100×3':531,'Perfil cuadrado 50×50×3':117};
+const INERCIA_CM4={'Perfil cuadrado 100×100×3':177,'Perfil cuadrado 50×50×3':19.5};   // para la flecha (límite L/360, E 2.040.000 kg/cm²)
 function entramadoPiso(b,p,L,largo,filas,cruces,g,tramo,C50){
   const tipo=b.entramado||'metalcon', perf=b.perfilPiso||90, A=p.osb||122, AL=p.osbH||244, fe=10;
   const kC=tipo==='metalcon'?'C '+perf:C50, kU=tipo==='metalcon'?'U '+(perf+2):null;
@@ -1052,7 +1074,7 @@ function radier(state,res){
 // precios para COMPARAR alternativas: los de la pestaña Valor si están; si no, una referencia aproximada [referencia, ajustar]
 const PRECIO_REF={'perfil|C 90|600':10500,   // precios de Cristian (4-oct-2026): C 90 $10.500 · 50×50 $35.000 (en tienda vi C 90 a $17.990)
  'perfil|U 92|600':7500,'perfil|C 150|600':15000,'perfil|U 152|600':12000,
-  'perfil|Perfil cuadrado 100×100×2|600':38000,'perfil|Perfil cuadrado 50×50×2|600':35000,'pollo|unidad':5000,'cemento|25':5500};
+  'perfil|Perfil cuadrado 100×100×3|600':38000,'perfil|Perfil cuadrado 50×50×3|600':35000,'pollo|unidad':5000,'cemento|25':5500};
 const precioDe=(state,k)=>(state.precios&&state.precios[k]!=null&&state.precios[k]!=='')?+state.precios[k]:(PRECIO_REF[k]||0);   // 0 = ya comprado
 
 function base(state,res){
@@ -1100,7 +1122,7 @@ function basePollos(state,dir){
   const L=T.luz, largo=T.largo;
   const apoyo=(T.apoyo>0&&T.apoyo<L)?T.apoyo:null;
   const sA=b.sepAtras||200, sF=b.sepAdelante||150, sC=b.sepCentro||150;
-  const C100='Perfil cuadrado 100×100×2', C50='Perfil cuadrado 50×50×2';
+  const C100='Perfil cuadrado 100×100×3', C50='Perfil cuadrado 50×50×3';
   const G={}, g=k=>G[k]=G[k]||[];
   const tramo=(k,len,lab)=>{ let x=len; while(x>600.01){ g(k).push({len:600,lab,w:'Base'}); x-=600-10; } if(x>0.5) g(k).push({len:r1(x),lab,w:'Base'}); };
   // ---- líneas a lo largo (filas), medidas desde atrás ----
@@ -1131,6 +1153,14 @@ function basePollos(state,dir){
     let w=dir==='corto'?piso*trib/100:0;                       // con vigas a lo largo, el piso no carga en estas líneas
     if(i===0||i===filas.length-1) w+=muro+reacBorde;
     if(apoyo&&Math.abs(f.y-apoyo)<1) w+=35+reacApoyo;
+    // 14-oct (Cristian): la fila trabaja EN CONJUNTO (viga continua sobre los pollos). Si con la separación de la regla
+    // no aguanta (momento 0,107·w·s² ≤ lo que resiste) o se dobla de más (flecha 0,0069·w·s⁴/EI ≤ s/360), se agregan
+    // pollos intermedios: la separación baja de 10 en 10 cm hasta que cumpla.
+    const Rk=RESISTE_KGM[f.perfil], Ik=INERCIA_CM4[f.perfil];
+    if(Rk&&Ik&&w>0){ const cumple=s=>{ const tr=Math.max(1,Math.ceil(largo/s-1e-9)), sr=largo/tr, kM=tr>=3?.107:.125, kD=tr>=3?.0069:tr===2?.0054:5/384;
+        return kM*w*Math.pow(sr/100,2)<=Rk && kD*(w/100)*Math.pow(sr,4)/(2040000*Ik)<=sr/360; };
+      let s0=f.sep; while(s0>60&&!cumple(s0)) s0-=10;
+      if(s0<f.sep){ f.sepRegla=f.sep; f.sep=s0; f.n=Math.ceil(largo/f.sep-1e-9)+1; f.sepReal=largo/(f.n-1); } }
     f.w=Math.round(w); f.carga=Math.round(w*f.sepReal/100); f.lado=ladoDe(f.carga);
     f.alto=Math.round(alto(f.y)); f.M=Math.round(f.w*Math.pow(f.sepReal/100,2)/8);
   });
@@ -1631,10 +1661,10 @@ function techoHTML(T,p){
   const svg2=`<svg viewBox="${-t.aleroLat-20} ${-a-20} ${W+2*t.aleroLat+40} ${Hh+a+aF+90}" role="img" aria-label="Planta de cerchas" style="min-width:420px">${q}</svg>`;
   const fila=(z)=>`<tr><td>${esc(z.lab)}</td><td class="m">${fm(z.len)}</td><td class="m">${z.n||1}</td></tr>`;
   const agr=xs=>{ const m=new Map(); xs.forEach(z=>{const k=z.lab+'|'+fm(z.len); if(m.has(k)) m.get(k).n++; else m.set(k,{lab:z.lab,len:z.len,n:1});}); return [...m.values()]; };
-  return `<p class="mini" style="margin:0 0 6px">Cercha reticulada de una pieza: cordones en C 90; montantes y diagonales en ${(PERF[t.webs]||PERF[90]).C}. Cada caída lleva ${Math.round(t.panos||5)} paños: un montante junto al borde para amarrar el ángulo, y montante más diagonal en cada paño hasta la cumbrera (${T.webs.filter(w=>w.a[0]<T.half-1).length} elementos por caída). El cordón inferior ${T.inf.length>1?`no cabe en un perfil: dos tramos traslapados ${t.trasl} cm sobre el tabique de apoyo, de ${fm(T.empalme.z0)} a ${fm(T.empalme.z1)}${T.empalme.falla?' (⚠ no quedan 30 cm libres para el taladro: correr un montante)':`, con ${Math.round(Math.max(T.empalme.izq,T.empalme.der))} cm libres al ${T.empalme.izq>=T.empalme.der?'lado de atrás':'lado del frente'} para el taladro`}`:'va de una pieza'}.</p>
+  return `<p class="mini" style="margin:0 0 6px">Cercha reticulada de una pieza: cordones en C 90; montantes y diagonales en ${(PERF[t.webs]||PERF[90]).C}. Cada caída lleva ${Math.round(t.panos||5)} paños: un montante junto al borde para amarrar el ángulo, y montante más diagonal en cada paño hasta la cumbrera (${T.webs.filter(w=>w.a[0]<T.half-1).length} elementos por caída). El cordón inferior ${T.empalme&&T.empalme.tope?`no cabe en un perfil: dos tramos de ${fm(T.inf[0].len)} y ${fm(T.inf[1].len)} <b>a tope sobre el tabique de apoyo</b> (unión a ${fm(T.empalme.c)}), empalmados con un trozo de ${PERF[90].U} de ${fm(T.empalme.uL)} (${fm(T.empalme.uL/2)} a cada lado, de ${fm(T.empalme.z0)} a ${fm(T.empalme.z1)}) y ${T.empalme.lent} lentejas (${T.empalme.lent/2} por lado)`:T.inf.length>1?`no cabe en un perfil: dos tramos traslapados ${t.trasl} cm sobre el tabique de apoyo, de ${fm(T.empalme.z0)} a ${fm(T.empalme.z1)}${T.empalme.falla?' (⚠ no quedan 30 cm libres para el taladro: correr un montante)':`, con ${Math.round(Math.max(T.empalme.izq,T.empalme.der))} cm libres al ${T.empalme.izq>=T.empalme.der?'lado de atrás':'lado del frente'} para el taladro`}`:'va de una pieza'}.</p>
   <div class="elev">${svg1}</div>
   <div class="row" style="align-items:flex-start;gap:18px;margin-top:8px">
-    <div class="tw" style="flex:1 1 260px"><table><thead><tr><th>Pieza de una cercha</th><th>Largo</th><th>Cant.</th></tr></thead><tbody>${agr([...T.sup,...T.inf,...T.webs]).map(fila).join('')}
+    <div class="tw" style="flex:1 1 260px"><table><thead><tr><th>Pieza de una cercha</th><th>Largo</th><th>Cant.</th></tr></thead><tbody>${agr([...T.sup,...T.inf,...T.webs,...(T.empU||[])]).map(fila).join('')}
       <tr><td><b>Por cercha</b> <span class="mini">cordones + reticulado</span></td><td class="m" colspan="2"><b>${fm(T.porCercha.C90)} + ${fm(T.porCercha.W)} m</b></td></tr></tbody></table></div>
     <div class="elev" style="flex:1 1 300px;margin:0">${svg2}</div>
   </div>
@@ -1646,8 +1676,234 @@ function techoHTML(T,p){
     <li class="info"><b>Aleros de los costados</b> (${fm(t.aleroLat)}): las costaneras siguen de largo; en cada caída va un perfil U 92 atornillado desde arriba, con el lado cerrado hacia afuera (${fm(T.al.U)} m en total). Abajo, trozos de omega de cielo de ${fm(t.aleroLat)} cada 40, tomados al perimetral, como un cielo.</li>
     <li class="info"><b>Bajo alero:</b> ${T.al.om} trozos de omega de cielo, ${fm(T.al.per)} m de ángulo perimetral y ${T.al.planchas} planchas de internit de 4 mm (${T.al.area.toFixed(1).replace('.',',')} m², cortadas en tiras del ancho del alero).</li>
     <li class="info"><b>Cruz de San Andrés entre cerchas:</b> fleje en X en el plano del montante central, en ${T.nVanosX} vanos (el primero y el último): ${(T.flejeX/100).toFixed(1).replace('.',',')} m.</li>
+    <li class="info"><b>Tornillos hexagonales de las cerchas:</b> ${T.hexUnion} por unión × ${T.nudos} uniones = ${T.hexCercha} por cercha · <b>${T.hexTotal}</b> en total${T.ala?' (con el ala)':''}.</li>
+    ${T.lentEmp?`<li class="info"><b>Empalme del cordón inferior:</b> ${T.n} trozos de ${PERF[90].U} de ${fm(T.empalme.uL)} (uno por cercha, sobre el tabique) y ${T.lentEmp} lentejas (${T.empalme.lent} por empalme).</li>`:''}
     <li class="info"><b>Refuerzo de cumbrera:</b> ${T.n} pletinas, una por cercha, entre los perfiles de la cumbrera.</li>
-  </ul>`;
+  </ul>`+cerchaArmadoHTML(T);
+}
+/* ---- PLANTILLA DE ARMADO DE LA CERCHA (14-oct-2026) — para que el equipo las arme todas iguales ----
+   Solo dibuja lo que ya calcula techo(): los mismos nodos, los mismos largos (de eje a eje) y las mismas cantidades.
+   No cambia ningún cálculo. Cada pieza lleva una marca (S1, I1, M1, D1…) y un color, igual en el dibujo, las fichas y la lista. */
+const CER_COL=['#1f4e79','#0b7f86','#37474f','#90a4ae','#d32f2f','#f57c00','#c49000','#2e7d32','#7b1fa2','#c2185b','#795548','#00897b','#7cb342','#1e88e5','#5e35b1','#e64a19'];
+function cerchaPiezas(T){
+  const {L,h,half,t}=T, m=h/half, aB=T.aB, aF=T.aF, C90=PERF[90].C, CW=(PERF[t.webs]||PERF[90]).C;
+  const G=[], add=(tipo,lab,len,perf,a,b)=>{ const k=lab+'|'+fm(len); let z=G.find(q=>q.k===k); if(!z){ z={k,tipo,lab,len,perf,inst:[]}; G.push(z); } z.inst.push({a,b}); };
+  add('S',T.sup[0].lab,T.sup[0].len,C90,[-aB,-aB*m],[half,h]);
+  add('S',T.sup[1].lab,T.sup[1].len,C90,[half,h],[L+aF,-aF*m]);
+  T.inf.forEach(z=>add('I',z.lab,z.len,C90,[z.x0??0,0],[z.x1??L,0]));   // v0.18b: una sola línea, a la misma altura
+  T.webs.forEach(w=>add(w.lab==='diagonal'?'D':w.lab==='montante'?'M':w.lab==='montante central'?'MC':w.lab==='montante sobre apoyo'?'MA':'P',w.lab,w.len,CW,w.a,w.b));
+  if(T.empalme&&T.empalme.tope) add('E','empalme',T.empalme.uL,PERF[90].U,[T.empalme.z0,0],[T.empalme.z1,0]);
+  const ord={S:0,I:1,M:2,MA:3,MC:4,D:5,P:6,E:7};
+  G.sort((x,y)=>ord[x.tipo]-ord[y.tipo]||(/^(M|D|P)$/.test(x.tipo)?x.len-y.len:0));
+  const cuenta={}, total={}; G.forEach(z=>total[z.tipo]=(total[z.tipo]||0)+1);
+  G.forEach((z,i)=>{ cuenta[z.tipo]=(cuenta[z.tipo]||0)+1;
+    z.mark=(z.tipo==='MC'||z.tipo==='MA'||z.tipo==='E'||total[z.tipo]===1)?z.tipo:z.tipo+cuenta[z.tipo];
+    z.col=CER_COL[i%CER_COL.length]; z.n=z.inst.length;
+    z.nom=z.tipo==='S'?'Pierna (cordón de arriba), '+z.lab.replace('pierna ','lado ')+(z.lab.includes('frente')&&aF>0||z.lab.includes('atrás')&&aB>0?', sale al alero':'')
+      :z.tipo==='I'?'Cordón de abajo'+(T.inf.length>1?(z.lab.includes('1')?', tramo 1 (lado atrás)':', tramo 2 (lado frente)'):'')
+      :z.tipo==='M'?'Montante (va parado)':z.tipo==='MA'?'Montante sobre el tabique central':z.tipo==='MC'?'Montante del centro, bajo la cumbrera'
+      :z.tipo==='D'?(T.t.apoyo>0&&z.inst.some(({a,b})=>Math.abs((a[1]<b[1]?a:b)[0]-T.t.apoyo)<0.5)?'Diagonal que llega al pie del montante del tabique (MA)':'Diagonal')
+      :z.tipo==='E'?'Trozo de U para el empalme del cordón de abajo (a tope sobre el tabique)':z.lab;
+    const w=z.inst[0]; z.incl=Math.abs(Math.atan2(w.b[1]-w.a[1],w.b[0]-w.a[0])*180/Math.PI); if(z.incl>90) z.incl=180-z.incl;
+    z.cortes=cerCortes(T,z); });
+  return G;
+}
+const cerG1=n=>n.toFixed(1).replace('.',',');
+// ÁNGULOS DE CORTE (v0.18b, revisor + Cristian): salen de la geometría de la cercha, no son fijos. «fuera de escuadra» = cuánto se gira el corte
+// respecto de un corte recto. Ej. casa de ejemplo (19,7°): cumbrera y alero a plomo 19,7°; montantes recto abajo y 19,7° arriba.
+function cerCortes(T,z){ const {L,half,h}=T, ang=T.ang, g=cerG1, dir=(a,b)=>Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI;
+  const entre=(d1,d2)=>{ let d=Math.abs(d1-d2)%180; return Math.min(d,180-d); };
+  const w=z.inst[0];
+  if(z.tipo==='S'){ const fr=z.lab.includes('frente'), al=fr?T.aF>0:T.aB>0;
+    return [`cumbrera: a plomo, ${g(ang)}° fuera de escuadra (las dos piernas forman ${g(180-2*ang)}°)`, al?`pasa sobre el talón (${g(ang)}° con el cordón de abajo) y sigue al alero`:`talón: ${g(ang)}° con el cordón de abajo`].concat(al?[`punta del alero: a plomo, ${g(ang)}° fuera de escuadra`]:[]); }
+  if(z.tipo==='I'){ const x0=Math.min(w.a[0],w.b[0]), x1=Math.max(w.a[0],w.b[0]), t=T.empalme&&T.empalme.tope;
+    return [x0<0.5?`punta del muro atrás: en el talón, bajo la pierna (${g(ang)}°)`:(t?'punta en el tabique: recta, a tope':'punta: recta'), x1>L-0.5?`punta del muro frente: en el talón, bajo la pierna (${g(ang)}°)`:(t?'punta en el tabique: recta, a tope':'punta: recta')]; }
+  if(z.tipo==='E') return ['las dos puntas rectas'];
+  const lo=w.a[1]<w.b[1]?w.a:w.b, hi=lo===w.a?w.b:w.a, dz=dir(lo,hi), dp=hi[0]<half?ang:-ang;
+  if(z.tipo==='MC') return ['abajo: recto', `arriba: en punta, ${g(ang)}° a cada lado (bajo las dos piernas)`];
+  if(/^M/.test(z.tipo)) return ['abajo: recto', `arriba: ${g(90-entre(dz,dp))}° fuera de escuadra (bajo la pierna)`];
+  if(z.tipo==='D') return [`abajo: ${g(entre(dz,0))}° con el cordón de abajo`, `arriba: ${g(entre(dz,dp))}° con la pierna`];
+  return []; }
+const cerM=d=>{ const r=Math.round(d*2)/2; return Number.isInteger(r)?fm(r):(r/100).toFixed(3).replace('.',','); };
+// textos girados que no se monten: si dos quedan muy juntos, el segundo se corre y lleva una rayita a su punto
+function cerSinMontar(xs,gap){ const out=[]; let last=-1e9; xs.forEach(x=>{ const p=Math.max(x,last+gap); out.push(p); last=p; }); return out; }
+function cerchaSVG(T,G,x0,x1,det){
+  const {L,h,half}=T, m=h/half, aB=T.aB, aF=T.aF, ang=Math.atan(m), F=(det?15:16)*(x1-x0)/800;
+  const ff='font-family="Arial, Helvetica, sans-serif"', ink='#1d2327';
+  const X=x=>x, Y=y=>-y, inV=x=>x>=x0-0.01&&x<=x1+0.01;
+  const yA=-(h+3.6*F), yB=det?9.4*F:13.6*F;
+  let s=`<defs><clipPath id="cc${det?Math.round(x0):'t'}"><rect x="${x0}" y="${yA}" width="${x1-x0}" height="${yB-yA}"/></clipPath></defs>`;
+  s+=`<rect x="${x0}" y="${yA}" width="${x1-x0}" height="${yB-yA}" fill="#fff"/>`;
+  let piezas='';
+  G.forEach(z=>z.inst.forEach(({a,b},k)=>{
+    if(z.tipo==='E'){ piezas+=`<rect x="${a[0]}" y="${-0.62*F}" width="${b[0]-a[0]}" height="${1.24*F}" fill="${z.col}" fill-opacity=".35" stroke="${z.col}" stroke-width="${0.14*F}"/>`; return; }
+    piezas+=`<line x1="${X(a[0])}" y1="${Y(a[1])}" x2="${X(b[0])}" y2="${Y(b[1])}" stroke="${z.col}" stroke-width="${(/^(S|I)$/.test(z.tipo)?0.62:0.42)*F}" stroke-linecap="${z.tipo==='I'?'butt':'round'}"/>`; }));
+  // la unión a tope del cordón de abajo: una raya blanca y negra sobre el tabique
+  if(T.empalme&&T.empalme.tope&&inV(T.empalme.c)) piezas+=`<line x1="${T.empalme.c}" x2="${T.empalme.c}" y1="${-0.9*F}" y2="${0.9*F}" stroke="#fff" stroke-width="${0.3*F}"/><line x1="${T.empalme.c}" x2="${T.empalme.c}" y1="${-0.9*F}" y2="${0.9*F}" stroke="${ink}" stroke-width="${0.1*F}"/>`;
+  s+=`<g clip-path="url(#cc${det?Math.round(x0):'t'})">${piezas}</g>`;
+  // nodos
+  const nodos=[]; const pon=(q)=>{ if(!nodos.some(r=>Math.abs(r[0]-q[0])<0.05&&Math.abs(r[1]-q[1])<0.05)) nodos.push(q); };
+  T.webs.forEach(w=>{ pon(w.a); pon(w.b); }); pon([0,0]); pon([L,0]); pon([half,h]);
+  nodos.filter(q=>inV(q[0])).forEach(q=>s+=`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="${0.32*F}" fill="${ink}"/>`);
+  // apoyos
+  const apoyos=[[0,'muro atrás'],[L,'muro frente']].concat(T.t.apoyo>0&&T.t.apoyo<L?[[T.t.apoyo,'tabique central']]:[]);
+  apoyos.filter(([x])=>inV(x)).forEach(([x,lab])=>{ s+=`<path d="M${x-0.8*F} ${1.4*F} L${x+0.8*F} ${1.4*F} L${x} ${0.45*F} Z" fill="${ink}"/>`;
+    if(!det) s+=`<text x="${x}" y="${2.6*F}" text-anchor="middle" font-size="${0.8*F}" fill="#5d6a70" ${ff}>${lab}</text>`; });
+  // cotas abajo: cada punto donde llega una pieza al cordón de abajo, medido SIEMPRE desde el 0 (cara del muro de atrás)
+  let xs=nodos.filter(q=>q[1]<0.5).map(q=>q[0]); if(T.empalme){ xs.push(T.empalme.z0,T.empalme.z1); } if(T.t.apoyo>0&&T.t.apoyo<L) xs.push(T.t.apoyo);
+  xs=[...new Set(xs.map(x=>Math.round(x*10)/10))].sort((a,b)=>a-b).filter(inV);
+  const y1=det?3.3*F:3.6*F, y2=det?4.9*F:5.2*F, fs=det?0.95*F:0.85*F, tk=0.4*F;
+  // fila de parciales: solo entre puntos donde llega una pieza (las puntas del traslape van solo en la fila de abajo)
+  const xn=xs.filter(x=>nodos.some(q=>q[1]<0.5&&Math.abs(q[0]-x)<0.06)||(T.t.apoyo>0&&Math.abs(x-T.t.apoyo)<0.06));
+  if(det&&xn.length>1){ s+=`<line x1="${xn[0]}" x2="${xn[xn.length-1]}" y1="${y1}" y2="${y1}" stroke="${ink}" stroke-width="${0.08*F}"/>`;
+    xn.forEach((x,i,xs)=>{ s+=`<line x1="${x-tk}" y1="${y1+tk}" x2="${x+tk}" y2="${y1-tk}" stroke="${ink}" stroke-width="${0.12*F}"/>`;
+      if(i){ const d=Math.round(x)-Math.round(xs[i-1]); /* cm redondeados: los parciales siempre suman lo de abajo */ if(d>=2.6*fs) s+=`<text x="${(x+xs[i-1])/2}" y="${y1-0.3*F}" text-anchor="middle" font-size="${fs}" fill="${ink}" ${ff}>${fm(d)}</text>`; } }); }
+  s+=`<line x1="${xs[0]}" x2="${xs[xs.length-1]}" y1="${y2}" y2="${y2}" stroke="${ink}" stroke-width="${0.08*F}"/>`;
+  const px=cerSinMontar(xs,fs*1.08);
+  xs.forEach((x,i)=>{ s+=`<line x1="${x}" y1="${y2-tk}" x2="${x}" y2="${y2+tk}" stroke="${ink}" stroke-width="${0.12*F}"/><circle cx="${x}" cy="${y2}" r="${0.14*F}" fill="${ink}"/>`;
+    if(Math.abs(px[i]-x)>0.5) s+=`<line x1="${x}" y1="${y2+tk}" x2="${px[i]}" y2="${y2+1.1*F}" stroke="#5d6a70" stroke-width="${0.06*F}"/>`;
+    const emp=T.empalme&&(Math.abs(x-T.empalme.z0)<0.06||Math.abs(x-T.empalme.z1)<0.06);
+    s+=`<text transform="translate(${px[i]} ${y2+1.2*F}) rotate(-90)" text-anchor="end" dominant-baseline="middle" font-size="${fs}" font-weight="700" fill="${emp?'#c45a1a':ink}" ${ff}>${cerM(x)}</text>`; });
+  s+=`<text x="${xs[0]-0.4*F}" y="${y2+0.3*F}" text-anchor="end" font-size="${0.8*F}" fill="#5d6a70" ${ff}>0 →</text>`;
+  if(!det){ // medidas generales
+    const y3=10.4*F, y4=12.6*F, cota=(a,b,y,txt)=>`<line x1="${a}" x2="${b}" y1="${y}" y2="${y}" stroke="${ink}" stroke-width="${0.08*F}"/>`+[a,b].map(x=>`<line x1="${x-tk}" y1="${y+tk}" x2="${x+tk}" y2="${y-tk}" stroke="${ink}" stroke-width="${0.12*F}"/>`).join('')+`<text x="${(a+b)/2}" y="${y-0.35*F}" text-anchor="middle" font-size="${0.95*F}" font-weight="700" fill="${ink}" ${ff}>${txt}</text>`;
+    s+=cota(0,L,y3,'luz '+fm(L)+' m (ancho de la casa, de muro a muro)');
+    if(aF>0) s+=cota(L,L+aF,y3,'')+`<text x="${L+aF}" y="${y3-1.2*F}" text-anchor="end" font-size="${0.95*F}" font-weight="700" fill="${ink}" ${ff}>alero ${fm(aF)}</text>`;
+    if(aB>0) s+=cota(-aB,0,y3,'')+`<text x="${-aB}" y="${y3-1.2*F}" font-size="${0.95*F}" font-weight="700" fill="${ink}" ${ff}>alero ${fm(aB)}</text>`;
+    if(aF>0||aB>0) s+=cota(-aB,L+aF,y4,'largo total de punta a punta '+fm(L+aB+aF)+' m (medido en horizontal)');
+    const xh=-aB-1.6*F; s+=`<line x1="${xh}" x2="${xh}" y1="0" y2="${-h}" stroke="${ink}" stroke-width="${0.08*F}"/>`+[0,-h].map(y=>`<line x1="${xh-tk}" y1="${y+tk}" x2="${xh+tk}" y2="${y-tk}" stroke="${ink}" stroke-width="${0.12*F}"/>`).join('')+`<text transform="translate(${xh-0.45*F} ${-h/2}) rotate(-90)" text-anchor="middle" font-size="${0.9*F}" font-weight="700" fill="${ink}" ${ff}>alto ${fm(h)}</text>`;
+    s+=`<text x="${half}" y="${-h-1.2*F}" text-anchor="middle" font-size="${0.95*F}" font-weight="700" fill="${ink}" ${ff}>cumbrera · alto ${fm(h)} m · pendiente ${T.pend} % (${cerG1(T.ang)}°)</text>`; }
+  else { // cotas por la pierna, medidas desde la cumbrera
+    const ns=nodos.filter(q=>q[1]>0.5||Math.abs(q[0]-L)<0.05||Math.abs(q[0])<0.05).filter(q=>inV(q[0]));
+    const izq=(x0+x1)/2<half; const pts=ns.filter(q=>izq?q[0]<=half+0.05:q[0]>=half-0.05).map(q=>[q[0],izq?-1:1]);
+    if(izq&&aB>0) pts.push([-aB,-1]); if(!izq&&aF>0) pts.push([L+aF,1]);
+    pts.forEach(([x,sg])=>{ const y=h-m*Math.abs(x-half), d=Math.hypot(x-half,h-y), nx=-sg*Math.sin(ang)*-1, ny=Math.cos(ang);
+      const ux=sg>0?Math.sin(ang):-Math.sin(ang); const px2=x+ux*1.3*F, py2=y+ny*1.3*F, rot=sg>0?T.ang:-T.ang;
+      s+=`<line x1="${x}" y1="${-y}" x2="${x+ux*0.9*F}" y2="${-(y+ny*0.9*F)}" stroke="${ink}" stroke-width="${0.08*F}"/>`;
+      s+=`<text transform="translate(${px2} ${-py2}) rotate(${rot})" text-anchor="middle" font-size="${0.85*F}" fill="${ink}" ${ff}>${fm(Math.round(d))}</text>`; });
+    s+=`<text x="${(x0+x1)/2}" y="${-h-2.6*F}" text-anchor="middle" font-size="${0.85*F}" fill="#5d6a70" ${ff}>arriba: medido por la pierna desde la cumbrera</text>`; }
+  // etiquetas: marca (y en la vista ampliada, el largo) ENCIMA de cada pieza; si chocan se corren a lo largo de la pieza
+  const cajas=[], ts=[0.5,0.36,0.64,0.24,0.76,0.14,0.86];
+  G.forEach(z=>z.inst.forEach(({a,b})=>{ let A=a,B=b; const cl=(P,Q)=>{ const t=(x)=>(x-P[0])/(Q[0]-P[0]||1e-9); return t; };
+    // tramo visible de la pieza
+    let ta=0,tb=1; if(Math.abs(b[0]-a[0])>0.01){ const t0=(x0-a[0])/(b[0]-a[0]), t1=(x1-a[0])/(b[0]-a[0]); ta=Math.max(0,Math.min(t0,t1)); tb=Math.min(1,Math.max(t0,t1)); } else if(!inV(a[0])) return;
+    if(tb-ta<0.05) return;
+    if(det){ const xm=(a[0]+b[0])/2, izq=(x0+x1)/2<half; if(izq?xm>half+1:xm<half-1) return; }   // en la vista ampliada solo se rotulan las piezas de ese lado
+    const w=(det?Math.max(z.mark.length,4)*0.62+0.7:z.mark.length*0.66+0.6)*F, hh=(det?2.15:1.2)*F;
+    let pos=null; for(const t0 of (z.tipo==='E'?[0.2,0.8,0.5]:ts)){ const t=ta+(tb-ta)*t0, cx=a[0]+(b[0]-a[0])*t, cy=-(a[1]+(b[1]-a[1])*t)+(z.tipo==='E'?-(det?1.9:1.3)*F:0);
+      const bx=[cx-w/2,cy-hh/2,cx+w/2,cy+hh/2]; if(bx[0]<x0||bx[2]>x1) continue;
+      if(!cajas.some(c=>!(bx[2]<c[0]||bx[0]>c[2]||bx[3]<c[1]||bx[1]>c[3]))){ pos=bx; break; } }
+    if(!pos){ const t=ta+(tb-ta)*0.5, cx=a[0]+(b[0]-a[0])*t, cy=-(a[1]+(b[1]-a[1])*t); pos=[cx-w/2,cy-hh/2,cx+w/2,cy+hh/2]; }
+    cajas.push(pos); const cx=(pos[0]+pos[2])/2, cy=(pos[1]+pos[3])/2;
+    s+=`<rect x="${pos[0]}" y="${pos[1]}" width="${w}" height="${hh}" rx="${0.3*F}" fill="#fff" stroke="${z.col}" stroke-width="${0.16*F}"/>`;
+    if(det) s+=`<text x="${cx}" y="${cy-0.12*F}" text-anchor="middle" font-size="${0.9*F}" font-weight="700" fill="${z.col}" ${ff}>${z.mark}</text><text x="${cx}" y="${cy+0.86*F}" text-anchor="middle" font-size="${0.95*F}" font-weight="700" fill="${ink}" ${ff}>${fm(z.len)}</text>`;
+    else s+=`<text x="${cx}" y="${cy+0.36*F}" text-anchor="middle" font-size="${0.95*F}" font-weight="700" fill="${z.col}" ${ff}>${z.mark}</text>`; }));
+  return `<svg viewBox="${x0} ${yA} ${x1-x0} ${yB-yA}" role="img" aria-label="Plantilla de armado de la cercha">${s}</svg>`;
+}
+// UNIONES (Cristian, 14-oct): en las orillas se le corta parte del alma a la pieza y queda un ala (pestaña) para atornillar con hexagonales
+// cortos de ½"; en el centro las piezas van montadas por delante del cordón, alma con alma. Tornillos: «5 hexagonales en cada unión»
+// (confirmado por Cristian el 14-oct). El total por cercha y por obra lo calcula techo().
+const CER_HEX_UNION=5;
+function cerUnionesHTML(T,G){ const cS=(G.find(z=>z.tipo==='S')||{}).col||'#1f4e79', cI=(G.find(z=>z.tipo==='I')||{}).col||'#37474f', cM=(G.find(z=>z.tipo==='M')||{}).col||'#2e7d32';
+  const ff='font-family="Arial, Helvetica, sans-serif"', a=T.ang*Math.PI/180, tor=(x,y)=>`<circle cx="${x}" cy="${y}" r="4.5" fill="#fff" stroke="#c62828" stroke-width="2.5"/>`;
+  // orilla: el cordón de abajo y la pierna llegando al talón; la pierna lleva el alma cortada y su ala queda sobre el cordón
+  const px=40, py=120, L1=230, ex=px+L1*Math.cos(a), ey=py-L1*Math.sin(a);
+  let o=`<rect x="20" y="${py-9}" width="300" height="18" fill="${cI}"/>`;
+  o+=`<line x1="${px}" y1="${py}" x2="${ex}" y2="${ey}" stroke="${cS}" stroke-width="18"/>`;
+  o+=`<polygon points="${px+10},${py-9} ${px+120},${py-9} ${px+120},${py+9} ${px+10},${py+9}" fill="${cS}" fill-opacity=".45" stroke="${cS}" stroke-width="2" stroke-dasharray="5 3"/>`;
+  [55,75,95,115,135].forEach((x,i)=>o+=tor(x+(i%2?0:0),py));
+  o+=`<text x="160" y="${py+38}" ${ff} font-size="15" fill="#1d2327">ala de la pierna sobre el cordón</text><text x="20" y="22" ${ff} font-size="16" font-weight="700" fill="#1d2327">En las orillas (talones)</text>`;
+  // centro: montante por delante del cordón, alma con alma
+  let c=`<rect x="20" y="102" width="300" height="20" fill="${cI}"/><rect x="150" y="20" width="22" height="122" fill="${cM}" stroke="#1d2327" stroke-width="1"/>`;
+  [106,112,118].forEach((y,i)=>c+=tor(i%2?166:156,y)); c+=tor(161,90); c+=tor(161,74);
+  c+=`<text x="182" y="60" ${ff} font-size="15" fill="#1d2327">montante por DELANTE</text><text x="182" y="78" ${ff} font-size="15" fill="#1d2327">del cordón (alma con alma)</text><text x="20" y="22" ${ff} font-size="16" font-weight="700" fill="#1d2327">En el centro</text>`;
+  const sv=(g,lab)=>`<svg viewBox="0 0 420 160" style="display:block;width:100%;max-width:440px;height:auto" role="img" aria-label="${lab}">${g}</svg>`;
+  return `<div style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><h4 style="margin:0 0 4px;font-size:16.5px">Cómo van las uniones</h4>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">${sv(o,'Unión en la orilla')}${sv(c,'Unión en el centro')}</div>
+    <ul style="margin:4px 0 0;padding-left:20px;font-size:15px;line-height:1.5">
+      <li><b>Orillas</b> (talones, junto a los muros): a la pieza se le corta parte del alma y queda un <b>ala (pestaña)</b> que monta sobre el cordón; ahí se atornilla con <b>hexagonales cortos de ½"</b>.</li>
+      <li><b>Centro</b>: montantes y diagonales van <b>montados por delante del cordón</b>, alma con alma, atornillados.</li>
+      <li>Tornillos: <b>${T.hexUnion||CER_HEX_UNION} hexagonales en cada unión</b> (en rojo en el dibujo): ${T.nudos} uniones por cercha = <b>${T.hexCercha} por cercha</b>, ${T.hexTotal} en total.${T.empalme&&T.empalme.tope?` El empalme del cordón de abajo lleva <b>${T.empalme.lent} lentejas</b> (${T.empalme.lent/2} a cada lado de la unión).`:''}</li></ul></div>`; }
+function cerchaArmadoHTML(T){
+  const {L,h,half,n}=T, aB=T.aB, aF=T.aF, G=cerchaPiezas(T), m=h/half;
+  const F0=16*(L+aB+aF+150)/800, vista=cerchaSVG(T,G,-aB-3.4*F0,L+aF+1.4*F0,false);
+  const mg=34, va=cerchaSVG(T,G,-aB-mg,half+mg,true), vf=cerchaSVG(T,G,half-mg,L+aF+mg,true);
+  const C90=PERF[90].C;
+  const sumC=G.filter(z=>/^(S|I)$/.test(z.tipo)).reduce((a,z)=>a+z.len*z.n,0), sumW=G.filter(z=>!/^(S|I|E)$/.test(z.tipo)).reduce((a,z)=>a+z.len*z.n,0), sumE=G.filter(z=>z.tipo==='E').reduce((a,z)=>a+z.len*z.n,0);
+  const cuadra=Math.abs(sumC-T.porCercha.C90)<0.6&&Math.abs(sumW-T.porCercha.W)<0.6, nPz=G.reduce((a,z)=>a+z.n,0);
+  const chip=z=>`<span style="display:inline-block;min-width:2.4em;text-align:center;background:${z.col};color:#fff;font-weight:700;border-radius:5px;padding:1px 6px">${z.mark}</span>`;
+  // marcas a lo largo de cada cordón (para marcarlo en el banco antes de armar)
+  const marcasDe=z=>{ const w=z.inst[0], a=w.a, b=w.b; let pts=[];
+    if(z.tipo==='S'){ const izq=a[0]<half-1; T.webs.forEach(q=>[q.a,q.b].forEach(p=>{ if(p[1]>0.5&&(izq?p[0]<half-0.05:p[0]>half+0.05)) pts.push(Math.hypot(p[0]-half,h-p[1])); }));
+      if(!izq&&aF>0) pts.push(Math.hypot(L-half,h)); if(izq&&aB>0) pts.push(Math.hypot(half,h));
+      return {cm:true,desde:'desde la punta de la cumbrera',hasta:izq?(aB>0?'punta del alero':'talón (muro atrás)'):(aF>0?'punta del alero':'talón (muro frente)'),pts:[...new Set(pts.map(d=>Math.round(d)))].sort((x,y)=>x-y)}; }
+    const x0=Math.min(a[0],b[0]), x1=Math.max(a[0],b[0]), der=x0>0.5&&x1>L-0.5, dd=x=>der?x1-x:x-x0; T.webs.forEach(q=>[q.a,q.b].forEach(p=>{ if(p[1]<0.5&&p[0]>x0+0.05&&p[0]<x1-0.05) pts.push(dd(p[0])); }));
+    const emp=[]; if(T.empalme){ [T.empalme.z0,T.empalme.z1].forEach(x=>{ if(x>x0+0.05&&x<x1-0.05){ pts.push(dd(x)); emp.push(Math.round(dd(x)*2)/2); } }); }
+    if(T.t.apoyo>0&&T.t.apoyo>x0&&T.t.apoyo<x1) pts.push(dd(T.t.apoyo));
+    if(der) return {emp,desde:'desde la punta del muro frente',hasta:'su punta del lado atrás (a '+cerM(x0)+' del 0)',pts:[...new Set(pts.map(d=>Math.round(d*2)/2))].sort((x,y)=>x-y)};
+    return {emp,desde:x0<0.5?'desde la punta del muro atrás (el 0)':'desde su punta del lado atrás (a '+cerM(x0)+' del 0)',hasta:x1>L-0.5?'punta del muro frente':'punta (a '+cerM(x1)+' del 0)',pts:[...new Set(pts.map(d=>Math.round(d*2)/2))].sort((x,y)=>x-y)}; };
+  const maxL=Math.max(...G.map(z=>z.len));
+  const ficha=z=>{ const cord=/^(S|I)$/.test(z.tipo), W=cord?1000:260, bw=cord?940:Math.max(70,540*z.len/maxL), x0=cord?30:20;
+    let sv=`<rect x="${x0}" y="${cord?92:16}" width="${bw}" height="${cord?22:18}" rx="3" fill="${z.col}"/>`;
+    const yd=cord?140:56; sv+=`<line x1="${x0}" x2="${x0+bw}" y1="${yd}" y2="${yd}" stroke="#1d2327" stroke-width="1.5"/>`+[x0,x0+bw].map(x=>`<line x1="${x}" x2="${x}" y1="${yd-10}" y2="${yd+6}" stroke="#1d2327" stroke-width="1.5"/>`).join('');
+    let pie='';
+    if(cord){ const mk=marcasDe(z), k=bw/z.len, xsr=mk.pts.map(d=>x0+d*k), px=cerSinMontar(xsr,19);
+      mk.pts.forEach((d,i)=>{ const en=(mk.emp||[]).includes(d), co=en?'#c45a1a':'#1d2327'; sv+=`<line x1="${xsr[i]}" x2="${xsr[i]}" y1="86" y2="120" stroke="${co}" stroke-width="2.5"/>`;
+        if(Math.abs(px[i]-xsr[i])>0.5) sv+=`<line x1="${xsr[i]}" y1="86" x2="${px[i]}" y2="78" stroke="#5d6a70" stroke-width="1"/>`;
+        sv+=`<text transform="translate(${px[i]} 76) rotate(-90)" font-size="17" font-weight="700" fill="${co}" font-family="Arial, Helvetica, sans-serif">${mk.cm?fm(d):cerM(d)}</text>`; });
+      sv+=`<text x="${x0+bw/2}" y="${yd+24}" text-anchor="middle" font-size="22" font-weight="700" fill="#1d2327" font-family="Arial, Helvetica, sans-serif">${fm(z.len)} m</text>`;
+      sv+=`<text x="${x0}" y="${yd+24}" font-size="15" fill="#5d6a70" font-family="Arial, Helvetica, sans-serif">◀ ${mk.desde.replace('desde la ','').replace('desde ','')}</text><text x="${x0+bw}" y="${yd+24}" text-anchor="end" font-size="15" fill="#5d6a70" font-family="Arial, Helvetica, sans-serif">${mk.hasta} ▶</text>`;
+      pie=mk.pts.length?`<div class="mini" style="font-size:13.5px">Rayas arriba = dónde llega cada montante o diagonal, medido ${mk.desde}${mk.emp&&mk.emp.length?(T.empalme&&T.empalme.tope?'; en naranjo, hasta dónde llega el trozo de U del empalme':'; en naranjo, donde empieza o termina el traslape con el otro tramo'):''}.</div>`:''; }
+    else { // montante o diagonal: dibujada como va en la cercha (parada o inclinada), a la misma escala entre todas
+      const maxW=Math.max(...G.filter(q=>!/^(S|I)$/.test(q.tipo)).map(q=>q.len)), k=86/maxW, Lp=Math.max(14,z.len*k), an=z.incl*Math.PI/180;
+      const ax=24, ay=94, bx=ax+Lp*Math.cos(an), by=ay-Lp*Math.sin(an);
+      sv=`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="${z.col}" stroke-width="11" stroke-linecap="butt"/><circle cx="${ax}" cy="${ay}" r="3.5" fill="#1d2327"/><circle cx="${bx}" cy="${by}" r="3.5" fill="#1d2327"/>`;
+      sv+=`<text x="${Math.max(bx,ax)+16}" y="${(ay+by)/2+8}" font-size="22" font-weight="700" fill="#1d2327" font-family="Arial, Helvetica, sans-serif">${fm(z.len)} m</text>`;
+      }
+    const H=cord?175:104;
+    return `<div style="border:1px solid var(--line);border-left:6px solid ${z.col};border-radius:8px;padding:8px 10px;background:var(--panel);${cord?'grid-column:1/-1':''}">
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-size:20px">${chip(z)}</span><b style="font-size:26px;font-family:var(--display)">${fm(z.len)} m</b><span style="font-size:16px"><b>× ${z.n}</b> por cercha · <b>${z.n*n}</b> en total</span></div>
+      <div style="font-size:14.5px;margin:2px 0 2px">${esc(z.nom)} · ${z.perf}${z.tipo==='D'?` · va inclinada ${cerG1(z.incl)}°`:z.tipo==='S'?` · inclinada ${cerG1(T.ang)}°`:''}</div>
+      ${z.cortes&&z.cortes.length?`<div style="font-size:14.5px;margin:0 0 2px"><b>Cortes:</b> ${z.cortes.join(' · ')}</div>`:''}
+      <svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto;max-width:${cord?"none":"340px"}" role="img" aria-label="Pieza ${z.mark}">${sv}</svg>${pie}</div>`; };
+  const filasT=G.map(z=>`<tr><td>${chip(z)}</td><td>${esc(z.nom)}</td><td>${z.perf}</td><td class="m"><b>${fm(z.len)}</b></td><td class="m">${z.n}</td><td class="m"><b>${z.n*n}</b></td></tr>`).join('');
+  const caja='border:2px solid var(--steel);border-radius:10px;padding:10px 12px;margin-top:10px;background:var(--panel)';
+  const pasos=[
+    `<b>Hacer la plantilla</b> en el piso o en una mesa bien plana: tirar una línea recta para el cordón de abajo y marcar el <b>0</b> (cara del muro de atrás).`,
+    `Con la huincha <b>siempre desde el 0</b> (nunca de punto a punto, así no se suma el error), marcar cada punto de la cota de abajo: ${T.webs.filter(w=>w.a[1]<0.5&&w.lab.startsWith('montante')).map(w=>w.a[0]).sort((a,b)=>a-b).map(x=>fm(x)).join(' · ')}.`,
+    `En cada punto, levantar a escuadra la altura del montante (es su mismo largo). En el centro, la cumbrera a <b>${fm(h)}</b>. Fijar topes (despuntes atornillados) por fuera de las líneas para que las piezas calcen solas.`,
+    `Cortar <b>una</b> pieza de cada marca y presentarla en la plantilla. Si calza, recién cortar todas: ${G.map(z=>`${z.mark} × ${z.n*n}`).join(', ')}. Escribir la marca con plumón en cada pieza.`,
+    `Armar la primera cercha y revisar: luz ${fm(L)}, alto ${fm(h)} en el centro, y que de la cumbrera a cada muro (talón) mida lo mismo por los dos lados: <b>${fm(Math.hypot(half,h))}</b>.`,
+    T.empalme&&T.empalme.tope?`El cordón de abajo es <b>una sola línea, a la misma altura</b>, en dos tramos <b>a tope sobre el tabique central</b> (unión a <b>${fm(T.empalme.c)}</b>): I1 de ${fm(T.inf[0].len)} e I2 de ${fm(T.inf[1].len)}. La unión se empalma con el trozo de ${PERF[90].U} (E) de <b>${fm(T.empalme.uL)}</b>, ${fm(T.empalme.uL/2)} a cada lado (de <b>${fm(T.empalme.z0)}</b> a <b>${fm(T.empalme.z1)}</b> desde el 0), con <b>${T.empalme.lent} lentejas</b> (${T.empalme.lent/2} por lado).`
+    :T.inf.length>1?`El cordón de abajo va en dos tramos (I1 e I2) traslapados <b>${fm(T.empalme.z1-T.empalme.z0)}</b> sobre el tabique central: de <b>${cerM(T.empalme.z0)}</b> a <b>${cerM(T.empalme.z1)}</b> desde el 0.`:'',
+    `La primera queda de <b>molde</b>: cada cercha nueva se arma en la misma plantilla y se compara punta con punta con la primera. Numerarlas de 1 a ${n}.`].filter(Boolean);
+  return `<div class="cer-arm" style="margin-top:16px">
+    <h3 style="margin:0 0 4px;font-size:20px">Plantilla de armado de la cercha</h3>
+    <p style="margin:0 0 6px;font-size:15px">Una cercha (son <b>${n}</b> iguales). Cada pieza tiene su <b>marca y su color</b>: el mismo en el dibujo, en las fichas y en la lista. Las medidas de abajo van todas <b>desde el 0</b> (muro de atrás).</p>
+    <div class="pla">${vista}</div></div>
+  ${(()=>{ // 14-oct (Cristian): cuántas, cada cuánto y en qué orden — para que el que le toque armar no tenga dudas
+    const sep=T.sepReal, larg=(T.t&&T.t.largo)||sep*(n-1), Wd=1000, pad=40, k=(Wd-2*pad)/larg; let g="";
+    g+=`<line x1="${pad}" y1="70" x2="${pad+larg*k}" y2="70" stroke="var(--steel)" stroke-width="3"/>`;
+    for(let i=0;i<n;i++){ const x=pad+i*sep*k, borde=(i===0||i===n-1); g+=`<line x1="${x}" y1="30" x2="${x}" y2="110" stroke="${borde?'#e8730c':'#2e8b57'}" stroke-width="${borde?7:5}"/><text x="${x}" y="24" text-anchor="middle" font-size="18" font-weight="700" fill="${borde?'#e8730c':'#2e8b57'}" font-family="IBM Plex Mono,monospace">${i+1}</text>`;
+      if(i<n-1) g+=`<text x="${x+sep*k/2}" y="132" text-anchor="middle" font-size="15" fill="var(--ink)" font-family="IBM Plex Mono,monospace">${fm(sep)}</text>`; }
+    g+=`<text x="${pad+larg*k/2}" y="160" text-anchor="middle" font-size="17" fill="var(--ink)" font-family="IBM Plex Mono,monospace">largo de la casa ${fm(larg)} m · ${n} cerchas cada ${fm(sep)} m (de eje a eje)</text>`;
+    return `<div class="cer-arm" style="border:2px solid #e8730c;border-radius:10px;padding:10px 12px;margin-top:12px;background:var(--panel)"><h3 style="margin:0 0 6px;font-size:19px">Cuántas, cada cuánto y en qué orden</h3>
+      <p style="margin:0 0 4px;font-size:16px">Se hacen <b>${n} cerchas</b>, separadas <b>cada ${fm(sep)} m</b> de eje a eje a lo largo de la casa (${fm(larg)} m). La 1 y la ${n} van sobre los muros de los costados.</p>
+      <p style="margin:0 0 6px;font-size:16px"><b style="color:#2e8b57">Primero</b> se arman y se montan las <b>${Math.max(0,n-2)} del centro</b> (de la 2 a la ${n-1}). <b style="color:#e8730c">Al último</b>, las <b>2 de los bordes</b> (la 1 y la ${n}).</p>
+      <svg viewBox="0 0 ${Wd} 170" style="display:block;width:100%;height:auto" role="img" aria-label="Ubicación y orden de las cerchas">${g}</svg></div>`; })()}
+  <div class="cer-arm" style="margin-top:12px"><h3 style="margin:0 0 4px;font-size:18px">Lado atrás, en grande (del 0 a la cumbrera)</h3><p class="mini" style="margin:0 0 4px;font-size:13.5px">Sobre cada pieza: su marca y su largo. Abajo, en negrita: dónde llega cada pieza, medido desde el 0${T.empalme?(T.empalme.tope?`; en naranjo, el trozo de U del empalme (de ${fm(T.empalme.z0)} a ${fm(T.empalme.z1)})`:'; en naranjo, donde empieza y termina el traslape del cordón de abajo'):''}.</p><div class="pla">${va}</div></div>
+  <div class="cer-arm" style="margin-top:12px"><h3 style="margin:0 0 4px;font-size:18px">Lado frente, en grande (de la cumbrera al alero)</h3><p class="mini" style="margin:0 0 4px;font-size:13.5px">Las medidas de abajo siguen siendo desde el mismo 0 del muro de atrás.</p><div class="pla">${vf}</div></div>
+  <div class="cer-arm" style="margin-top:12px"><h3 style="margin:0 0 6px;font-size:18px">Cada pieza suelta (para cortar)</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px">${G.filter(z=>/^(S|I)$/.test(z.tipo)).map(ficha).join('')}</div></div>
+  <div class="cer-arm" style="margin-top:8px"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px">${G.filter(z=>!/^(S|I)$/.test(z.tipo)).map(ficha).join('')}</div>
+    <p class="mini" style="margin:6px 0 0;font-size:13.5px">Los largos son <b>de eje a eje</b> (de centro de perfil a centro de perfil), los mismos del despiece. Los ángulos de corte salen del dibujo de la cercha. Igual: <b>presentar la primera de cada marca en la plantilla y cortarla a medida</b>; si hay que ajustar por el ancho del perfil o por la unión, anotar aquí el largo real y cortar todas iguales a esa: ________</p></div>
+  <div class="cer-arm" style="margin-top:12px"><h3 style="margin:0 0 4px;font-size:18px">Lista de corte por cercha</h3>
+    <div class="tw"><table><thead><tr><th>Marca</th><th>Pieza</th><th>Perfil</th><th>Largo</th><th>Por cercha</th><th>Total (× ${n})</th></tr></thead><tbody>${filasT}
+    <tr><td colspan="4"><b>Total</b> <span class="mini">${C90} cordones ${fm(sumC)} m + reticulado ${fm(sumW)} m por cercha${sumE?` + ${PERF[90].U} empalme ${fm(sumE)} m`:''}${T.lentEmp?` · ${T.empalme.lent} lentejas por empalme (${T.lentEmp} en total)`:''}</span></td><td class="m"><b>${nPz}</b></td><td class="m"><b>${nPz*n}</b></td></tr></tbody></table></div>
+    <p class="mini" style="margin:4px 0 0">${cuadra?'✓ Cuadra con la tabla «Pieza de una cercha» de arriba y con el despiece.':'⚠ No cuadra con la tabla de arriba: revisar.'}</p></div>
+  <div class="cer-arm" style="${caja}"><h3 style="margin:0 0 6px;font-size:18px">Cómo armarlas todas iguales</h3>
+    <ol style="margin:0;padding-left:22px;font-size:15.5px;line-height:1.5">${pasos.map(x=>`<li style="margin-bottom:4px">${x}</li>`).join('')}</ol>
+    ${cerUnionesHTML(T,G)}</div>`;
 }
 function agrupar(xs){ const m=new Map(); xs.forEach(x=>m.set(fm(x),(m.get(fm(x))||0)+1)); return [...m].map(([k,n])=>n>1?`${k} × ${n}`:k).join(' · '); }
 
@@ -1878,7 +2134,10 @@ function pintarPlano(R,info){
   const anch={90:9,60:6,40:4};
   pl.tabiques.forEach((t,i)=>{ const e=anch[t.perfil]||9; const r=t.o==='h'?[t.desde,t.eje-e/2,t.hasta-t.desde,e]:[t.eje-e/2,t.desde,e,t.hasta-t.desde];
     g+=`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="${t.perfil==90?'var(--steel)':'var(--muted)'}"/>`;
-    if(t.fijo){ const cx=t.o==='h'?(t.desde+t.hasta)/2:t.eje, cy=t.o==='h'?t.eje:(t.desde+t.hasta)/2; g+=`<g><circle cx="${cx}" cy="${cy}" r="17" fill="var(--bad)"/><text x="${cx}" y="${cy+7}" text-anchor="middle" font-size="20">📌</text></g>`; } });
+    if(t.fijo){ const cx=t.o==='h'?(t.desde+t.hasta)/2:t.eje, cy=t.o==='h'?t.eje:(t.desde+t.hasta)/2; g+=`<g><circle cx="${cx}" cy="${cy}" r="17" fill="var(--bad)"/><text x="${cx}" y="${cy+7}" text-anchor="middle" font-size="20">📌</text></g>`; }
+    // 14-oct (Cristian): el nombre o letra de cada tabique interior, en una etiqueta junto al muro (a 1/3 del largo, para no tapar el 📌)
+    { const nom=String(t.nombre||('T'+(i+1))).slice(0,22), lx=t.o==='h'?t.desde+(t.hasta-t.desde)/3:t.eje+22, ly=t.o==='h'?t.eje-22:t.desde+(t.hasta-t.desde)/3, w=nom.length*12+18;
+      g+=`<g><rect x="${lx-w/2}" y="${ly-15}" width="${w}" height="26" rx="13" fill="var(--accent)" opacity=".92"/><text x="${lx}" y="${ly+5}" text-anchor="middle" font-size="17" font-weight="700" fill="#111" font-family="IBM Plex Mono,monospace">${esc(nom)}</text></g>`; } });
   // vanos sobre los muros
   const nPorMuro={};
   pl.vanos.slice().sort((a,b)=>a.desde-b.desde).forEach(v=>{ const k=v.muro; const alt=(nPorMuro[k]=(nPorMuro[k]||0)+1)%2===0; const col=v.tipo==='puerta'?'var(--accent)':'var(--vol)'; let r=null, lx, ly;
@@ -2075,7 +2334,8 @@ function baseHTML(BA){
     g+=`<text x="${W+18}" y="${f.y+8}" font-size="24" fill="var(--ink)" font-family="IBM Plex Mono,monospace">${f.n} × ${fm(f.sepReal)}</text>`; });
   g+=`<text x="${W/2}" y="${-18}" text-anchor="middle" font-size="24" fill="var(--muted)" font-family="IBM Plex Mono,monospace">atrás (más bajo, ${fm(BA.hA)})</text><text x="${W/2}" y="${H+44}" text-anchor="middle" font-size="24" fill="var(--muted)" font-family="IBM Plex Mono,monospace">frente (más alto, ${fm(BA.hF)})</text>`;
   const svg=`<svg viewBox="${-pad} ${-pad-20} ${W+2*pad+200} ${H+2*pad+40}" style="width:100%;max-width:640px;height:auto;margin-top:10px" role="img" aria-label="Planta de pollos">${g}</svg>`;
-  const tabla=`<div class="tw"><table style="margin-top:8px"><thead><tr><th>Fila</th><th>Fierro</th><th>Pollos</th><th>Cada</th><th>Carga por pollo</th><th>Base</th><th>Piso sobre suelo</th></tr></thead><tbody>${[...BA.filas,...(BA.lineasT||[]).filter(t=>t.pollos).map(t=>Object.assign({},t,{nom:t.nom+' (a '+fm(t.x)+')'}))].map(f=>`<tr><td>${esc(f.nom)}</td><td class="m">${(f.perfil||'').replace('Perfil cuadrado ','').replace('×2','')}</td><td class="m">${f.n}</td><td class="m">${fm(f.sepReal)}</td><td class="m">${f.carga.toLocaleString('es-CL')} kg</td><td class="m">${f.lado} × ${f.lado}</td><td class="m">${fm(f.alto)}</td></tr>`).join('')}</tbody></table></div>
+  const tabla=`<div class="tw"><table style="margin-top:8px"><thead><tr><th>Fila</th><th>Fierro</th><th>Pollos</th><th>Cada</th><th>Viga: pide / resiste</th><th>Carga por pollo</th><th>Base</th><th>Piso sobre suelo</th></tr></thead><tbody>${[...BA.filas,...(BA.lineasT||[]).filter(t=>t.pollos).map(t=>Object.assign({},t,{nom:t.nom+' (a '+fm(t.x)+')'}))].map(f=>`<tr><td>${esc(f.nom)}</td><td class="m">${(f.perfil||'').replace('Perfil cuadrado ','').replace('×3','').replace('×2','')}</td><td class="m">${f.n}</td><td class="m">${fm(f.sepReal)}${f.sepRegla?` <span title="la regla decía cada ${fm(f.sepRegla)}; se agregaron pollos intermedios para que la viga cumpla">➕</span>`:''}</td><td class="m">${(()=>{ const tr=Math.max(1,(f.n||2)-1), kM=tr>=3?0.107:0.125, kD=tr>=3?0.0069:tr===2?0.0054:5/384;   // viga CONTINUA sobre los pollos (trabaja en conjunto): coeficientes de tramos iguales, el más exigido (tramo extremo y primer apoyo interior)
+      const M=Math.round(kM*(f.w||0)*Math.pow(f.sepReal/100,2)), R=(typeof RESISTE_KGM!=='undefined'&&RESISTE_KGM[f.perfil])||0; const I=(typeof INERCIA_CM4!=='undefined'&&INERCIA_CM4[f.perfil])||0, Lc=f.sepReal, d=I?kD*((f.w||0)/100)*Math.pow(Lc,4)/(2040000*I):0, rel=d>0?Math.round(Lc/d):0; return R?`${M} / ${R} kg·m · flecha L/${rel} ${M<=R&&rel>=360?'✅':'⚠️'}`:'—'; })()}</td><td class="m">${f.carga.toLocaleString('es-CL')} kg</td><td class="m">${f.lado} × ${f.lado}</td><td class="m">${fm(f.alto)}</td></tr>`).join('')}</tbody></table></div>
     <p class="mini">Base calculada para que el pollo no le pase al suelo más de ${String(BA.suelo).replace('.',',')} kg/cm², con ${BA.prof} cm de profundidad${BA.columnaFrente?' · en el frente el fierro sube corrido hasta 2,40':''}.</p>`;
   return svg+tabla+(BA.enL?`<p class="mini">Casa en L: arriba se dibuja el cuerpo; el ala se arma con las mismas reglas y está sumada (${BA.ala.nPollos} pollos: ${BA.filasAla.map(f=>f.n).join(' + ')}). Donde se juntan, en obra se comparte una línea de 100×100: el cálculo la cuenta dos veces (queda del lado seguro).</p>`:'');
 }
@@ -2102,6 +2362,8 @@ function materiales(R,p){
   cuts.filter(([k])=>!/^Perfil cuadrado/.test(k)).forEach(([k,c])=>item(`perfil|${k}|${c.B}`,`${k==='Ángulo perimetral'?'Ángulo perimetral':'Perfil '+k} de ${fm(c.B)} m`,c.bars.length,'un',`${k==='Ángulo perimetral'?'tiras':'perfiles'} ${k} de ${fm(c.B)} m`));
   const flejeTot=R.fle.tot+(R.techo?R.techo.flejeX:0);
   item('fleje|50','Fleje galvanizado (rollo de 50 m)',Math.ceil(flejeTot/5000),'un',`rollo de fleje de 50 m (${(flejeTot/100).toFixed(1).replace('.',',')} m: esquinas${R.techo?' y cruces entre cerchas':''})`,'f');
+  if(R.techo&&R.techo.hexTotal) item('hexagonal|cerchas','Tornillo hexagonal (uniones de las cerchas)',R.techo.hexTotal,'un',`hexagonales para las cerchas (${R.techo.hexUnion} por unión × ${R.techo.nudos} uniones = ${R.techo.hexCercha} por cercha)`);
+  if(R.techo&&R.techo.lentEmp) item('lenteja|empalme-cercha','Tornillo cabeza lenteja ½" (empalmes del cordón inferior de las cerchas)',R.techo.lentEmp,'un',`lentejas para los empalmes de las cerchas (${R.techo.empalme?R.techo.empalme.lent:20} por cercha)`);
   if(R.techo) item('pletina|cumbrera','Pletina de refuerzo de cumbrera',R.techo.n,'un',`pletinas de cumbrera (una por cercha; ${R.techo.n} cerchas)`);
 
   abrir('forros','Forros (planchas de muros y cielos)','');
