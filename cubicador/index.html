@@ -178,7 +178,7 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
     <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Valor de los materiales</h2><div class="row"><button class="b" data-dl="valor">⬇️ Descargar</button><button class="b pri" id="copiar-valor">Copiar presupuesto</button></div></div>
       <p class="mini" style="margin:4px 0 10px">Las cantidades salen solas de la cubicación. Escribe el precio unitario de cada cosa (en pesos) y se suma todo. Los precios quedan guardados en el teléfono y sirven para las próximas obras.</p>
       <div class="tw"><table id="tabla-valor"></table></div>
-      <div class="row" style="margin-top:10px;align-items:center"><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-iva" style="margin:0">Sumar IVA (19 %)</label><span class="mini" id="msg-valor"></span></div></div>
+      <div class="row" style="margin-top:10px;align-items:center"><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-iva" style="margin:0">Sumar IVA (19 %)</label><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-resp" style="margin:0">Mis precios ya traen respaldo (precio = materiales + mano de obra)</label><span class="mini" id="msg-valor"></span></div></div>
     <details class="card" style="margin-top:12px"><summary><b>💼 Precio al cliente</b> <span class="mini">· aparte del costo</span></summary><p class="mini" style="margin:6px 0">Materiales a costo más un recargo (35 % como mínimo) y la mano de obra, que se cobra casi lo mismo que cuestan los materiales. Los porcentajes se pueden cambiar.</p><div class="tw" id="precio-cliente"></div></details>
   </section>
 
@@ -473,7 +473,7 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
       <div><dt>3 · Pilar</dt><dd>Pieza armada en cajón con 2 perfiles C y 2 perfiles U. Va en las esquinas y pertenece a uno solo de los dos tabiques que se juntan ahí.</dd></div>
       <div><dt>4 · Pie derecho (montante)</dt><dd>Perfil C vertical que forma el tabique. Van cada 40 cm a eje. En los manuales también se le llama montante.</dd></div>
       <div><dt>5 · Junta de plancha</dt><dd>Donde termina una plancha y empieza la siguiente: cada 1,22 la OSB por fuera, cada 1,20 la volcanita por dentro. Ahí siempre va un pie derecho, para atornillar las dos orillas.</dd></div>
-      <div><dt>6 · Fleje (cruz de San Andrés)</dt><dd>Cinta de acero galvanizado puesta en X sobre la cara exterior, en las esquinas. Rigidiza el tabique contra el viento. Cubre 2 paños (2,44); si hay un vano a menos de 1 m de la esquina, no se pone.</dd></div>
+      <div><dt>6 · Fleje (cruz de San Andrés)</dt><dd>Cinta de acero galvanizado puesta en X sobre la cara exterior, en las esquinas. Rigidiza el tabique contra el viento y mantiene la casa a plomo. Cubre 2 paños (2,44); si hay un vano a menos de 1 m de la esquina, no se pone. Cuándo va: en zonas de viento fuerte y frecuente como Magallanes, siempre en las esquinas; en otras zonas, si el muro lleva placa de corte (OSB o terciado estructural) la placa arriostra y la X va solo si no hay placa o la pide el calculista (manual Cintac).</dd></div>
       <div><dt>7 · Jamba</dt><dd>Pie derecho a cada lado de un vano, al ras del vano y con la espalda del perfil hacia la abertura, para atornillar el marco.</dd></div>
       <div><dt>8 · Vano</dt><dd>La abertura que deja el tabique para una ventana o una puerta. Se mide por su ancho, su alto y desde dónde parte.</dd></div>
       <div><dt>9 · Dintel</dt><dd>Perfil horizontal sobre el vano, entre las jambas. Recibe el peso de lo que está arriba.</dd></div>
@@ -569,9 +569,28 @@ function largoPerfil(k,p){ return ({'C 90':p.lC90,'U 92':p.lU92,'C 60':p.lC60,'U
 /* ---------- motor ---------- */
 /* MOTOR-INICIO */
 const MATS={terciado:'Terciado ranurado',internit:'Internit',volcanita:'Volcanita'};
-function matOf(m,p){ return m==='terciado'?{w:p.osb,h:p.osbH}:{w:p.vol,h:p.volH}; }
+function matOf(m,p){ return m==='ninguno'?{w:p.vol,h:p.volH,none:true}:m==='terciado'?{w:p.osb,h:p.osbH}:{w:p.vol,h:p.volH}; }
+// ALTURA VARIABLE (Cristian, 17-oct-2026, casa de ejemplo de varias esquinas): con techos de una o varias aguas cada muro tiene su alto.
+// w.alt = [[x, alto], …] a lo largo del muro (cm); entre puntos va en recta; dos puntos en el mismo x = un salto (quiebre).
+// Sin w.alt el muro tiene el alto general (p.H) y todo se calcula exactamente igual que antes.
+// franjas de plancha (lo que sobra arriba de las planchas enteras) juntadas de mayor a menor en planchas de alto plH
+function juntarFranjas(fr,plH){ const pz=[]; fr.slice().sort((u,v)=>v-u).forEach(r=>{ const i=pz.findIndex(x=>x>=r-0.01); if(i>=0) pz[i]-=r; else pz.push(plH-r); }); return pz.length; }
+function perfilAlto(w,p){
+  const pts=(w&&w.alt&&w.alt.length)?w.alt.filter(q=>q&&q[1]>0).map(q=>[+q[0],+q[1]]).sort((a,b)=>a[0]-b[0]):null;
+  if(!pts||!pts.length) return {var:false,max:p.H,min:p.H,at:()=>p.H,area:(a,b)=>(b-a)*p.H};
+  const at=x=>{ if(x<=pts[0][0]) return pts[0][1]; if(x>=pts[pts.length-1][0]) return pts[pts.length-1][1]; let best=null;
+    for(let i=0;i<pts.length-1;i++){ const [x0,h0]=pts[i],[x1,h1]=pts[i+1]; if(x>=x0-0.01&&x<=x1+0.01){ const h=x1-x0<0.01?Math.max(h0,h1):h0+(h1-h0)*(x-x0)/(x1-x0); best=best==null?h:Math.max(best,h); } }
+    return best; };
+  // superficie entre a y b (cm²): se integra por tramos rectos
+  const area=(a,b)=>{ const xs=[...new Set([a,b,...pts.map(q=>q[0]).filter(x=>x>a&&x<b)])].sort((u,v)=>u-v); let s=0;
+    for(let i=0;i<xs.length-1;i++){ const u=xs[i],v=xs[i+1]; const hu=atLado(u,+1), hv=atLado(v,-1); s+=(v-u)*(hu+hv)/2; } return s; };
+  // alto justo a la derecha (+1) o a la izquierda (-1) de x, para no promediar un salto
+  const atLado=(x,lado)=>{ const e=lado>0?0.02:-0.02; return at(x+e); };
+  return {var:true,max:Math.max(...pts.map(q=>q[1])),min:Math.min(...pts.map(q=>q[1])),at,area,pts};
+}
 function frame(w,perim,p,forcedU){
   const L=w.L, E=p.e, warn=[];
+  const AH=perfilAlto(w,p), hAt=AH.at;
   const prof=perim?PERF[90]:(PERF[w.perfil]||PERF[90]);
   const BAR=p.bar, LU=largoPerfil(prof.U,p); // el tabique se corta a 6 m como máximo; la solera más larga que su perfil U se empalma
   const a0=perim?E:0, a1=perim?L-E:L;
@@ -589,12 +608,12 @@ function frame(w,perim,p,forcedU){
   const caras=rooms.map(([r0,r1_],i)=>({key:'A'+i,r0,r1:r1_,lab:perim?(rooms.length>1?`Interior, tramo ${i+1}`:'Interior'):(rooms.length>1?`Cara A, tramo ${i+1}`:'Cara A')}));
   if(!perim){ const rb=tramos(ts.filter(t=>t.cara==='B')); rb.forEach(([r0,r1_],i)=>caras.push({key:rb.length>1?'B'+i:'B',r0,r1:r1_,lab:rb.length>1?`Cara B, tramo ${i+1}`:'Cara B'})); }
   caras.forEach(c=>{ c.mat=(w.forro&&w.forro[c.key])||p.forroDef||'volcanita'; c.m=matOf(c.mat,p); });
-  const jInt=[]; caras.forEach(c=>{ for(let j=c.r0+c.m.w;j<c.r1-p.tol;j+=c.m.w) if(!jInt.some(q=>Math.abs(q-j)<=p.tol)) jInt.push(r1(j)); });
+  const jInt=[]; caras.forEach(c=>{ if(c.m.none) return; for(let j=c.r0+c.m.w;j<c.r1-p.tol;j+=c.m.w) if(!jInt.some(q=>Math.abs(q-j)<=p.tol)) jInt.push(r1(j)); });
 
   // cortes de tabique: se buscan los puntos donde se puede cortar (fuera de vanos y T, a 10 cm o más de cualquier
   // pie derecho obligatorio y con 30 cm libres a un lado para el taladro). Entre todas las formas posibles se elige:
   // menos tabiques; luego ninguno bajo el mínimo; luego el primer tabique lo más largo posible (6 + 3, no 4,5 + 4,5).
-  let unions=forcedU;
+  let unions=forcedU, bloqueado=null;
   if(!unions){
     unions=[];
     if(e0-s0>BAR+0.01){
@@ -633,7 +652,11 @@ function frame(w,perim,p,forcedU){
       let sol=null;
       for(let k=2;k<=8&&!sol;k++) sol=pick(0,k);
       if(sol) unions=sol.cuts.map(r1);
-      else { warn.push(['bad',`${w.name}: no encontré dónde cortar el tabique cumpliendo las reglas.`]); for(let c=s0+BAR;c<e0;c+=BAR) unions.push(r1(c)); }
+      else { // v0.20 (revisor): ningún corte cumple las reglas → el muro queda BLOQUEADO; el corte se escribe a mano
+        const cand=[]; for(let k=0;k<vanos.length-1;k++){ const g0=vanos[k].x+vanos[k].w, g1=vanos[k+1].x; if(g1-g0>=10&&!ts.some(t=>t.x<g1&&t.x+t.w>g0)) cand.push([(g0+g1)/2,`entre vanos (${fm(g0)}–${fm(g1)})`]); }
+        (AH.pts||[]).forEach(([x])=>{ if(x>s0+60&&x<e0-60&&!vanos.some(v=>x>v.x-1&&x<v.x+v.w+1)) cand.push([x,'quiebre de altura']); });
+        bloqueado={cand:cand.filter(([x])=>x>s0+60&&x<e0-60).slice(0,6)};
+        warn.push(['bad',`${w.name}: MURO BLOQUEADO — ningún corte cumple las reglas (§5) y no se corta por defecto. Escribe el corte a mano en «Planta → Alto de cada muro → cortes».${bloqueado.cand.length?' Candidatos: '+bloqueado.cand.map(([x,t])=>fm(x)+' ('+t+')').join(' · ')+'.':''}`]); }
       if(sol&&sol.sh>0) warn.push(['warn',`${w.name}: con estos vanos queda un tabique de menos de ${fm(p.minTab)} m.`]);
     }
   }
@@ -647,6 +670,8 @@ function frame(w,perim,p,forcedU){
   unions.forEach(c=>{add(c,'uni','unión');add(c,'uni','unión')});
   vanos.forEach(v=>{add(v.x,'jam','jamba');add(v.x+v.w,'jam','jamba')});
   ts.forEach(t=>{add(t.x,'T','costado T');add(t.x+t.w,'T','costado T')});
+  // v0.20 (revisor): pie derecho obligatorio en cada quiebre de altura, incluida la punta del frontón
+  if(AH.var) AH.pts.forEach(([x])=>{ if(x>a0+1&&x<a1-1&&!vanos.some(v=>x>v.x+0.5&&x<v.x+v.w-0.5)&&!st.some(q=>Math.abs(q.x-x)<=p.tol)) add(x,'qbr','quiebre de altura'); });
   const inVano=x=>vanos.some(v=>x>v.x+0.5&&x<v.x+v.w-0.5);
   const juntas=[];
   if(perim){ for(let j=p.osb;j<L;j+=p.osb) juntas.push([j,'osb']); }
@@ -690,9 +715,9 @@ function frame(w,perim,p,forcedU){
   // piezas
   const C=[], U=[];
   const pc=(arr,len,lab)=>{ if(len>0.5) arr.push({len:r1(len),lab,w:w.name}); };
-  if(p.H>largoPerfil(prof.C,p)) warn.push(['bad',`${w.name}: el pie derecho de ${fm(p.H)} no sale de un ${prof.C} de ${fm(largoPerfil(prof.C,p))}.`]);
-  st.forEach(s=>pc(C,p.H,'pie derecho'));
-  pil.forEach(()=>{pc(C,p.H,'pilar (C)');pc(C,p.H,'pilar (C)');pc(U,p.H,'pilar (U)');pc(U,p.H,'pilar (U)');});
+  if(AH.max>largoPerfil(prof.C,p)) warn.push(['bad',`${w.name}: el pie derecho de ${fm(AH.max)} no sale de un ${prof.C} de ${fm(largoPerfil(prof.C,p))}.`]);
+  st.forEach(s=>pc(C,hAt(s.x),'pie derecho'));
+  pil.forEach(([a,b])=>{ const hp=Math.max(hAt(a),hAt(b)); pc(C,hp,'pilar (C)');pc(C,hp,'pilar (C)');pc(U,hp,'pilar (U)');pc(U,hp,'pilar (U)');});
   const det=[];
   vanos.forEach(v=>{
     const door=v.t==='puerta';
@@ -706,7 +731,7 @@ function frame(w,perim,p,forcedU){
       pc(C,head,'puntal de jamba'); pc(C,head,'puntal de jamba');
       if(v.w>(p.dintelRet||200)) warn.push(['warn',`${w.name}: vano de ${fm(v.w)}: con esta luz el dintel cajón queda justo; conviene dintel reticulado de toda la altura disponible o perfil tubular, y dejar 5-10 mm de holgura sobre el marco.`]);
     } else pc(C,v.w,'dintel');
-    if(p.H-head>4) for(let i=0;i<nP;i++) pc(C,p.H-head,'puntal');
+    (n.length?n:[v.x+v.w/2]).forEach(q=>{ const hh=hAt(q)-head; if(hh>4) pc(C,hh,'puntal'); });
     if(!door){ const sill=head-v.h; pc(C,v.w,'alféizar'); if(sill>4) for(let i=0;i<nP;i++) pc(C,sill,'muchacho'); }
     else if(v.alf) pc(C,v.w,'alféizar');
     if(!door&&head-v.h<0) warn.push(['bad',`${w.name}: la ventana de ${fm(v.x)} mide ${fm(v.h)} de alto y no cabe bajo el cabezal de ${fm(head)}.`]);
@@ -715,22 +740,50 @@ function frame(w,perim,p,forcedU){
   segs.forEach(([a,b])=>{
     // si la solera es más larga que su perfil U, se sobrepone otra pieza 50 cm atornillada (Cristian); también se puede usar U de 6 m
     const pcU=(len,lab)=>{ let x=len; if(len>LU+0.01) warn.push(['info',`${w.name}: la ${lab} mide ${fm(len)} y el ${prof.U} viene de ${fm(LU)}: se sobrepone una pieza ${p.trSol||50} cm (o se usa ${prof.U} de 6 m).`]); while(x>LU+0.01){ pc(U,LU,lab); x=x-LU+(p.trSol||50); } pc(U,x,lab+(len>LU+0.01?' (traslapo)':'')); };
-    pcU(b-a,'solera superior');
+    // v0.20 (revisor): en un muro de alto variable la solera de arriba va inclinada: su largo real + el escalón de cada quiebre
+    const largoTop=(a,b)=>{ if(!AH.var) return b-a; const xs=[...new Set([a,b,...AH.pts.map(q=>q[0]).filter(x=>x>a&&x<b)])].sort((u,v)=>u-v); let l=0;
+      for(let i=0;i<xs.length-1;i++){ const u=xs[i],v=xs[i+1]; l+=Math.hypot(v-u,hAt(v-0.02)-hAt(u+0.02)); if(i>0) l+=Math.abs(hAt(u+0.02)-hAt(u-0.02)); } return l; };
+    const lTop=largoTop(a,b);
+    pcU(lTop,'solera superior');
+    // EETT casa de ejemplo de varias esquinas (17-oct): solera de refuerzo compuesta — un C 90 envuelto en un U 92 — sobre la solera superior
+    if(p.soleraComp){ pcU(lTop,'solera compuesta (U)'); let x=lTop; while(x>BAR+0.01){ pc(C,BAR,'solera compuesta (C)'); x-=BAR-(p.trSol||50); } pc(C,x,'solera compuesta (C)'); }
+    // y un refuerzo horizontal a 1,22 del piso (para fijar las placas de OSB): se corta en cada vano que pasa por esa altura
+    if(p.refH>0&&perim){ let x=a; vanos.filter(v=>v.x>=a-0.05&&v.x+v.w<=b+0.05).forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h;
+        if(sill<p.refH&&head>p.refH){ if(v.x-x>0.5) pc(C,v.x-x,'refuerzo horizontal'); x=v.x+v.w; } }); if(b-x>0.5){ let y=b-x; while(y>BAR+0.01){ pc(C,BAR,'refuerzo horizontal'); y-=BAR; } pc(C,y,'refuerzo horizontal'); } }
+    // línea horizontal de C 90 a la altura y, donde el muro pasa de minH y no la corta un vano (para cadenetas)
+    const lineaH=(y,minH,lab)=>{ let ini=null; const cerrar=x1=>{ if(ini!=null&&x1-ini>5){ let l=x1-ini; while(l>BAR+0.01){ pc(C,BAR,lab); l-=BAR; } pc(C,l,lab); } ini=null; };
+      for(let x=a;x<=b+0.01;x+=5){ const ok=hAt(x)>minH&&!vanos.some(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h; return x>v.x&&x<v.x+v.w&&sill<y&&head>y; });
+        if(ok&&ini==null) ini=x; if(!ok) cerrar(x); } cerrar(b); };
+    // v0.20: cadeneta en la junta horizontal de la OSB cuando el muro pasa de 2,44 (con la bajada bajo la solera)
+    if(perim&&p.cadOSB!==false&&AH.max+(p.bajaPl||0)>p.osbH+0.5) lineaH(p.osbH-(p.bajaPl||0),p.osbH-(p.bajaPl||0)+5,'cadeneta junta OSB');
+    // v0.20: pies derechos de más de 3 m sin otro amarre horizontal: cadeneta a media altura (el manual Cintac lo sugiere)
+    if(p.cadMedia!==false&&AH.max>300&&!(perim&&p.refH>0)&&!(perim&&p.cadOSB!==false)) lineaH(150,300,'cadeneta media altura (pie derecho > 3 m)');
     let x=a; vanos.filter(v=>v.t==='puerta'&&v.x>=a-0.05&&v.x+v.w<=b+0.05).forEach(v=>{pcU(v.x-x,'solera inferior');x=v.x+v.w;}); pcU(b-x,'solera inferior');
   });
   // planchas: columnas de plancha a lo alto; una columna entera dentro de un vano no se usa
   const cols=(x0,x1,ancho)=>{ let n=0; for(let a=x0;a<x1-0.5;a+=ancho){ const b=Math.min(a+ancho,x1); if(!vanos.some(v=>a>=v.x-0.5&&b<=v.x+v.w+0.5)) n++; } return n; };
+  // planchas a lo alto por columna: con alto parejo es cols × filas (igual que antes); con alto variable cada columna lleva las filas que pide su punto más alto
+  // con alto variable: cada columna lleva sus planchas enteras y el resto (franja de arriba) se saca de otra plancha:
+  // las franjas se juntan de mayor a menor en planchas de alto plH (una plancha da varias franjas)
+  const colsH=(x0,x1,ancho,plH,baja,frOut)=>{ if(!AH.var) return cols(x0,x1,ancho)*Math.ceil(p.H/plH-0.001); let n=0; const fr=[]; baja=baja||0;
+    for(let a=x0;a<x1-0.5;a+=ancho){ const b=Math.min(a+ancho,x1); if(vanos.some(v=>a>=v.x-0.5&&b<=v.x+v.w+0.5)) continue;
+      const hc=baja+Math.max(hAt(a),hAt(b),...(AH.pts||[]).filter(q=>q[0]>a&&q[0]<b).map(q=>q[1])); const ent=Math.floor(hc/plH+0.001), r=hc-ent*plH;
+      n+=ent; if(r>4) fr.push(r); }
+    if(frOut){ frOut.ent=(frOut.ent||0)+n; frOut.fr.push(...fr); }
+    return n+juntarFranjas(fr,plH); };
   const pl={osb:0,int:{},caras:[]};
   // por fuera la plancha baja 3 a 4 cm bajo el piso para tapar la unión y que no filtre agua (por eso se usa de 2,40-2,44)
   const altoForro=p.H; // la plancha de 2,40-2,44 cubre el muro y baja sus 3-4 cm; no hace falta otra fila
-  if(perim){ pl.osb=cols(0,L,p.osb)*Math.ceil(altoForro/p.osbH-0.001); pl.caras.push({lab:'OSB exterior',r0:0,r1:L,n:pl.osb,mat:'osb'});
+  // 7) v0.20: un sobretabique o muro suelto marcado «exterior» lleva OSB (y malla) como un muro perimetral
+  const conOSB=perim||!!w.exterior; pl.franjas={ent:0,fr:[]};
+  if(conOSB){ pl.osb=AH.var?colsH(0,L,p.osb,p.osbH,p.bajaPl||0,pl.franjas):cols(0,L,p.osb)*Math.ceil(altoForro/p.osbH-0.001); if(!AH.var) pl.franjas.ent=pl.osb; pl.caras.push({lab:'OSB exterior',r0:0,r1:L,n:pl.osb,mat:'osb'});
     // el internit exterior va HORIZONTAL (al revés de la OSB, que va vertical): así cruza las juntas y no quedan aperturas
     if(w.intExt){ let n=0; const hw=p.volH, hh=p.vol;
-      for(let y=0;y<p.H-0.5;y+=hh) for(let x=0;x<L-0.5;x+=hw){ const x1=Math.min(x+hw,L), y1=Math.min(y+hh,p.H);
+      for(let y=0;y<AH.max-0.5;y+=hh) for(let x=0;x<L-0.5;x+=hw){ const x1=Math.min(x+hw,L), y1=Math.min(y+hh,AH.max); if(y>=Math.max(hAt(x),hAt(x1))-0.5) continue;
         const tapado=vanos.some(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h; return x>=v.x-0.5&&x1<=v.x+v.w+0.5&&y>=sill-0.5&&y1<=head+0.5; });
         if(!tapado) n++; }
       pl.intExt=n; pl.caras.push({lab:'Internit exterior horizontal',r0:0,r1:L,n,mat:'intext'}); } }
-  caras.forEach(c=>{ const n=cols(c.r0,c.r1,c.m.w)*Math.ceil(p.H/c.m.h); pl.int[c.mat]=(pl.int[c.mat]||0)+n; pl.caras.push({lab:c.lab,r0:c.r0,r1:c.r1,n,mat:c.mat,key:c.key}); });
+  caras.forEach(c=>{ const n=c.m.none?0:colsH(c.r0,c.r1,c.m.w,c.m.h); pl.int[c.mat]=(pl.int[c.mat]||0)+n; pl.caras.push({lab:c.lab,r0:c.r0,r1:c.r1,n,mat:c.mat,key:c.key}); });
   // si una unión no deja espacio para el taladro, se prueba correrla hasta 60 cm
   if(!forcedU && warn.some(x=>x[1].includes('taladro'))){
     for(let i=0;i<unions.length;i++){
@@ -743,22 +796,65 @@ function frame(w,perim,p,forcedU){
       }
     }
   }
-  return {w,perim,L,a0,a1,s0,e0,segs,unions,st,pil,vanos,ts,det,C,U,prof,warn,nStud:st.length,pl};
+  const areaBruta=AH.area(a0,a1);   // cm² del muro entre sus caras (alto real)
+  if(w.suelto&&!w.sobre) warn.push(['warn',`${w.name}: muro suelto — amarre superior y fundación: preguntar (calculista o arquitecto).`]);
+  return {w,perim,L,a0,a1,s0,e0,segs,unions,st,pil,vanos,ts,det,C,U,prof,warn,nStud:st.length,pl,AH,areaBruta,bloqueado};
 }
 
+// FLEJE (revisión del 17-oct-2026, v0.20 — revisor de obras + manual Cintac):
+//  · una X en cada punta del muro que tenga al menos fleMin de muro lleno (como antes);
+//  · muro corto (menos de 2 × 2,44): UNA sola X, en la punta con más muro lleno; no se montan;
+//  · si ninguna punta sirve: aviso «muro perimetral sin fleje» y se propone la X en el paño lleno más largo, aunque no esté en la punta;
+//  · si el muro tiene menos de ~35 % de muro lleno: aviso «consultar calculista»;
+//  · cada diagonal llega al alto REAL de su punta (muros de alto variable);
+//  · en muros de más de 3 m, si la X queda a más de 60° se parte en dos pisos (en el refuerzo de 1,22 o donde los dos queden
+//    entre 30° y 60°; Cintac fig. 13). Cada X lleva 4 pletinas de 200×200 y 2 tensores (EETT III.6.1).
+// MODO DEL FLEJE (Cristian, 23-oct-2026):
+//  · 'viento' (por defecto): zona de viento fuerte y frecuente (Punta Arenas / Magallanes) → X en las esquinas, para que la casa
+//    no pierda el plomo con el viento, aunque lleve placa de corte;
+//  · 'placa': el muro lleva placa de corte (OSB o terciado estructural) y no es zona de viento fuerte → sin fleje, salvo que lo
+//    pida el calculista (manual Cintac pág. 16: «en el caso de no existir placas de corte, el arriostramiento se logra por medio de cruces»);
+//  · 'calculo': se calcula igual que 'viento', pero la cantidad y la ubicación las manda el plano de cálculo.
 function fleje(walls,p){
-  const out=[]; let tot=0;
-  const n=walls.length;
-  for(let i=0;i<n;i++){
-    const w=walls[i], v=w.vanos.filter(x=>x.w>0).sort((a,b)=>a.x-b.x);
-    const libreIni=v.length?v[0].x:w.L, libreFin=v.length?w.L-(v[v.length-1].x+v[v.length-1].w):w.L;
-    [['ini',libreIni],['fin',libreFin]].forEach(([lado,lib])=>{
-      let ancho=Math.min(p.fleW,lib), m=0;
-      if(lib<p.fleMin) ancho=0; else m=2*Math.hypot(ancho,p.H);
-      tot+=m; out.push({w:i,lado,lib,ancho,m});
-    });
+  const out=[], warn=[]; let tot=0, nX=0;
+  const modo=p.fleModo||'viento';
+  if(modo==='placa'){
+    warn.push(['info','Sin fleje en los muros: la placa de corte (OSB o terciado estructural) arriostra (manual Cintac pág. 16). Si el muro no lleva placa estructural, la obra está en zona de viento fuerte o el calculista lo pide, cambiar «Fleje» en «Medidas base y reglas».']);
+    return {out,tot,warn,nX};
   }
-  return {out,tot};
+  if(modo==='calculo') warn.push(['info','Fleje «según cálculo»: se muestra la X en las esquinas como referencia; la cantidad y la ubicación las manda el plano de cálculo.']);
+  const n=walls.length, T30=Math.tan(Math.PI/6), T60=Math.tan(Math.PI/3);
+  const equis=(w,AH,x0,x1)=>{ const an=x1-x0, h0=AH.at(x0), h1=AH.at(x1), hmax=Math.max(h0,h1), hmin=Math.min(h0,h1);
+    if(!AH.var) return {m:2*Math.hypot(an,p.H),pisos:1,nX:1};
+    if(hmax>300&&hmax/an>T60){ const ok=y=>y>=an*T30-0.5&&y<=an*T60+0.5&&hmin-y>=an*T30-0.5&&hmax-y<=an*T60+0.5;
+      let y=[p.refH||0,hmin/2,(hmin+hmax)/4].find(q=>q>0&&ok(q)); let aviso=false;
+      if(!y){ y=Math.min(an*T60,hmin/2); aviso=true; }
+      const m=2*Math.hypot(an,y)+Math.hypot(an,h1-y)+Math.hypot(an,h0-y);
+      if(aviso) warn.push(['warn',`${w.name}: la X de fleje de ${fm(an)} de ancho no logra quedar entre 30° y 60° ni partida en dos pisos: revisar en obra (Cintac fig. 13).`]);
+      return {m,pisos:2,y,nX:2}; }
+    return {m:Math.hypot(an,h1)+Math.hypot(an,h0),pisos:1,nX:1}; };
+  for(let i=0;i<n;i++){
+    const w=walls[i], v=w.vanos.filter(x=>x.w>0).sort((a,b)=>a.x-b.x), AH=perfilAlto(w,p);
+    const libreIni=v.length?v[0].x:w.L, libreFin=v.length?w.L-(v[v.length-1].x+v[v.length-1].w):w.L;
+    const ends=[['ini',libreIni],['fin',libreFin]].map(([lado,lib])=>{ let ancho=Math.min(p.fleW,lib); if(lib<p.fleMin) ancho=0; return {w:i,lado,lib,ancho,m:0}; });
+    // muro corto: una sola X (la punta con más muro lleno)
+    if(w.L<2*p.fleW&&ends[0].ancho&&ends[1].ancho){ const chico=ends[0].lib>=ends[1].lib?ends[1]:ends[0]; chico.ancho=0; chico.corto=true; }
+    ends.forEach(e=>{ if(!e.ancho) return; e.x0=e.lado==='ini'?0:w.L-e.ancho; e.x1=e.x0+e.ancho; const q=equis(w,AH,e.x0,e.x1); e.m=q.m; e.pisos=q.pisos; if(q.y) e.y=q.y; e.nX=q.nX; });
+    if(!ends[0].ancho&&!ends[1].ancho){
+      // ninguna punta sirve: el paño lleno más largo entre vanos
+      const gaps=[]; for(let k=0;k<v.length-1;k++) gaps.push([v[k].x+v[k].w,v[k+1].x]);
+      const g=gaps.map(([a,b])=>({a,b,l:b-a})).sort((x,y)=>y.l-x.l)[0];
+      if(g&&g.l>=p.fleMin){ const an=Math.min(p.fleW,g.l), x0=g.a+(g.l-an)/2, q=equis(w,AH,x0,x0+an);
+        ends.push({w:i,lado:'medio',lib:g.l,ancho:an,x0,x1:x0+an,m:q.m,pisos:q.pisos,y:q.y,nX:q.nX});
+        warn.push(['warn',`${w.name}: muro perimetral sin fleje en las puntas (quedan ${fm(libreIni)} y ${fm(libreFin)}). Se propone la X en el paño lleno más largo, de ${fm(g.l)} (de ${fm(g.a)} a ${fm(g.b)}).`]); }
+      else if(w.L<150) warn.push(['info',`${w.name}: muro de ${fm(w.L)}: no cabe una X de fleje; lo amarran sus esquinas.`]);
+      else warn.push(['bad',`${w.name}: muro perimetral sin fleje: no hay ningún paño lleno de ${fm(p.fleMin)} o más. Consultar calculista.`]);
+    }
+    const lleno=w.L-v.reduce((a,x)=>a+x.w,0);
+    if(w.L>0&&lleno/w.L<0.35) warn.push(['bad',`${w.name}: solo ${Math.round(lleno/w.L*100)} % de muro lleno (${fm(lleno)} de ${fm(w.L)}): consultar calculista por el arriostramiento.`]);
+    ends.forEach(e=>{ tot+=e.m; nX+=e.nX||0; out.push(e); });
+  }
+  return {out,tot,warn,nX};
 }
 
 function cortar(pieces,p,B){
@@ -786,7 +882,8 @@ function cubierta(pB,pF,largoC,p){
 }
 function techo(state,res){
   // Cercha de dos aguas tipo W (Fink) de una pieza, con montante sobre el apoyo intermedio (tabique central).
-  const t=state.techo, p=state.p; if(!t||!t.on||!(t.luz>0)||!(t.largo>0)) return null;
+  const t=state.techo, p=state.p; if(t&&t.on&&t.plano&&t.plano.on) return techoPlano(state,res);
+  if(!t||!t.on||!(t.luz>0)||!(t.largo>0)) return null;
   const L=t.luz, h=t.alto, half=L/2, m=h/half;
   const aB=(t.aleroAtras??t.alero), aF=t.alero;
   const piernaB=Math.hypot(half+aB, h+aB*m), piernaF=Math.hypot(half+aF, h+aF*m), pierna=Math.max(piernaB,piernaF);
@@ -885,6 +982,28 @@ function techo(state,res){
     nudos:nds.length, hexUnion, hexCercha:nds.length*hexUnion, hexTotal:nds.length*hexUnion*n};
 }
 
+// CERCHAS DEL PLANO (Cristian, 17-oct-2026, casa de ejemplo de varias esquinas): cuando el arquitecto ya diseñó las cerchas (techo de
+// varias aguas, limahoyas, cerchas distintas) NO se calculan: se copian del plano. Por cada tipo: cuántas y los metros de
+// C 90 y de C 60 de UNA cercha, y otro perfil si lleva (en metros o en piezas, ej. CA 150 × 1,6 que pasa de 6 m).
+// Piezas de 6 m = ⌈metros totales ÷ 6 × 1,1⌉ (10 % de despunte). Cruces de San Andrés en C 60 y costaneras omega, opcionales.
+function techoPlano(state,res){
+  const t=state.techo, p=state.p, P=t.plano||{}, B=600;
+  const tipos=(P.tipos||[]).filter(x=>(+x.cant||0)>0);
+  const pzs=(cm,b)=>cm>0?Math.ceil(cm/(b||B)*1.1-1e-9):0;
+  let c90=0, c60=0; const otros={};
+  tipos.forEach(x=>{ const n=+x.cant||0; c90+=n*(+x.c90||0); c60+=n*(+x.c60||0);
+    const nom=String(x.otro||'').trim(); if(nom){ const o=otros[nom]=otros[nom]||{nom,cm:0,pz:0}; if(+x.otroPz>0) o.pz+=n*(+x.otroPz); else o.cm+=n*(+x.otroM||0); } });
+  const cruces=+P.crucesM||0, omegaCm=+P.omegaM||0;
+  const piezas=[{k:'C 90',B,n:pzs(c90),cm:c90,lab:'cordones de las cerchas del plano'},{k:'C 60',B,n:pzs(c60+cruces),cm:c60+cruces,lab:'reticulado de las cerchas'+(cruces?' + cruces de San Andrés':'')}];
+  Object.values(otros).forEach(o=>piezas.push({k:o.nom,B,n:o.pz+pzs(o.cm),cm:o.cm,pzDirectas:o.pz,lab:'perfil especial de las cerchas'}));
+  if(omegaCm>0) piezas.push({k:'Omega estructural',B:p.omBar,n:pzs(omegaCm,p.omBar),cm:omegaCm,lab:'costaneras'});
+  const m2=+P.m2||0, osbPl=P.osb&&m2>0?Math.ceil(m2*1.1/(p.osb*p.osbH/1e4)-1e-9):0;
+  const nC=tipos.reduce((a,x)=>a+(+x.cant||0),0);
+  return {plano:true,t,tipos,piezas:piezas.filter(z=>z.n>0),c90,c60,cruces,omegaCm,n:nC,m2,osbPl,
+    cubML:(+P.cubML||0)/100,cubNom:P.cubNom||'Cubierta',hojaML:(+P.hojaML||0)/100,canalML:(+P.canalML||0)/100,bajadas:+P.bajadas||0,
+    cubierta:m2,flejeX:0,hexTotal:0,lentEmp:0,al:{planchas:0},planchas:{lados:[],cols:0},L:t.luz||0,largoC:0};
+}
+
 function calcular(state){
   const p=state.p, res={walls:[],ints:[],warn:[],groups:{}};
   const n=state.walls.length;
@@ -893,19 +1012,19 @@ function calcular(state){
     const c=(a.pE?1:0)+(b.pS?1:0);
     if(n>1&&c!==1) res.warn.push(['bad',`Esquina ${a.name} → ${b.name}: tiene ${c} pilares. Debe tener uno.`]);
   }
-  state.walls.forEach((w,i)=>{ if(!(w.L>0)) return; const r=frame(w,true,p); r.path='walls.'+i; res.walls.push(r); res.warn.push(...r.warn); });
+  state.walls.forEach((w,i)=>{ if(!(w.L>0)) return; const r=frame(w,true,p,w.cortes&&w.cortes.length?w.cortes.slice().sort((a,b)=>a-b):undefined); r.path='walls.'+i; res.walls.push(r); res.warn.push(...r.warn); });
   state.ints.forEach((w,i)=>{ if(!(w.L>0)) return; const r=frame(w,false,p); r.path='ints.'+i; res.ints.push(r); res.warn.push(...r.warn); });
   [...res.walls,...res.ints].forEach(r=>{
     (res.groups[r.prof.C]=res.groups[r.prof.C]||[]).push(...r.C);
     (res.groups[r.prof.U]=res.groups[r.prof.U]||[]).push(...r.U);
   });
-  res.fle=fleje(state.walls.filter(w=>w.L>0),p);
+  res.fle=fleje(state.walls.filter(w=>w.L>0),p); res.warn.push(...res.fle.warn);
   // letra de cada muro: los perimetrales con la suya (en una L: A B E F C D…); los tabiques interiores siguen después
   [...res.walls,...res.ints].forEach((r,i)=>{ r.letra=(i<res.walls.length&&r.w.letra)?r.w.letra:String.fromCharCode(65+i); r.codes=r.segs.map((_,k)=>r.letra+(k+1)); });
   res.techo=techo(state,res);
   // CASA EN L: el ala lleva su propio techo (misma pendiente). Se suman cerchas, cubierta, planchas y fleje; los perfiles
   // ya caen en los mismos grupos. El encuentro de los dos techos (limahoya) es pendiente de lección.
-  if(res.techo&&state.techoAla){ const r2=techo(Object.assign({},state,{techo:state.techoAla}),res);
+  if(res.techo&&!res.techo.plano&&state.techoAla){ const r2=techo(Object.assign({},state,{techo:state.techoAla}),res);
     if(r2){ const T1=res.techo; T1.ala=r2; T1.n+=r2.n; T1.cubierta+=r2.cubierta; T1.flejeX+=r2.flejeX; T1.lentEmp=(T1.lentEmp||0)+(r2.lentEmp||0); T1.hexTotal=(T1.hexTotal||0)+(r2.hexTotal||0);
       T1.planchas=Object.assign({},T1.planchas,{lados:[...T1.planchas.lados.map(l=>Object.assign({},l,{cols:T1.planchas.cols})),...r2.planchas.lados.map(l=>Object.assign({},l,{cols:r2.planchas.cols,ala:true}))]});
       T1.al=Object.assign({},T1.al,{planchas:(T1.al.planchas||0)+(r2.al.planchas||0)}); } }
@@ -922,10 +1041,15 @@ function calcular(state){
     [c.l,c.a,c.l,c.a].forEach(L=>parte(L,p.perBar,per,'perimetral'));
     (res.groups['Omega cielo']=res.groups['Omega cielo']||[]).push(...om);
     (res.groups['Ángulo perimetral']=res.groups['Ángulo perimetral']||[]).push(...per);
-    return {c,n:best.n,fr:best.fr,largo:best.sentido,area:c.l*c.a/10000,nOm,lo,perM:2*(c.l+c.a)};
+    return {c,n:state.sinVolCielo?0:best.n,fr:best.fr,largo:best.sentido,area:c.l*c.a/10000,nOm,lo,perM:2*(c.l+c.a)};
   });
   res.extras=extras(state,res);
   res.base=base(state,res);
+  // v0.20: OSB total juntando las franjas de arriba de TODOS los muros (no muro por muro)
+  { const todos=[...res.walls,...res.ints]; const ent=todos.reduce((a,r)=>a+(r.pl.franjas?r.pl.franjas.ent:0),0), fr=todos.flatMap(r=>r.pl.franjas?r.pl.franjas.fr:[]);
+    res.osbTotal=ent+juntarFranjas(fr,p.osbH); res.osbFranjas=fr.length; }
+  // v0.20 (revisor): un vaciado que queda a menos de 0,3 m³ del siguiente camión es arriesgado (si falta, hay que pedir otro camión)
+  if(res.base&&res.base.vaciados) res.base.vaciados.forEach(v=>{ const cap=v.camiones*res.base.cam; if(cap-v.m3<0.3) res.warn.push(['warn',`Hormigón · ${v.nom}: ${v.m3.toFixed(2).replace('.',',')} m³ queda a menos de 0,3 m³ de llenar ${v.camiones>1?'los camiones':'el camión'} (${cap} m³): si la zanja sale más ancha, falta hormigón.`]); });
   return res;
 }
 
@@ -1013,12 +1137,20 @@ function radier(state,res){
   const cen=central?largo-2*c:0;               // fundación corrida bajo el tabique de apoyo (a lo largo de la casa)
   const mlCim=perim+cen;
   const seccion=c*(prof+sobre);                     // cm²
-  const m3Cim=mlCim*seccion/1e6;
-  const m2Losa=(Ar-c*P+4*c*c-cen*c)/1e4;            // la losa va DENTRO del sobrecimiento
+  // vigas de fundación interiores (EETT de la casa de ejemplo de varias esquinas, 17-oct): metros escritos a mano, sección propia
+  const mlVig=(b.mlVigas||0), vA=b.vigaAncho||20, vH=b.vigaAlto||40, m3Vig=mlVig*vA*vH/1e6;
+  const m3Cim=mlCim*seccion/1e6+m3Vig;
+  const m2Losa=(Ar-c*P+4*c*c-cen*c-mlVig*vA)/1e4;   // la losa va DENTRO del sobrecimiento (y descuenta las vigas)
   const m3Losa=m2Losa*esp/100;
   const perdida=1+(b.perdida??5)/100;
   const m3=(m3Cim+m3Losa)*perdida;
   const m3Pedir=Math.ceil(m3*2)/2;                  // el camión se pide en medios m³ [inferido]
+  // HORMIGÓN POR VACIADO (Cristian, 17-oct-2026): se pide por vaciado y cada vaciado se redondea HACIA ARRIBA a m³ entero
+  // («no venden medios cubos»: 0,6 se pide como 1). El camión lleva 8 m³ por viaje.
+  const emp=b.emplantillado||0, m3Emp=emp>0?(mlCim*c+mlVig*vA)*emp/1e6:0, cam=b.camion||8;
+  const vaciados=[...(emp>0?[{nom:`Emplantillado ${emp} cm`,m3:m3Emp*perdida}]:[]),{nom:'Cimientos y sobrecimientos'+(mlVig?' + vigas de fundación':''),m3:m3Cim*perdida},{nom:'Radier (losa)',m3:m3Losa*perdida}]
+    .map(v=>Object.assign(v,{pedir:Math.ceil(v.m3-1e-9),camiones:Math.ceil(Math.ceil(v.m3-1e-9)/cam-1e-9)}));
+  const m3Vac=vaciados.reduce((a,v)=>a+v.pedir,0), camiones=vaciados.reduce((a,v)=>a+v.camiones,0);
   // malla ACMA C92 2,60 × 5,00 (13 m²): con traslapo y cortes rinde ~10 m²
   const rinde=b.rindeMalla||10, mallas=Math.ceil(m2Losa/rinde-1e-9);
   const nylon=Math.ceil(m2Losa*1.15);               // +15 %: traslapos de 15 cm y subir por el borde [inferido]
@@ -1034,8 +1166,8 @@ function radier(state,res){
     escalerilla={filas, largo:lE, trasl:tE, ancho:c-2*recub, n:Math.ceil(mlCim*filas/(lE-tE)-1e-9)}; }
   if(arm!=='escalerilla'){
     const enCim=arm==='escalerilla+cim', nL=b.nLong||4, dL=b.diamLong||10, dE=b.diamEstr||6, sE=b.sepEstr||20, trasl=40*dL/10;   // traslapo 40 diámetros
-    const barrasL=Math.ceil(nL*mlCim/(600-trasl)-1e-9);
-    const eA=c-2*recub, eH=(enCim?prof:prof+sobre)-2*recub, largoE=2*(eA+eH)+10, nE=Math.ceil(mlCim/sE-1e-9)+(central?2:0)+4;
+    const barrasL=Math.ceil(nL*(mlCim+mlVig)/(600-trasl)-1e-9);
+    const eA=c-2*recub, eH=(enCim?prof:prof+sobre)-2*recub, largoE=2*(eA+eH)+10, nE=Math.ceil((mlCim+mlVig)/sE-1e-9)+(central?2:0)+4;
     const porBarra=Math.floor(600/largoE), barrasE=Math.ceil(nE/porBarra);
     fierros={nL, dL, dE, sE, trasl, barrasL, nE, eA, eH, largoE, barrasE, enCim};
   }
@@ -1066,7 +1198,7 @@ function radier(state,res){
   const wT=T.on!==false?120:0, wMuro=41+wT*(L/100)/2+seccion/1e4*2400;   // kg por metro de cimiento
   const presion=wMuro/(c*100);                                           // kg/cm²
   // si se hace en obra: H20 ≈ 12 sacos de 25 kg, 0,5 m³ de arena y 0,8 m³ de ripio por m³
-  return {tipo:'radier', L, largo, esp, c, prof, sobre, central, perim, cen, mlCim, m3Cim, m2Losa, m3Losa, m3, m3Pedir, perdida:b.perdida??5,
+  return {tipo:'radier', L, largo, esp, c, prof, sobre, central, perim, cen, mlCim, m3Cim, m2Losa, m3Losa, m3, m3Pedir, perdida:b.perdida??5, vaciados, m3Vac, camiones, cam, mlVig, m3Vig, emp,
     mallas, rinde, nylon, calugasLosa, calugasCim, arm, espRipio, m3Cama, escarpe, m3Escarpe, m3Relleno, fierros, escalerilla, alambre, moldaje, m3Exc, presion, suelo:b.suelo||1.0,
     obra:{sacos:Math.ceil(m3*12), arena:Math.ceil(m3*0.5*10)/10, ripio:Math.ceil(m3*0.8*10)/10}, apoyo:T.apoyo};
 }
@@ -1210,7 +1342,7 @@ function extras(state,res){
   // 1) AISLACIÓN: todo el perímetro (contrato), muro por dentro descontando los vanos
   // ojo: el rollo se vende por ancho × largo (m²), no por metros lineales. Un rollo de 2,40 de ancho cubre el alto
   // del muro y su largo son los metros lineales de muro que alcanza.
-  let m2=0, ml=0; res.walls.forEach(r=>{ const largo=r.a1-r.a0; ml+=largo; let a=largo*p.H; r.vanos.forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead); a-=v.w*(door?head:v.h); }); m2+=a; });
+  let m2=0, ml=0; res.walls.forEach(r=>{ const largo=r.a1-r.a0; ml+=largo; let a=r.AH&&r.AH.var?r.areaBruta:largo*p.H; r.vanos.forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead); a-=v.w*(door?head:v.h); }); m2+=a; });
   m2/=10000; ml/=100; const m2Rollo=(p.lanaAncho||240)*(p.lanaLargo||1500)/10000;
   out.aislacion={m2, ml, m2Rollo, ancho:(p.lanaAncho||240)/100, largo:(p.lanaLargo||1500)/100, rollos:Math.ceil(m2/m2Rollo-0.001)};
   // 2) JOTAS Y BOTAGUAS: por cada vano exterior. Jota: arriba y a los costados; botagua: bajo la ventana, 5 cm más por lado
@@ -1222,10 +1354,10 @@ function extras(state,res){
   out.botaguas={piezas:botas, metros:botas.reduce((a,x)=>a+x.len,0)/100, B:p.lBota||300};
   // 3) CABALLETE: a lo largo de la cumbrera, con su traslape
   const T=res.techo;
-  if(T){ const L=T.largoC+(T.ala?T.ala.largoC:0), pz=p.lCab||300   /* jota, botagua y caballete vienen de 3 m (Cristian, 4-oct) */, tr=p.trCab||15; const n=Math.ceil((L-tr)/(pz-tr)-0.001); out.caballete={largo:L/100, piezas:n, pz, tr}; }
+  if(T&&!T.plano){ const L=T.largoC+(T.ala?T.ala.largoC:0), pz=p.lCab||300   /* jota, botagua y caballete vienen de 3 m (Cristian, 4-oct) */, tr=p.trCab||15; const n=Math.ceil((L-tr)/(pz-tr)-0.001); out.caballete={largo:L/100, piezas:n, pz, tr}; }
   // 4) FRONTONES: el triángulo sobre los dos muros que cruza la cercha (2,40 hasta la cumbrera). Pies derechos cada 40 a eje,
   //    OSB por fuera y, si ese muro lleva internit exterior, también internit.
-  if(T){ const L=T.L, h=T.h, half=L/2, yTop=x=>x<=half?h*x/half:h*(L-x)/half;
+  if(T&&!T.plano){ const L=T.L, h=T.h, half=L/2, yTop=x=>x<=half?h*x/half:h*(L-x)/half;
     const gables=res.walls.filter(r=>Math.abs(r.L-L)<1);
     const studs=[]; for(let x=p.step;x<L-5;x+=p.step) studs.push(r1(yTop(x)));
     const area=L*h/2/10000, osbPl=Math.ceil(area*1.15/(p.osb*p.osbH/10000)-0.001), intPl=Math.ceil(area*1.15/(p.vol*p.volH/10000)-0.001);
@@ -1234,7 +1366,7 @@ function extras(state,res){
     out.frontones={muros:gables.map(r=>r.letra+' · '+r.w.name), area, nStuds:studs.filter(x=>x>5).length, studs, osb:osbPl*gables.length,
       internit:intPl*gables.filter(r=>r.w.intExt).length, conInternit:gables.filter(r=>r.w.intExt).map(r=>r.letra)};
   }
-  if(T&&T.ala){   // casa en L: 2 frontones del cuerpo + 1 del ala (el otro extremo del ala muere en el techo del cuerpo)
+  if(T&&!T.plano&&T.ala){   // casa en L: 2 frontones del cuerpo + 1 del ala (el otro extremo del ala muere en el techo del cuerpo)
     const fr=(L,h)=>{ const half=L/2, y=x=>x<=half?h*x/half:h*(L-x)/half, st=[]; for(let x=p.step;x<L-5;x+=p.step) st.push(r1(y(x))); return {area:L*h/2/10000, st}; };
     const c=fr(T.L,T.h), a=fr(T.ala.L,T.ala.h), g=k=>res.groups[k]=res.groups[k]||[];
     (res.groups['C 90']||[]).splice(0,Infinity,...(res.groups['C 90']||[]).filter(x=>x.lab!=='pie derecho de frontón'));
@@ -1244,7 +1376,8 @@ function extras(state,res){
   }
   // 5b) MALLA HIDRÓFUGA EN MUROS (Cristian, 4-oct): sobre el OSB va solo malla hidrófuga (ya no fieltro ni otras barreras).
   //     Muros exteriores sin vanos + 10 % de traslapo.
-  out.mallaMuro={m2:m2, compra:Math.ceil(m2*1.10)};
+  const m2Ext=res.ints.filter(r=>r.w.exterior).reduce((a,r)=>{ let x=r.areaBruta; r.vanos.forEach(v=>x-=v.w*v.h); return a+x; },0)/10000;
+  out.mallaMuro={m2:m2+m2Ext, compra:Math.ceil((m2+m2Ext)*1.10)};
   // EXTRAS QUE SE COBRAN APARTE (Cristian, 4-oct): «son pequeñas cosas que me permiten hacer trabajos extra»
   const TT=state.techo||{}, mRollo=out.aislacion.m2Rollo;
   //  · aislación de piso y de cielo (la perimetral va siempre; piso y cielo solo si el cliente las pide)
@@ -1272,8 +1405,11 @@ function extras(state,res){
   if(b.on!==false){
     const radier=b.tipo==='radier', sep=radier?(p.sepAnclaje||80):(p.sepHex||60);   // manual Cintac: perno cada 80 como máximo
     let n=0, nV=0;
-    [...res.walls,...res.ints].forEach(r=>{ const largo=r.a1-r.a0; n+=Math.ceil(largo/sep-1e-9)+1; nV+=r.vanos.length*2; });
-    out.anclajes={tipo:radier?'perno':'hexagonal', perno:b.perno||'expansion', sep, n:n+nV, nVanos:nV};
+    // v0.20 (Cintac): cada tabique lleva su perno a 30 cm máximo de su inicio → +1 en cada unión entre tabiques
+    let nU=0; [...res.walls,...res.ints].filter(r=>!r.w.sobre).forEach(r=>{ const largo=r.a1-r.a0; n+=Math.ceil(largo/sep-1e-9)+1; nV+=r.vanos.length*2; nU+=(r.unions||[]).length; });
+    out.anclajes={tipo:radier?'perno':'hexagonal', perno:b.perno||'expansion', sep, n:n+nV+nU, nVanos:nV, nUniones:nU};
+    // v0.20: suple de anclaje de 10 cm de C 90 por perno (Cintac fig. 3); sale de los despuntes, y si no alcanzan se cuentan perfiles
+    if(radier&&p.suple!==false){ const g=res.groups['C 90']=res.groups['C 90']||[]; for(let i=0;i<out.anclajes.n;i++) g.push({len:10,lab:'suple de anclaje',w:'Anclajes'}); out.anclajes.suple=out.anclajes.n; }
   }
   // 7) REFUERZO DE BISAGRA (Cristian): listón 2x2 dentro de la jamba del lado de las bisagras, atornillado al Metalcon,
   //    para que la puerta no quede suelta. Uno por puerta, del alto de la puerta.
@@ -1349,11 +1485,49 @@ function perimetro(W, H, rc) {
   return {lados, esq, a, b, area: W * H - a * b, perim: 2 * (W + H)};
 }
 
+// VARIAS ESQUINAS (Cristian, 17-oct-2026, casa de ejemplo de varias esquinas): un rectángulo al que le faltan rectángulos en varias
+// esquinas (forma de Z, o una esquina escalonada = dos recortes en la misma esquina). Se arma la planta por celdas, se
+// recorre el borde en sentido horario y cada lado es un muro: A, B, C… partiendo por el lado de arriba más a la izquierda.
+function perimetroVarios(W, H, recortes) {
+  const R = (recortes || []).filter(r => r && r.ancho > 0 && r.fondo > 0 && r.ancho < W && r.fondo < H && /^[NS][EW]$/.test(r.esquina || ''))
+    .map(r => { const n = r.esquina[0] === 'N', e = r.esquina[1] === 'E'; return [e ? W - r.ancho : 0, n ? 0 : H - r.fondo, e ? W : r.ancho, n ? r.fondo : H, r.esquina]; });
+  const xs = [...new Set([0, W, ...R.flatMap(r => [r[0], r[2]])])].sort((a, b) => a - b);
+  const ys = [...new Set([0, H, ...R.flatMap(r => [r[1], r[3]])])].sort((a, b) => a - b);
+  const dentro = (i, j) => { if (i < 0 || j < 0 || i >= xs.length - 1 || j >= ys.length - 1) return false;
+    const cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2; return !R.some(r => cx > r[0] && cx < r[2] && cy > r[1] && cy < r[3]); };
+  // aristas del borde con el interior a la derecha (x al este, y al sur)
+  const ar = []; let area = 0;
+  for (let i = 0; i < xs.length - 1; i++) for (let j = 0; j < ys.length - 1; j++) { if (!dentro(i, j)) continue;
+    const x0 = xs[i], x1 = xs[i + 1], y0 = ys[j], y1 = ys[j + 1]; area += (x1 - x0) * (y1 - y0);
+    if (!dentro(i, j - 1)) ar.push([[x0, y0], [x1, y0]]);
+    if (!dentro(i + 1, j)) ar.push([[x1, y0], [x1, y1]]);
+    if (!dentro(i, j + 1)) ar.push([[x1, y1], [x0, y1]]);
+    if (!dentro(i - 1, j)) ar.push([[x0, y1], [x0, y0]]); }
+  const k = q => q[0] + ',' + q[1], sig = new Map(ar.map(a => [k(a[0]), a]));
+  const ini = ar.slice().sort((a, b) => a[0][1] - b[0][1] || a[0][0] - b[0][0])[0];
+  const pts = []; let a = ini, guard = 0;
+  do { pts.push(a[0]); a = sig.get(k(a[1])); } while (a && a !== ini && ++guard < 1000);
+  // se juntan los tramos en línea recta
+  const v = pts.filter((q, i) => { const p0 = pts[(i - 1 + pts.length) % pts.length], p1 = pts[(i + 1) % pts.length];
+    return !((p0[0] === q[0] && q[0] === p1[0]) || (p0[1] === q[1] && q[1] === p1[1])); });
+  // que A sea el lado de arriba: se parte en el vértice de arriba más a la izquierda
+  const s0 = v.reduce((m, q, i) => (q[1] < v[m][1] || (q[1] === v[m][1] && q[0] < v[m][0])) ? i : m, 0);
+  const vv = [...v.slice(s0), ...v.slice(0, s0)], n = vv.length, letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lados = vv.map((S, i) => { const F = vv[(i + 1) % n], len = Math.abs(F[0] - S[0]) + Math.abs(F[1] - S[1]);
+    const d = [Math.sign(F[0] - S[0]), Math.sign(F[1] - S[1])];
+    return {letra: letras[i], S, F, d, nrm: [-d[1], d[0]], ext: len, hor: d[1] === 0}; });
+  const conv = i => { const p0 = lados[(i - 1 + n) % n].d, p1 = lados[i].d; return p0[0] * p1[1] - p0[1] * p1[0] > 0; };
+  lados.forEach((l, i) => { l.entraIni = !conv(i); l.entraFin = !conv((i + 1) % n); });
+  const perim = lados.reduce((s, l) => s + l.ext, 0);
+  return {lados, esq: R.length ? 'varias' : null, a: 0, b: 0, area, perim, rects: R};
+}
+
 function plantaAEstado(pl, p) {
   const E = p.e, W = pl.ancho, H = pl.fondo, TOL = 15;
   const ancho = {90: 9, 60: 6, 40: 4};
   const avisos = [];
-  const PER = perimetro(W, H, pl.recorte), LADOS = PER.lados;
+  const VARIAS = (pl.recortes || []).length > 0;
+  const PER = VARIAS ? perimetroVarios(W, H, pl.recortes) : perimetro(W, H, pl.recorte), LADOS = PER.lados;
 
   // ---- tabiques interiores: orientación, eje y extremos ajustados a la cara que tocan ----
   const T = pl.tabiques.map((t, i) => {
@@ -1388,22 +1562,36 @@ function plantaAEstado(pl, p) {
   // ---- muros perimetrales A (fondo, norte), B (este), C (frente, sur), D (oeste) y, en una L, E y F ----
   // Largo de cada muro = su largo exterior; en una esquina ENTRANTE se le suma el ancho del muro (el pilar de esa
   // esquina queda más allá de la línea de fachada). El pilar de cada esquina es del muro más largo (empate: horizontal).
-  const NOMBRES = {A: 'Norte (fondo)', B: 'Este', C: 'Sur (frente)', D: 'Oeste', E: 'Muro E (entrante)', F: 'Muro F (entrante)'};
+  const NOMBRES = VARIAS ? {} : {A: 'Norte (fondo)', B: 'Este', C: 'Sur (frente)', D: 'Oeste', E: 'Muro E (entrante)', F: 'Muro F (entrante)'};
   const nL = LADOS.length;
   const muros = LADOS.map((l, k) => {
     const prev = LADOS[(k - 1 + nL) % nL], next = LADOS[(k + 1) % nL];
     const gana = (yo, otro) => yo.ext > otro.ext || (yo.ext === otro.ext && yo.hor);
-    return {name: NOMBRES[l.letra], letra: l.letra, L: l.ext + (l.entraIni ? E : 0) + (l.entraFin ? E : 0),
+    return {name: NOMBRES[l.letra] || ('Muro ' + l.letra), letra: l.letra, L: l.ext + (l.entraIni ? E : 0) + (l.entraFin ? E : 0),
       pS: gana(l, prev), pE: gana(l, next), vanos: [], ts: [], forro: {}, intExt: (pl.intExt || []).includes(l.letra), _l: l};
   });
   // posición a lo largo de un muro (desde su esquina de partida, recorrido horario, con el corrimiento del entrante)
   const off = k => LADOS[k].entraIni ? E : 0;
+  // ALTO DE CADA MURO (17-oct): pl.alturas[letra] = {hS, hE, qx, qa, qb}: alto al inicio y al final (en el sentido del
+  // recorrido) y, si hay, un quiebre a qx del inicio con alto qa antes y qb después (frontón o cambio de agua).
+  const altDe = (al, Ltot, o) => { if (!al || !(al.hS > 0 || al.hE > 0 || al.qx > 0)) return null;
+    const hS = al.hS > 0 ? al.hS : p.H, hE = al.hE > 0 ? al.hE : p.H, pts = [[0, hS]];
+    if (al.qx > 0 && al.qx + o < Ltot) { pts.push([al.qx + o, al.qa > 0 ? al.qa : hS]); pts.push([al.qx + o, al.qb > 0 ? al.qb : (al.qa > 0 ? al.qa : hS)]); }
+    pts.push([Ltot, hE]); return pts; };
+  muros.forEach((m, k) => { const a = altDe((pl.alturas || {})[m.letra], m.L, off(k)); if (a) m.alt = a; });
+  // v0.20: corte escrito a mano para un muro bloqueado: pl.cortes[letra] = '6,00; 3,20' (metros desde el inicio del muro)
+  muros.forEach((m, k) => { const t = (pl.cortes || {})[m.letra]; if (!t) return;
+    const cs = String(t).split(/[;\s]+/).map(x => parseFloat(x.replace(',', '.'))).filter(x => x > 0).map(x => Math.round(x * 1000) / 10 + off(k)).filter(x => x > 0 && x < m.L);
+    if (cs.length) m.cortes = cs; });
   const along = (k, x, y) => { const l = LADOS[k]; return (x - l.S[0]) * l.d[0] + (y - l.S[1]) * l.d[1] + off(k); };
   T.forEach(t => ['a', 'b'].forEach(ext => {
     if (!t.toca[ext] || !t.toca[ext].perim) return;
     const k = t.toca[ext].k, x0 = t.eje - t.e / 2, x1 = t.eje + t.e / 2;
     const s0 = t.hor ? along(k, 0, x0) : along(k, x0, 0), s1 = t.hor ? along(k, 0, x1) : along(k, x1, 0);
-    muros[k].ts.push({x: Math.round(Math.min(s0, s1) * 10) / 10, w: t.e, de: t.nombre});
+    const xT = Math.round(Math.min(s0, s1) * 10) / 10;
+    // 17-oct: si el tabique llega justo a la esquina (en la zona del pilar) no es una T: lo recibe el pilar
+    if (xT < E - 0.5 || xT + t.e > muros[k].L - E + 0.5) return;
+    muros[k].ts.push({x: xT, w: t.e, de: t.nombre});
   }));
 
   // ---- tabiques interiores como «ints»; T de un tabique sobre otro con su cara ----
@@ -1412,8 +1600,22 @@ function plantaAEstado(pl, p) {
     const o = t.toca[ext] && t.toca[ext].tab; if (!o) return;
     const x0 = t.eje - t.e / 2;
     const cara = (ext === 'a') ? 'B' : 'A';   // si llega por el lado de coordenada menor, toca la cara A
-    ints[o.i].ts.push({x: Math.round((x0 - o.a) * 10) / 10, w: t.e, cara: ext === 'b' ? 'A' : 'B', de: t.nombre});
+    const xT = Math.round((x0 - o.a) * 10) / 10, Lo = Math.round((o.b - o.a) * 10) / 10;
+    // 17-oct: dos tabiques que se juntan por sus puntas forman una esquina (L), no una T: la recibe el pie derecho del extremo
+    if (xT < 1 || xT + t.e > Lo - 1) return;
+    ints[o.i].ts.push({x: xT, w: t.e, cara: ext === 'b' ? 'A' : 'B', de: t.nombre});
   }));
+
+  // ---- SOBRETABIQUES Y MUROS SUELTOS (17-oct): tabique C 90 de largo y alto propios que no sale del dibujo, ej. el
+  //      sobretabique con las ventanas altas sobre una cercha viga, o un muro suelto del acceso. «apoyo: 'radier'» lleva pernos.
+  (pl.sobretabiques || []).forEach((t, i) => { if (!(t.largo > 0 && t.alto > 0)) return;
+    ints.push({name: t.nombre || ('Sobretabique ' + (i + 1)), L: t.largo, perfil: 90, vanos: [], ts: [], forro: {}, alt: [[0, t.alto], [t.largo, t.alto]], sobre: t.apoyo !== 'radier', suelto: true,
+      exterior: t.exterior === true || t.exterior === 'si'}); });
+  // v0.20 (revisor): los tabiques interiores llegan al cordón inferior de las cerchas: por defecto el alto perimetral menor
+  // (cuando los muros tienen alto propio); editable en pl.altoInt
+  const altosPer = muros.filter(m => m.alt).flatMap(m => m.alt.map(q => q[1]));
+  const altoInt = pl.altoInt > 0 ? pl.altoInt : (altosPer.length ? Math.min(...altosPer, ...muros.filter(m => !m.alt).map(() => p.H)) : 0);
+  if (altoInt > 0 && Math.abs(altoInt - p.H) > 0.5) ints.forEach(m => { if (!m.alt) m.alt = [[0, altoInt], [m.L, altoInt]]; });
 
   // ---- vanos ----
   (pl.vanos || []).forEach(v => {
@@ -1425,7 +1627,9 @@ function plantaAEstado(pl, p) {
 
   // ---- recintos: celdas libres entre caras de muros, unidas por contacto ----
   const rects = T.map(t => t.hor ? [t.a, t.eje - t.e / 2, t.b, t.eje + t.e / 2] : [t.eje - t.e / 2, t.a, t.eje + t.e / 2, t.b]);
-  if (PER.esq) { const a = PER.a, b = PER.b;        // el recorte más el ancho de sus dos muros, hacia adentro
+  if (VARIAS) PER.rects.forEach(r => { const n = r[4][0] === 'N', e = r[4][1] === 'E';   // cada recorte + el ancho de sus muros, hacia adentro
+    rects.push([e ? r[0] - E : 0, n ? 0 : r[1] - E, e ? W : r[2] + E, n ? r[3] + E : H]); });
+  else if (PER.esq) { const a = PER.a, b = PER.b;        // el recorte más el ancho de sus dos muros, hacia adentro
     rects.push({SE: [W - a - E, H - b - E, W, H], SW: [0, H - b - E, a + E, H], NE: [W - a - E, 0, W, b + E], NW: [0, 0, a + E, b + E]}[PER.esq]); }
   const xs = [...new Set([E, W - E, ...rects.flatMap(r => [r[0], r[2]])])].filter(x => x >= E && x <= W - E).sort((a, b) => a - b);
   const ys = [...new Set([E, H - E, ...rects.flatMap(r => [r[1], r[3]])])].filter(y => y >= E && y <= H - E).sort((a, b) => a - b);
@@ -1452,6 +1656,7 @@ function plantaAEstado(pl, p) {
   // ---- forro de cada cara según el recinto que mira ----
   const humedo = t => t === 'baño' || t === 'cocina';
   const matEn = (x, y) => {
+    if (pl.forroBase === 'ninguno') return 'ninguno';   // sin forro interior (Cristian, casa de ejemplo de varias esquinas)
     if ((pl.zonas || []).some(z => humedo(z.tipo) && x >= z.x0 && x <= z.x1 && y >= z.y0 && y <= z.y1)) return 'internit';
     const r = regionDe(x, y); return r && humedo(r.tipo) ? 'internit' : (pl.forroBase || 'terciado');
   };
@@ -1460,7 +1665,7 @@ function plantaAEstado(pl, p) {
   const puntoMuro = (k, s) => { const l = LADOS[k], q = s - off(k); return [l.S[0] + l.d[0] * q + l.nrm[0] * (E + 1), l.S[1] + l.d[1] * q + l.nrm[1] * (E + 1)]; };
   muros.forEach((m, k) => tramos(E, m.L - E, m.ts).forEach(([r0, r1], i) => {
     const [x, y] = puntoMuro(k, (r0 + r1) / 2); const mat = matEn(x, y); if (mat !== (pl.forroBase || 'terciado')) m.forro['A' + i] = mat; }));
-  ints.forEach(m => { const t = m._t;
+  ints.forEach(m => { const t = m._t; if (!t) return;
     const punto = (s, lado) => t.hor ? [t.a + s, t.eje + lado * (t.e / 2 + 1)] : [t.eje + lado * (t.e / 2 + 1), t.a + s];
     const tA = m.ts.filter(u => u.cara !== 'B'), tB = m.ts.filter(u => u.cara === 'B');
     tramos(0, m.L, tA).forEach(([r0, r1], i) => { const mat = matEn(...punto((r0 + r1) / 2, -1)); if (mat !== (pl.forroBase || 'terciado')) m.forro['A' + i] = mat; });
@@ -1479,7 +1684,7 @@ function plantaAEstado(pl, p) {
   const apoyoT = T.find(t => t.perfil === 90 && t.hor === cumbreraHor);
   // cuerpo principal (rectángulo mayor) y ala de la L
   let R1 = {x0: 0, y0: 0, x1: W, y1: H}, R2 = null;
-  if (PER.esq) { const a = PER.a, b = PER.b, n = PER.esq.includes('N'), e = PER.esq.includes('E');
+  if (PER.esq && !VARIAS) { const a = PER.a, b = PER.b, n = PER.esq.includes('N'), e = PER.esq.includes('E');
     const hz = {r1: {x0: 0, x1: W, y0: n ? b : 0, y1: n ? H : H - b}, r2: {x0: e ? 0 : a, x1: e ? W - a : W, y0: n ? 0 : H - b, y1: n ? b : H}};
     const vt = {r1: {x0: e ? 0 : a, x1: e ? W - a : W, y0: 0, y1: H}, r2: {x0: e ? W - a : 0, x1: e ? W : a, y0: n ? b : 0, y1: n ? H : H - b}};
     const ar = r => (r.x1 - r.x0) * (r.y1 - r.y0); const op = ar(hz.r1) >= ar(vt.r1) ? hz : vt; R1 = op.r1; R2 = op.r2; }
@@ -1491,6 +1696,10 @@ function plantaAEstado(pl, p) {
   const techo = Object.assign({}, base0, pl.techo || {},
     {luz, largo: largoT, apoyo: apoyoRel != null && apoyoRel > 0 && apoyoRel < luz ? apoyoRel : luz / 2, apoyoReal: apoyoRel != null && apoyoRel > 0 && apoyoRel < luz});
   if (pl.techo && pl.techo.on === false) techo.on = false;
+  // varias esquinas: el techo no se arma solo (limahoyas, varias aguas); se usa «las cerchas vienen en el plano»
+  if (VARIAS && techo.on && !(techo.plano && techo.plano.on)) { techo.on = false;
+    avisos.push('Planta con varias esquinas: el techo no se calcula solo (varias aguas, limahoyas). En «Techo» elige «Las cerchas vienen en el plano» y copia las cerchas del arquitecto.'); }
+  if (VARIAS && (!pl.base || (pl.base.tipo !== 'radier' && pl.base.on !== false))) avisos.push('Planta con varias esquinas: la base de pollos se calcula con el rectángulo que la envuelve (queda del lado seguro, sobra). El radier sí usa la forma real.');
   // el ala: cumbrera en el sentido en que sobresale; misma pendiente que el cuerpo principal
   let techoAla = null, baseRects = null;
   if (R2) { const w2 = R2.x1 - R2.x0, h2 = R2.y1 - R2.y0, saleY = R2.x0 >= R1.x0 && R2.x1 <= R1.x1;
@@ -1501,7 +1710,7 @@ function plantaAEstado(pl, p) {
 
   const tabs = T.map(t => ({a: t.a, b: t.b, eje: t.eje, hor: t.hor, e: t.e}));   // para dibujar y ubicar vanos
   muros.forEach(m => delete m._l);
-  return {estado: {walls: muros, ints, cielos, techo, techoAla, baseRects, area: PER.area, perim: PER.perim, forma: PER.esq ? 'L' : 'rect', base: pl.base || {}},
+  return {estado: {walls: muros, ints, cielos, techo, techoAla, baseRects, area: PER.area, perim: PER.perim, sinVolCielo: pl.forroBase === 'ninguno', altoInt: (typeof altoInt !== 'undefined' ? altoInt : 0), sinAislacion: !!pl.sinAislacion, forma: VARIAS ? 'varias' : PER.esq ? 'L' : 'rect', base: pl.base || {}},
     regiones, avisos, tabs, lados: LADOS.map(l => ({letra: l.letra, S: l.S, F: l.F, ext: l.ext}))};
 }
 if (typeof module !== 'undefined') module.exports = {plantaAEstado};
@@ -1513,9 +1722,11 @@ const $=s=>document.querySelector(s);
 let S=null;   // estado calculado (muros, tabiques, cielos, techo) del trabajo abierto
 /* ---------- resultados ---------- */
 function svgWall(r,fl,p){
-  const L=r.L, H=p.H, Y=y=>H-y, pad=12;
+  const AH=r.AH||{var:false,at:()=>p.H,max:p.H}, L=r.L, H=AH.var?AH.max:p.H, Y=y=>H-y, pad=12;
   let g='';
-  g+=`<rect x="${r.s0}" y="0" width="${r.e0-r.s0}" height="${H}" fill="var(--tab)"/>`;
+  if(AH.var){ const xs=[...new Set([r.s0,r.e0,...(AH.pts||[]).map(q=>q[0]).filter(x=>x>r.s0&&x<r.e0)])].sort((a,b)=>a-b); const top=[]; xs.forEach(x=>{ top.push([x,AH.at(x-0.02)]); top.push([x,AH.at(x+0.02)]); });
+    g+=`<path d="M${r.s0} ${H} ${top.map(([x,h])=>`L${x} ${Y(h)}`).join(' ')} L${r.e0} ${H} Z" fill="var(--tab)"/>`; }
+  else g+=`<rect x="${r.s0}" y="0" width="${r.e0-r.s0}" height="${H}" fill="var(--tab)"/>`;
   r.vanos.forEach(v=>{
     const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h;
     g+=`<rect x="${v.x}" y="${Y(head)}" width="${v.w}" height="${head-sill}" fill="var(--vano)" stroke="var(--steel)" stroke-width="1.2"/>`;
@@ -1526,9 +1737,11 @@ function svgWall(r,fl,p){
     g+=`<text x="${v.x+v.w/2}" y="${Y((head+sill)/2)+4}" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${fm(v.w)}</text>`;
   });
   r.ts.forEach(t=>{ g+=`<rect x="${t.x}" y="0" width="${t.w}" height="${H}" fill="var(--vol-soft)" stroke="var(--vol)" stroke-dasharray="4 3"/><text x="${t.x+t.w/2}" y="${H+30}" text-anchor="middle" font-size="12" fill="var(--vol)" font-family="IBM Plex Mono,monospace">T</text>`; });
-  if(fl) fl.forEach(f=>{ if(!f.ancho) return; const x0=f.lado==='ini'?0:L-f.ancho, x1=x0+f.ancho; g+=`<path d="M${x0} 0 L${x1} ${H} M${x0} ${H} L${x1} 0" stroke="var(--osb)" stroke-width="2" stroke-dasharray="7 4" fill="none" opacity=".75"/>`; });
+  if(fl) fl.forEach(f=>{ if(!f.ancho) return; const x0=f.x0!=null?f.x0:(f.lado==='ini'?0:L-f.ancho), x1=f.x1!=null?f.x1:x0+f.ancho, h0=AH.at(x0), h1=AH.at(x1);
+    const X=(ya0,yb0,ya1,yb1)=>`<path d="M${x0} ${Y(ya0)} L${x1} ${Y(yb1)} M${x0} ${Y(yb0)} L${x1} ${Y(ya1)}" stroke="var(--osb)" stroke-width="2" stroke-dasharray="7 4" fill="none" opacity=".75"/>`;
+    g+=f.pisos>1?X(0,f.y,0,f.y)+X(f.y,h0,f.y,h1):X(0,h0,0,h1); });
   const col={osb:'var(--osb)',vol:'var(--vol)',gri:'var(--muted)'};
-  r.st.forEach(s=>{ g+=`<rect x="${s.x-2}" y="0" width="4" height="${H}" fill="${col[s.k]||'var(--steel)'}"/>`; });
+  r.st.forEach(s=>{ const hs=AH.at(s.x); g+=`<rect x="${s.x-2}" y="${Y(hs)}" width="4" height="${hs}" fill="${col[s.k]||'var(--steel)'}"/>`; });
   r.pil.forEach(([a,b])=>{ g+=`<rect x="${a}" y="0" width="${b-a}" height="${H}" fill="var(--steel)"/><path d="M${a} 0 L${b} ${H} M${a} ${H} L${b} 0" stroke="var(--panel)" stroke-width="1.5"/>`; });
   if(r.codes) r.segs.forEach(([a,b],k)=>{ g+=`<text x="${(a+b)/2}" y="-20" text-anchor="middle" font-size="16" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono,monospace">${r.codes[k]}</text>`; });
   r.unions.forEach(c=>{ g+=`<line x1="${c}" x2="${c}" y1="-14" y2="${H+14}" stroke="var(--bad)" stroke-width="2" stroke-dasharray="5 3"/><text x="${c}" y="-18" text-anchor="middle" font-size="12" fill="var(--bad)" font-family="IBM Plex Mono,monospace">unión ${fm(c)}</text>`; });
@@ -1635,7 +1848,23 @@ function cotasHTML(r){
       <div class="mini" style="margin-top:3px">En el muro (desde la esquina exterior), el tabique va de ${fm(a)} a ${fm(b)}: ${linea(x=>fm(x),false)}</div></div>`;
   }).join('');
 }
+// Techo con las cerchas del plano (17-oct-2026): tabla de tipos con sus metros y lo que se compra (piezas de 6 m + 10 %)
+function techoPlanoHTML(T,p){
+  const k1=v=>(Math.round(v*10)/10).toString().replace('.',','), mm=cm=>k1(cm/100);
+  const filas=T.tipos.map(x=>`<tr><td>${esc(x.nombre||'')}</td><td class="m">${x.cant}</td><td class="m">${mm(x.c90||0)}</td><td class="m">${mm(x.c60||0)}</td><td>${x.otro?esc(x.otro)+' · '+(+x.otroPz>0?x.otroPz+' pieza'+(x.otroPz>1?'s':''):mm(x.otroM||0)+' m'):'—'}</td><td class="m">${mm(x.cant*(x.c90||0))} + ${mm(x.cant*(x.c60||0))}</td></tr>`).join('');
+  return `<p class="mini" style="margin:0 0 6px">Las cerchas <b>vienen en el plano</b> (las diseñó el arquitecto): no se calculan, se copian. Por cada tipo, cuántas y los metros de perfil de <b>una</b> cercha. Se compra en piezas de 6 m: metros totales ÷ 6 × 1,1 (10 % de despunte), redondeado hacia arriba.</p>
+  <div class="tw"><table><thead><tr><th>Tipo</th><th>Cant.</th><th>C 90 (m c/u)</th><th>C 60 (m c/u)</th><th>Otro perfil</th><th>Total C 90 + C 60 (m)</th></tr></thead><tbody>${filas}
+    <tr><td><b>${T.n} cerchas</b></td><td></td><td></td><td></td><td></td><td class="m"><b>${mm(T.c90)} + ${mm(T.c60)}</b></td></tr></tbody></table></div>
+  <ul class="notes" style="margin-top:10px">${T.piezas.map(z=>`<li class="info"><b>${z.n} ${esc(z.k)}</b> de ${fm(z.B)} m — ${esc(z.lab)}${z.cm?` (${mm(z.cm)} m${z.pzDirectas?` + ${z.pzDirectas} piezas enteras`:''})`:` (${z.pzDirectas} piezas enteras: el largo pasa de 6 m o va de una pieza)`}</li>`).join('')}
+    ${T.cruces?`<li class="info"><b>Cruces de San Andrés:</b> ${mm(T.cruces)} m de C 60, ya sumados al C 60.</li>`:''}
+    ${T.m2?`<li class="info"><b>Cubierta:</b> ${k1(T.m2)} m² inclinados → malla hidrófuga ${Math.ceil(T.m2)} m²${T.osbPl?` y ${T.osbPl} OSB de ${fm(p.osb)} × ${fm(p.osbH)} (+10 %)`:''}.</li>`:''}
+    ${T.cubML?`<li class="info"><b>${esc(T.cubNom)}:</b> ${k1(T.cubML)} metros lineales de plancha.</li>`:''}
+    ${T.hojaML?`<li class="info"><b>Hojalatería</b> (limahoyas, cumbrera, remates): ${k1(T.hojaML)} m.</li>`:''}
+    ${T.canalML||T.bajadas?`<li class="info"><b>Aguas lluvia:</b> ${T.canalML?k1(T.canalML)+' m de canal':''}${T.canalML&&T.bajadas?' · ':''}${T.bajadas?T.bajadas+' bajadas':''}.</li>`:''}
+  </ul>`;
+}
 function techoHTML(T,p){
+  if(T.plano) return techoPlanoHTML(T,p);
   const {L,h,half,nodos,webs,t}=T, a=T.aB, aF=T.aF, m=h/half, pad=70;
   const Y=y=>h-y+40;
   const xl=-a, xr=L+aF, yl=-a*m, yr=-aF*m;
@@ -1927,6 +2156,14 @@ D.trabajos.forEach(t=>{ if(t.id!=='sylvana'||t.fix0410) return; (t.planta.vanos|
 // 10-oct (Cristian): la ventana del lavaplatos (muro C, frente) es horizontal 1,40 × 0,60, alféizar a 1,20 y dintel a 1,80
 D.trabajos.forEach(t=>{ if(t.id!=='sylvana'||t.fix1010) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='C'&&v.tipo==='ventana'&&v.ancho===120&&v.alto===100){ v.desde-=10; v.ancho=140; v.alto=60; v.cab=180; } });
   t.fix1010=true; guardar(); });
+// 17-oct (Cristian): la casa de ejemplo de varias esquinas queda en la lista como ejemplo de planta con varias esquinas, muros de alto
+// variable, sobretabique, cerchas del plano y hormigón por vaciado (se agrega una sola vez; si se borra, no vuelve)
+const NL={"id":"ejemplo-varias-esquinas","nombre":"Casa de ejemplo de varias esquinas · Etapa 1","fecha":"2026-10-17","planta":{"ancho":1362,"fondo":825,"forroBase":"ninguno","sinAislacion":true,"intExt":[],"recortes":[{"esquina":"NW","ancho":564,"fondo":180},{"esquina":"NW","ancho":356,"fondo":241},{"esquina":"SE","ancho":312,"fondo":357}],"alturas":{"A":{"hS":358,"hE":261,"qx":486,"qa":261,"qb":261},"B":{"hS":261,"hE":261,"qx":234,"qa":338,"qb":338},"C":{"hS":261,"hE":261},"D":{"hS":261,"hE":261},"E":{"hS":261,"hE":260,"qx":694,"qa":400,"qb":304},"F":{"hS":260,"hE":260},"G":{"hS":260,"hE":304},"H":{"hS":400,"hE":400},"I":{"hS":400,"hE":358},"J":{"hS":358,"hE":358}},"tabiques":[{"nombre":"B acceso / estar","perfil":90,"o":"v","eje":362,"desde":241,"hasta":334},{"nombre":"C acceso / baño","perfil":90,"o":"v","eje":570,"desde":180,"hasta":334},{"nombre":"E baño / Simón","perfil":90,"o":"v","eje":742,"desde":0,"hasta":338},{"nombre":"F dormitorios","perfil":90,"o":"v","eje":1044,"desde":0,"hasta":468},{"nombre":"Pasillo oeste","perfil":90,"o":"h","eje":338,"desde":358,"hasta":450},{"nombre":"Pasillo norte","perfil":90,"o":"h","eje":338,"desde":566,"hasta":1044},{"nombre":"Cocina norte","perfil":90,"o":"h","eje":462,"desde":664,"hasta":1044},{"nombre":"D cocina / estar","perfil":90,"o":"v","eje":668,"desde":466,"hasta":825}],"sobretabiques":[{"nombre":"Sobretabique ventanas altas (sobre cercha viga)","largo":570,"alto":96,"apoyo":"cercha","exterior":true},{"nombre":"Muro suelto del acceso (norte)","largo":108,"alto":369,"apoyo":"radier"}],"vanos":[{"muro":"A","tipo":"ventana","desde":117,"ancho":50,"alto":170,"cab":220},{"muro":"A","tipo":"ventana","desde":299,"ancho":110,"alto":170,"cab":220},{"muro":"A","tipo":"ventana","desde":561,"ancho":150,"alto":120,"cab":220},{"muro":"D","tipo":"puerta","desde":67,"ancho":70,"alto":203},{"muro":"E","tipo":"ventana","desde":83,"ancho":135,"alto":120,"cab":220},{"muro":"E","tipo":"ventana","desde":230,"ancho":135,"alto":120,"cab":220},{"muro":"E","tipo":"ventana","desde":399,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":546,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":693,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":840,"ancho":135,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":36,"ancho":58,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":389,"ancho":100,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":501,"ancho":58,"alto":170,"cab":220},{"muro":"I","tipo":"puerta","desde":93,"ancho":95,"alto":223},{"muro":"T5","tipo":"puerta","desde":90,"ancho":75,"alto":203},{"muro":"T5","tipo":"puerta","desde":335,"ancho":75,"alto":203},{"muro":"T3","tipo":"puerta","desde":341,"ancho":80,"alto":203},{"muro":"T7","tipo":"puerta","desde":120,"ancho":192,"alto":213},{"muro":"S0","tipo":"ventana","desde":21,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":99,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":177,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":255,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":333,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":411,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":489,"ancho":58,"alto":60,"cab":71}],"recintos":[{"nombre":"Espacio familiar","tipo":"living","x":250,"y":600},{"nombre":"Baño familiar","tipo":"baño","x":650,"y":150},{"nombre":"Dormitorio Simón","tipo":"dormitorio","x":890,"y":170},{"nombre":"Dormitorio principal","tipo":"dormitorio","x":1200,"y":230},{"nombre":"Cocina","tipo":"cocina","x":850,"y":650}],"zonas":[],"techo":{"on":true,"alto":120,"sep":100,"alero":40,"aleroAtras":40,"aleroLat":40,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12,"plano":{"on":true,"crucesM":6800,"omegaM":18400,"m2":110.5,"osb":true,"cubML":12900,"cubNom":"Zincalum Z-Rib 0,5 terracota (ancho útil 0,99)","hojaML":5360,"canalML":1650,"bajadas":4,"tipos":[{"nombre":"Cercha 1","cant":8,"c90":800,"c60":560},{"nombre":"Cercha 2","cant":4,"c90":430,"c60":830,"otro":"CA 150 × 1,6 mm","otroPz":2},{"nombre":"Cercha 3","cant":5,"c90":1360,"c60":1860},{"nombre":"Cercha 4","cant":2,"c90":1500,"c60":1900},{"nombre":"Cercha 5","cant":4,"c90":1100,"c60":540},{"nombre":"Cercha 5B","cant":4,"c90":900,"c60":450},{"nombre":"Cercha viga","cant":1,"c90":1140,"c60":1430}]}},"base":{"on":true,"tipo":"radier","espLosa":10,"cimAncho":25,"cimProf":40,"sobreAlto":10,"perdida":0,"emplantillado":5,"mlVigas":2352,"vigaAncho":20,"vigaAlto":40,"fundCentral":false,"perno":"expansion"}},"p":{"soleraComp":true,"refH":122,"bajaPl":5},"respaldo":true,"moGlobal":11000000};
+if(NL&&!D.nl1710){ if(!D.trabajos.some(t=>t.id===NL.id)) D.trabajos.push(JSON.parse(JSON.stringify(NL))); D.nl1710=true; guardar(); }
+// v0.20 (revisor): en el ejemplo ya guardado, la 5ª ventana del muro sur (E) va a 6,93 (lámina L7), el sobretabique de las
+// ventanas altas es exterior y la OSB baja 5 cm bajo la solera (EETT III.6.2)
+D.trabajos.forEach(t=>{ if(t.id!=='ejemplo-varias-esquinas'||t.fix1710b) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='E'&&v.desde===705) v.desde=693; });
+  ((t.planta.sobretabiques||[])[0]||{}).exterior=true; t.p=Object.assign({},t.p||{},{bajaPl:5}); t.fix1710b=true; guardar(); });
 const J=()=>D.trabajos.find(t=>t.id===D.abierto)||D.trabajos[0];
 const PJ=()=>Object.assign({},P,{pegado:true,forroDef:(J().planta.forroBase||'terciado')},J().p||{});
 
@@ -1980,33 +2217,45 @@ function pintarPasos(){ const pl=J().planta, T=pl.techo||{};
     ['tabiques',pl.tabiques.length>0,'Tabiques','Dibuja con ✏ o cárgalos en la lista. Si no hay, se cubica solo el perímetro.',''],
     ['vanos',pl.vanos.length>0,'Puertas y ventanas','Toca ＋ Puerta o ＋ Ventana sobre el muro y ajusta la medida.',''],
     ['recintos',humedos,'Baños y cocina','Ubica cada recinto y marca cuál es baño o cocina: ahí va internit.',''],
-    ['techo',T.on!==false&&!!T.caidas,'Techo (opcional)',T.on===false?'Sin techo: se cubica solo la tabiquería.':'Elige hacia dónde caen las aguas, o «Sin techo».','op']];
+    ['techo',T.on!==false&&(!!T.caidas||!!(T.plano&&T.plano.on)),'Techo (opcional)',T.on===false?'Sin techo: se cubica solo la tabiquería.':(T.plano&&T.plano.on?'Cerchas copiadas del plano.':'Elige hacia dónde caen las aguas, o «Sin techo».'),'op']];
   $('#pasos').innerHTML=P.map(([k,ok,t,d,op],i)=>`<button class="paso${ok?' ok':(op?' op':'')}" data-paso="${k}"><span class="n">${ok?'✓':i+1}</span><span><b>${t}</b><span>${d}</span></span></button>`).join(''); }
 $('#pasos').addEventListener('click',e=>{ const b=e.target.closest('[data-paso]'); if(!b) return; const id={contorno:'f-contorno',tabiques:'f-tabiques',vanos:'f-vanos',recintos:'f-recintos',techo:'f-techo'}[b.dataset.paso];
   const det=$('#'+id).closest('details'); if(det) det.open=true; $('#'+id).scrollIntoView({behavior:'smooth',block:'start'}); });
 function pintarForms(){ pintarPasos();
   const pl=J().planta;
   $('#titulo').innerHTML=MODO_OBRA?esc(J().nombre):`${esc(J().nombre)}<small>${fm(pl.ancho)} × ${fm(pl.fondo)} m</small>`;
-  const RC=pl.recorte||{};
-  $('#f-contorno').innerHTML=`<div class="row">${TXT('nombre',J().nombre,'Nombre de la obra')}${F('planta.ancho',pl.ancho,RC.esquina?'Ancho total (m)':'Ancho (m)')}${F('planta.fondo',pl.fondo,RC.esquina?'Fondo total (m)':'Fondo (m)')}`+
-    `${SEL('planta.recorte.esquina',RC.esquina||'','Forma',[['','Rectángulo'],['SE','En L · falta la esquina de abajo a la derecha'],['SW','En L · falta la esquina de abajo a la izquierda'],['NE','En L · falta la esquina de arriba a la derecha'],['NW','En L · falta la esquina de arriba a la izquierda']])}`+
-    `${RC.esquina?F('planta.recorte.ancho',RC.ancho??300,'Lo que falta: ancho (m)')+F('planta.recorte.fondo',RC.fondo??300,'Lo que falta: fondo (m)'):''}${SEL('planta.forroBase',pl.forroBase,'Forro interior',[['terciado','Terciado ranurado'],['volcanita','Volcanita'],['internit','Internit']])}</div>
-    <p class="mini">Muros: <b>A</b> fondo (arriba) · <b>B</b> derecha · <b>C</b> frente (abajo) · <b>D</b> izquierda${RC.esquina?' · <b>E</b> y <b>F</b>: los dos muros de la esquina que entra':''}. En cada esquina va un pilar, del muro más largo${RC.esquina?' (también en la esquina de adentro)':''}.</p>
-    <div class="row">${'ABCD'.split('').map(k=>`<label class="chip${(pl.intExt||[]).includes(k)?' on':''}" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-int="${k}"${(pl.intExt||[]).includes(k)?' checked':''} style="margin:0">internit exterior ${k}</label>`).join('')}</div>`;
+  const RC=pl.recorte||{}, VAR=(pl.recortes||[]).length>0, formaV=VAR?'varias':(RC.esquina||'');
+  let LET='ABCD'.split(''); try{ LET=plantaAEstado(aPlanta(pl),PJ()).lados.map(l=>l.letra); }catch(e){}
+  const chkP=(attr,k,on,t)=>`<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" ${attr}="${k}"${on?' checked':''} style="margin:0">${t}</label>`;
+  const ESQ=[['NW','arriba a la izquierda'],['NE','arriba a la derecha'],['SE','abajo a la derecha'],['SW','abajo a la izquierda']];
+  const AL=pl.alturas||{}, SB=pl.sobretabiques||[];
+  $('#f-contorno').innerHTML=`<div class="row">${TXT('nombre',J().nombre,'Nombre de la obra')}${F('planta.ancho',pl.ancho,formaV?'Ancho total (m)':'Ancho (m)')}${F('planta.fondo',pl.fondo,formaV?'Fondo total (m)':'Fondo (m)')}`+
+    `<label class="f">Forma<select data-forma>${[['','Rectángulo'],['SE','En L · falta la esquina de abajo a la derecha'],['SW','En L · falta la esquina de abajo a la izquierda'],['NE','En L · falta la esquina de arriba a la derecha'],['NW','En L · falta la esquina de arriba a la izquierda'],['varias','Le faltan varias esquinas (Z, escalonada…)']].map(([v,n])=>`<option value="${v}"${formaV===v?' selected':''}>${n}</option>`).join('')}</select></label>`+
+    `${!VAR&&RC.esquina?F('planta.recorte.ancho',RC.ancho??300,'Lo que falta: ancho (m)')+F('planta.recorte.fondo',RC.fondo??300,'Lo que falta: fondo (m)'):''}${SEL('planta.forroBase',pl.forroBase,'Forro interior',[['terciado','Terciado ranurado'],['volcanita','Volcanita'],['internit','Internit'],['ninguno','Sin forro interior (ni muros ni cielo)']])}</div>`+
+    (VAR?`<div style="display:flex;flex-direction:column;gap:8px;margin:8px 0">${pl.recortes.map((r,i)=>`<div class="item">${SEL(`planta.recortes.${i}.esquina`,r.esquina,'Falta en la esquina',ESQ)}${F(`planta.recortes.${i}.ancho`,r.ancho,'ancho (m)')}${F(`planta.recortes.${i}.fondo`,r.fondo,'fondo (m)')}<button class="x" data-del="planta.recortes.${i}" title="Quitar">✕</button></div>`).join('')}<div><button class="b" data-add="recorte">+ Esquina que falta</button><p class="mini" style="margin:4px 0 0">Esquina escalonada: dos recortes en la misma esquina (uno más ancho y otro más alto).</p></div></div>`:'')+
+    `<p class="mini">${VAR?`Muros: <b>${LET.join(' · ')}</b>, desde el lado de arriba más a la izquierda y en el sentido del reloj (mira las letras en el dibujo). En cada esquina va un pilar, del muro más largo (también en las esquinas de adentro).`:`Muros: <b>A</b> fondo (arriba) · <b>B</b> derecha · <b>C</b> frente (abajo) · <b>D</b> izquierda${RC.esquina?' · <b>E</b> y <b>F</b>: los dos muros de la esquina que entra':''}. En cada esquina va un pilar, del muro más largo${RC.esquina?' (también en la esquina de adentro)':''}.`}</p>
+    <div class="row">${(VAR?LET:'ABCD'.split('')).map(k=>`<label class="chip${(pl.intExt||[]).includes(k)?' on':''}" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-int="${k}"${(pl.intExt||[]).includes(k)?' checked':''} style="margin:0">internit exterior ${k}</label>`).join('')}</div>
+    <div class="row" style="margin-top:6px">${chkP('data-plchk','aislacion',!pl.sinAislacion,'lleva aislación en los muros')}${chkP('data-pchk','soleraComp',!!PJ().soleraComp,'solera de refuerzo compuesta (C 90 dentro de U 92) sobre la superior')}${F('p.refH',PJ().refH||NaN,'Refuerzo horizontal a (m; vacío = sin)')}</div>
+    <div class="row" style="margin-top:6px">${chkP('data-pchk','plFleje',PJ().plFleje!==false,'pletinas 200×200 y tensores del fleje (EETT III.6.1)')}${chkP('data-pchk','suple',PJ().suple!==false,'suple de anclaje 10 cm por perno (Cintac fig. 3)')}${chkP('data-pchk','cadOSB',PJ().cadOSB!==false,'cadeneta en la junta de la OSB si el muro pasa de 2,44')}${chkP('data-pchk','cadMedia',PJ().cadMedia!==false,'cadeneta a media altura en pies derechos de más de 3 m (manual Cintac sugiere)')}${F('planta.altoInt',pl.altoInt||NaN,'Alto tabiques interiores (m; vacío = el alto perimetral menor)')}</div>
+    <details style="margin-top:8px"><summary><b>Alto de cada muro y cortes</b> <span class="mini">· techo de una o varias aguas (vacío = ${fm(PJ().H)}); corte a mano si el muro queda bloqueado</span></summary>
+      <p class="mini" style="margin:6px 0">Alto al inicio y al final del muro, en el sentido del reloj. Si cambia de golpe (frontón o cambio de agua), pon dónde (metros desde el inicio) y el alto antes y después.</p>
+      <div style="display:flex;flex-direction:column;gap:6px">${(VAR?LET:'ABCD'.split('')).map(k=>{ const a=AL[k]||{}; return `<div class="item"><b style="align-self:center;min-width:22px">${k}</b>${F(`planta.alturas.${k}.hS`,a.hS??NaN,'alto inicio')}${F(`planta.alturas.${k}.hE`,a.hE??NaN,'alto final')}${F(`planta.alturas.${k}.qx`,a.qx??NaN,'quiebre a (m)')}${F(`planta.alturas.${k}.qa`,a.qa??NaN,'alto antes')}${F(`planta.alturas.${k}.qb`,a.qb??NaN,'alto después')}${TXT(`planta.cortes.${k}`,(pl.cortes||{})[k],'cortes a mano (m; ej. 6,00)')}${AL[k]?`<button class="x" data-del-alt="${k}" title="Volver al alto parejo">✕</button>`:''}</div>`; }).join('')}</div></details>
+    <details style="margin-top:8px"${SB.length?' open':''}><summary><b>Sobretabiques y muros sueltos</b> <span class="mini">· los que no salen del dibujo (ej. ventanas altas sobre una viga)</span></summary>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${SB.map((t,i)=>`<div class="item">${TXT(`planta.sobretabiques.${i}.nombre`,t.nombre,'Nombre')}${F(`planta.sobretabiques.${i}.largo`,t.largo,'Largo (m)')}${F(`planta.sobretabiques.${i}.alto`,t.alto,'Alto (m)')}${SEL(`planta.sobretabiques.${i}.apoyo`,t.apoyo||'cercha','Apoya en',[['cercha','cercha o viga (sin pernos)'],['radier','el radier (con pernos)']])}${SEL(`planta.sobretabiques.${i}.exterior`,(t.exterior===true||t.exterior==='si')?'si':'no','Cara',[['no','interior'],['si','exterior (OSB y malla)']])}<button class="x" data-del="planta.sobretabiques.${i}" title="Quitar">✕</button></div>`).join('')}<div><button class="b" data-add="sobre">+ Sobretabique</button> <span class="mini">Sus ventanas se ponen en «Puertas y ventanas» eligiendo este muro.</span></div></div></details>`;
   $('#f-tabiques').innerHTML=pl.tabiques.map((t,i)=>`<div class="item">${TXT(`planta.tabiques.${i}.nombre`,t.nombre,'Nombre')}${SEL(`planta.tabiques.${i}.perfil`,t.perfil,'Perfil',[[90,'C 90'],[60,'C 60'],[40,'C 40']])}${SEL(`planta.tabiques.${i}.o`,t.o,'Dirección',[['h','horizontal (←→)'],['v','vertical (↑↓)']])}${F(`planta.tabiques.${i}.eje`,t.eje,t.o==='h'?'Eje a (m) del fondo':'Eje a (m) de la izquierda')}${F(`planta.tabiques.${i}.desde`,t.desde,'Desde (m)')}${F(`planta.tabiques.${i}.hasta`,t.hasta,'Hasta (m)')}<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fijo="${i}"${t.fijo?' checked':''} style="margin:0">no mover</label><button class="x" data-del="planta.tabiques.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin tabiques interiores.</p>';
-  const muros=[...(pl.recorte&&pl.recorte.esquina?[['E','E · entrante'],['F','F · entrante']]:[]),['A','A · fondo'],['B','B · derecha'],['C','C · frente'],['D','D · izquierda'],...pl.tabiques.map((t,i)=>['T'+i,t.nombre])];
+  const muros=[...(VAR?LET.map(k=>[k,'Muro '+k]):[...(pl.recorte&&pl.recorte.esquina?[['E','E · entrante'],['F','F · entrante']]:[]),['A','A · fondo'],['B','B · derecha'],['C','C · frente'],['D','D · izquierda']]),...pl.tabiques.map((t,i)=>['T'+i,t.nombre]),...SB.map((t,i)=>['S'+i,t.nombre||('Sobretabique '+(i+1))])];
   $('#f-vanos').innerHTML=pl.vanos.map((v,i)=>`<div class="item">${SEL(`planta.vanos.${i}.muro`,v.muro,'Muro',muros)}${SEL(`planta.vanos.${i}.tipo`,v.tipo,'Tipo',[['ventana','Ventana'],['puerta','Puerta']])}${F(`planta.vanos.${i}.desde`,v.desde,'Desde (m)')}${F(`planta.vanos.${i}.ancho`,v.ancho,'Ancho')}${F(`planta.vanos.${i}.alto`,v.alto,'Alto')}${v.tipo==='ventana'?F(`planta.vanos.${i}.cab`,v.cab||PJ().winHead,'Dintel a (desde el piso)'):''}<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fijov="${i}"${v.fijo?' checked':''} style="margin:0">no mover</label><button class="x" data-del="planta.vanos.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin vanos.</p>';
   $('#f-recintos').innerHTML=pl.recintos.map((r,i)=>`<div class="item">${TXT(`planta.recintos.${i}.nombre`,r.nombre,'Nombre')}${SEL(`planta.recintos.${i}.tipo`,r.tipo,'Tipo',[['dormitorio','Dormitorio'],['baño','Baño'],['cocina','Cocina'],['living','Living / comedor'],['otro','Otro']])}${F(`planta.recintos.${i}.x`,r.x,'x (m)')}${F(`planta.recintos.${i}.y`,r.y,'y (m)')}<button class="x" data-del="planta.recintos.${i}" title="Quitar">✕</button></div>`).join('');
   $('#f-zonas').innerHTML=(pl.zonas||[]).map((z,i)=>`<div class="item">${SEL(`planta.zonas.${i}.tipo`,z.tipo,'Tipo',[['cocina','Cocina'],['baño','Baño']])}${F(`planta.zonas.${i}.x0`,z.x0,'x desde')}${F(`planta.zonas.${i}.x1`,z.x1,'x hasta')}${F(`planta.zonas.${i}.y0`,z.y0,'y desde')}${F(`planta.zonas.${i}.y1`,z.y1,'y hasta')}<button class="x" data-del="planta.zonas.${i}" title="Quitar">✕</button></div>`).join('')||'<p class="mini">Sin zonas.</p>';
-  const T=pl.techo; const tipoTecho=T.on===false?'no':(T.caidas||'');
-  $('#f-techo').innerHTML=`<label class="f" style="flex:1 1 100%">Techo<select data-techo-tipo>${[['','Elegir…'],['no','Sin techo: solo tabiquería'],['frente','Dos aguas · caen hacia el frente (C) y el fondo (A)'],['costados','Dos aguas · caen hacia los costados (B y D)']].map(([v,n])=>`<option value="${v}"${tipoTecho===v?' selected':''}>${n}</option>`).join('')}</select></label>`+
-    (T.on===false?'<p class="mini" style="flex-basis:100%">Sin techo: los materiales muestran solo muros, tabiques y cielos. Cuando sepas cómo va el techo, elige las caídas y se suma solo.</p>':'')+[['alto','Alto al centro'],['sep','Cerchas cada'],['alero','Alero frente'],['aleroAtras','Alero fondo'],['aleroLat','Alero costados'],['cost','Costaneras cada'],['trasl','Traslape cordón']].map(([k,l])=>F('planta.techo.'+k,T[k],l)).join('')+F('planta.techo.panos',T.panos,'Paños por caída','c');
+  const T=pl.techo; const PLN=T.plano&&T.plano.on, tipoTecho=T.on===false?'no':(PLN?'plano':(T.caidas||''));
+  $('#f-techo').innerHTML=`<label class="f" style="flex:1 1 100%">Techo<select data-techo-tipo>${[['','Elegir…'],['no','Sin techo: solo tabiquería'],['frente','Dos aguas · caen hacia el frente (C) y el fondo (A)'],['costados','Dos aguas · caen hacia los costados (B y D)'],['plano','Las cerchas vienen en el plano (varias aguas, limahoyas)']].map(([v,n])=>`<option value="${v}"${tipoTecho===v?' selected':''}>${n}</option>`).join('')}</select></label>`+
+    (T.on===false?'<p class="mini" style="flex-basis:100%">Sin techo: los materiales muestran solo muros, tabiques y cielos. Cuando sepas cómo va el techo, elige las caídas y se suma solo.</p>':'')+(PLN?planoForm(T.plano):[['alto','Alto al centro'],['sep','Cerchas cada'],['alero','Alero frente'],['aleroAtras','Alero fondo'],['aleroLat','Alero costados'],['cost','Costaneras cada'],['trasl','Traslape cordón']].map(([k,l])=>F('planta.techo.'+k,T[k],l)).join('')+F('planta.techo.panos',T.panos,'Paños por caída','c'));
   const B=pl.base=pl.base||{};
   const esRad=B.tipo==='radier', chk=(k,t,on)=>`<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-base-chk="${k}"${on?' checked':''} style="margin:0">${t}</label>`;
   $('#base-nota').textContent=esRad?'Losa de hormigón H20 sobre nylon, con malla levantada en calugas. Cimiento y sobrecimiento perimetral (bajo tierra + sobre el suelo) y fundación corrida bajo el tabique que recibe las cerchas; lo que ocupan se descuenta de la losa.':'Filas de pollos a lo largo de la casa: atrás y mitad de atrás cada 2,00; bajo el tabique de apoyo, mitad de adelante y frente cada 1,50. Sobre cada fila un perfil cuadrado 100×100, perímetro en 100×100, travesaños 50×50 y diagonales en el frente y el costado más alto.';
   const selB=(k,v,l,ops)=>`<label class="f">${l}<select data-base-sel="${k}">${ops.map(([a,n])=>`<option value="${a}"${String(v)===String(a)?' selected':''}>${n}</option>`).join('')}</select></label>`;
   $('#f-base').innerHTML=chk('on','calcular la base',B.on!==false)+selB('tipo',B.tipo||'pollos','Tipo de base',[['pollos','Pollos y fierros (piso elevado)'],['radier','Radier (losa de hormigón)']])+(esRad?
-    [['espLosa','Espesor losa (cm)',10],['cimAncho','Ancho cimiento (cm)',25],['cimProf','Cimiento bajo tierra (cm)',40],['sobreAlto','Sobrecimiento sobre suelo (cm)',10],['escarpe','Escarpe (cm, mínimo 30)',30],['espRipio','Cama de ripio (cm)',10],['rindeMalla','Malla C92 rinde (m²)',10],['perdida','Pérdida hormigón (%)',5]].map(([k,l,d])=>F('planta.base.'+k,B[k]??d,l,'c')).join('')+
+    [['espLosa','Espesor losa (cm)',10],['cimAncho','Ancho cimiento / zanja (cm)',25],['cimProf','Cimiento bajo tierra (cm)',40],['sobreAlto','Sobrecimiento sobre suelo (cm)',10],['escarpe','Escarpe (cm, mínimo 30)',30],['espRipio','Cama de ripio (cm)',10],['rindeMalla','Malla C92 rinde (m²)',10],['perdida','Pérdida hormigón (%)',5]].map(([k,l,d])=>F('planta.base.'+k,B[k]??d,l,'c')).join('')+
     selB('armadura',B.armadura==='escalerilla'?'escalerilla':'fierros','Enfierradura (ver Glosario)',[['fierros','C · jaula de fierros en todo el alto'],['escalerilla','A · escalerilla arriba (solo suelo firme)']])+selB('perno',B.perno||'expansion','Perno de anclaje',[['expansion','Expansión 3/8" × 2¾" (manual Metalcon)'],['quimico','Químico: varilla 3/8" + epóxico'],['impacto','Clavo de impacto (solo tabiques que no cargan)']])+
     selB('moldaje',B.moldaje||'terciado','Moldaje',[['terciado','Terciado + listones 2x2'],['metalico','Metálico']])+
     chk('fundCentral','fundación corrida bajo el tabique de apoyo',B.fundCentral!==false)+chk('centralPrimero','fundación central primero (guía de nivel, moldaje por sus 2 caras)',!!B.centralPrimero)
@@ -2020,12 +2269,32 @@ function pintarForms(){ pintarPasos();
   const p=PJ(); $('#params').innerHTML=PARAMS.map(([k,l])=>`<label class="f" style="flex:1 1 130px">${l} (cm)<input type="text" class="n" data-p="p.${k}" data-t="c" inputmode="decimal" value="${String(p[k]).replace('.',',')}"></label>`).join('');
   pintarModos();
 }
+// formulario de «las cerchas vienen en el plano» (17-oct): por tipo, cuántas y los metros de perfil de UNA cercha
+function planoForm(P){ const b='planta.techo.plano.', tp=P.tipos||[];
+  return `<div style="flex-basis:100%;display:flex;flex-direction:column;gap:6px"><p class="mini" style="margin:4px 0">Copia del plano del arquitecto cada tipo de cercha: cuántas son y los metros de perfil de <b>una</b> (mídelos en la lámina de cerchas). Se compran piezas de 6 m: metros ÷ 6 × 1,1. Un perfil que pasa de 6 m (ej. CA 150 de 7,14) va en piezas.</p>`+
+    tp.map((x,i)=>`<div class="item">${TXT(`${b}tipos.${i}.nombre`,x.nombre,'Tipo')}${F(`${b}tipos.${i}.cant`,x.cant,'Cuántas','c')}${F(`${b}tipos.${i}.c90`,x.c90,'C 90 de una (m)')}${F(`${b}tipos.${i}.c60`,x.c60,'C 60 de una (m)')}${TXT(`${b}tipos.${i}.otro`,x.otro,'Otro perfil')}${F(`${b}tipos.${i}.otroPz`,x.otroPz,'piezas de una','c')}${F(`${b}tipos.${i}.otroM`,x.otroM,'o metros de una')}<button class="x" data-del="${b}tipos.${i}" title="Quitar">✕</button></div>`).join('')+
+    `<div><button class="b" data-add="cercha">+ Tipo de cercha</button></div><div class="row">${F(b+'crucesM',P.crucesM,'Cruces de San Andrés C 60 (m)')}${F(b+'omegaM',P.omegaM,'Costaneras omega (m)')}${F(b+'m2',P.m2,'Cubierta (m² inclinados)','c')}<label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-plano-osb${P.osb?' checked':''} style="margin:0">OSB en el techo</label></div>
+    <div class="row">${TXT(b+'cubNom',P.cubNom,'Plancha de cubierta')}${F(b+'cubML',P.cubML,'Plancha (metros lineales)')}${F(b+'hojaML',P.hojaML,'Hojalatería: limahoyas, cumbrera, remates (m)')}${F(b+'canalML',P.canalML,'Canal (m)')}${F(b+'bajadas',P.bajadas,'Bajadas','c')}</div></div>`; }
 function ref(path){ const ks=path.split('.'); let o=J(); for(let i=0;i<ks.length-1;i++){ if(o[ks[i]]===undefined) o[ks[i]]={}; o=o[ks[i]]; } return [o,ks[ks.length-1]]; }
 document.addEventListener('input',e=>{ const el=e.target, path=el.dataset.p; if(!path) return; const [o,k]=ref(path), t=el.dataset.t; let v;
   if(t==='m'){ v=m2cm(el.value); if(isNaN(v)) return; } else if(t==='c'){ v=num(el.value); if(isNaN(v)) return; } else v=el.value;
-  if(k==='perfil') v=+v; o[k]=v; guardar(); if(path.endsWith('.o')||path.endsWith('.muro')||path.endsWith('recorte.esquina')) pintarForms(); calcularLuego(); });
-document.addEventListener('change',e=>{ const el=e.target; if(el.dataset.extra){ const EX=J().extras=J().extras||{}; EX[el.dataset.extra]=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.extraSel){ const EX=J().extras=J().extras||{}; EX[el.dataset.extraSel]=el.value; guardar(); calcularLuego(); return; } if(el.dataset.baseSel){ const B=J().planta.base=J().planta.base||{}; B[el.dataset.baseSel]=el.dataset.baseSel==='perfilPiso'?+el.value:el.value; guardar(); pintarForms(); calcularLuego(); return; } if(el.dataset.baseChk){ const B=J().planta.base=J().planta.base||{}; B[el.dataset.baseChk]=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.techoTipo!==undefined){ const T=J().planta.techo; if(el.value==='no'){ T.on=false; } else { T.on=true; if(el.value) T.caidas=el.value; else delete T.caidas; } guardar(); pintarForms(); calcularLuego(); return; } if(el.dataset.fijo!==undefined){ J().planta.tabiques[+el.dataset.fijo].fijo=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.fijov!==undefined){ J().planta.vanos[+el.dataset.fijov].fijo=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.int){ const pl=J().planta; pl.intExt=pl.intExt||[]; const k=el.dataset.int; pl.intExt=el.checked?[...new Set([...pl.intExt,k])]:pl.intExt.filter(x=>x!==k); guardar(); pintarForms(); calcularLuego(); }
+  if(k==='perfil') v=+v; o[k]=v; guardar(); if(path.endsWith('.o')||path.endsWith('.muro')||path.endsWith('.esquina')) pintarForms(); calcularLuego(); });
+document.addEventListener('change',e=>{ const el=e.target;
+  if(el.dataset.forma!==undefined){ const pl=J().planta, v=el.value;
+    if(v==='varias'){ pl.recortes=pl.recortes&&pl.recortes.length?pl.recortes:(pl.recorte&&pl.recorte.esquina?[{esquina:pl.recorte.esquina,ancho:pl.recorte.ancho||300,fondo:pl.recorte.fondo||300}]:[{esquina:'NW',ancho:300,fondo:200},{esquina:'SE',ancho:300,fondo:300}]); delete pl.recorte; }
+    else { delete pl.recortes; if(v) pl.recorte=Object.assign({ancho:300,fondo:300},pl.recorte||{},{esquina:v}); else delete pl.recorte; }
+    guardar(); pintarForms(); calcularLuego(); return; }
+  if(el.dataset.pchk){ const J0=J(); J0.p=J0.p||{}; J0.p[el.dataset.pchk]=el.checked; guardar(); calcularLuego(); return; }
+  if(el.dataset.plchk==='aislacion'){ J().planta.sinAislacion=!el.checked; guardar(); calcularLuego(); return; }
+  if(el.dataset.planoOsb!==undefined){ J().planta.techo.plano.osb=el.checked; guardar(); calcularLuego(); return; }
+  if(el.dataset.extra){ const EX=J().extras=J().extras||{}; EX[el.dataset.extra]=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.extraSel){ const EX=J().extras=J().extras||{}; EX[el.dataset.extraSel]=el.value; guardar(); calcularLuego(); return; } if(el.dataset.baseSel){ const B=J().planta.base=J().planta.base||{}; B[el.dataset.baseSel]=el.dataset.baseSel==='perfilPiso'?+el.value:el.value; guardar(); pintarForms(); calcularLuego(); return; } if(el.dataset.baseChk){ const B=J().planta.base=J().planta.base||{}; B[el.dataset.baseChk]=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.techoTipo!==undefined){ const T=J().planta.techo; if(el.value==='plano'){ T.on=true; T.plano=Object.assign({tipos:[{nombre:'Cercha 1',cant:1,c90:0,c60:0}]},T.plano||{}); T.plano.on=true; } else { if(T.plano) T.plano.on=false; if(el.value==='no'){ T.on=false; } else { T.on=true; if(el.value) T.caidas=el.value; else delete T.caidas; } } guardar(); pintarForms(); calcularLuego(); return; } if(el.dataset.fijo!==undefined){ J().planta.tabiques[+el.dataset.fijo].fijo=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.fijov!==undefined){ J().planta.vanos[+el.dataset.fijov].fijo=el.checked; guardar(); calcularLuego(); return; } if(el.dataset.int){ const pl=J().planta; pl.intExt=pl.intExt||[]; const k=el.dataset.int; pl.intExt=el.checked?[...new Set([...pl.intExt,k])]:pl.intExt.filter(x=>x!==k); guardar(); pintarForms(); calcularLuego(); }
   if(el.dataset.p==='nombre'){ pintarLista(); pintarForms(); } });
+document.addEventListener('click',e=>{ const a=e.target.closest('button[data-add]'), d=e.target.closest('button[data-del-alt]'); if(!a&&!d) return; const pl=J().planta;
+  if(d){ if(pl.alturas) delete pl.alturas[d.dataset.delAlt]; }
+  else if(a.dataset.add==='recorte') (pl.recortes=pl.recortes||[]).push({esquina:'NE',ancho:200,fondo:200});
+  else if(a.dataset.add==='sobre') (pl.sobretabiques=pl.sobretabiques||[]).push({nombre:'Sobretabique '+((pl.sobretabiques||[]).length+1),largo:300,alto:100,apoyo:'cercha'});
+  else if(a.dataset.add==='cercha'){ const P=pl.techo.plano=pl.techo.plano||{on:true,tipos:[]}; (P.tipos=P.tipos||[]).push({nombre:'Cercha '+(P.tipos.length+1),cant:1,c90:0,c60:0}); }
+  guardar(); pintarForms(); calcularLuego(); });
 document.addEventListener('click',e=>{ const b=e.target.closest('button[data-del]'); if(!b) return; const [o,k]=ref(b.dataset.del); o.splice(+k,1); guardar(); pintarForms(); calcularLuego(); });
 $('#add-tab').onclick=()=>{ const pl=J().planta; pl.tabiques.push({nombre:'Tabique '+(pl.tabiques.length+1),perfil:60,o:'v',eje:pl.ancho/2,desde:0,hasta:pl.fondo}); guardar(); pintarForms(); calcularLuego(); };
 $('#add-vano').onclick=()=>{ J().planta.vanos.push({muro:'C',tipo:'ventana',desde:100,ancho:120,alto:100}); guardar(); pintarForms(); calcularLuego(); };
@@ -2113,7 +2382,7 @@ $('#plano').addEventListener('click',e=>{ if(modo.tipo==='ver') return; const sv
 });
 function aPlanta(pl){
   const ts=pl.tabiques.map(t=>t.o==='h'?{nombre:t.nombre,perfil:+t.perfil,x1:t.desde,y1:t.eje,x2:t.hasta,y2:t.eje}:{nombre:t.nombre,perfil:+t.perfil,x1:t.eje,y1:t.desde,x2:t.eje,y2:t.hasta});
-  const vanos=pl.vanos.map(v=>Object.assign({},v,{muro:/^T\d+$/.test(v.muro)?(pl.tabiques[+v.muro.slice(1)]||{}).nombre:v.muro}));
+  const vanos=pl.vanos.map(v=>Object.assign({},v,{muro:/^T\d+$/.test(v.muro)?(pl.tabiques[+v.muro.slice(1)]||{}).nombre:/^S\d+$/.test(v.muro)?(((pl.sobretabiques||[])[+v.muro.slice(1)]||{}).nombre||('Sobretabique '+(+v.muro.slice(1)+1))):v.muro}));
   return Object.assign({},pl,{tabiques:ts,vanos});
 }
 function pintarPlano(R,info){
@@ -2128,6 +2397,9 @@ function pintarPlano(R,info){
     g+=`<rect x="${e?nx0-E:nx0}" y="${wy}" width="${a+E}" height="${E}" fill="var(--steel)"/><rect x="${wx}" y="${n?ny0:ny0-E}" width="${E}" height="${b+E}" fill="var(--steel)"/>`;
     g+=`<text x="${nx0+a/2}" y="${ny0+b/2}" text-anchor="middle" font-size="22" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${fm(a)} × ${fm(b)}</text>`; }
   const LAD=info&&info.lados?Object.fromEntries(info.lados.map(l=>[l.letra,l])):null;
+  const VAR=(pl.recortes||[]).length>0&&info&&info.lados;
+  if(VAR){ const d='M'+info.lados.map(l=>l.S.join(' ')).join(' L')+' Z';   // el contorno real; el muro se pinta hacia adentro
+    g=`<defs><clipPath id="cp-casa"><path d="${d}"/></clipPath></defs><path d="${d}" fill="var(--panel2)" stroke="var(--steel)" stroke-width="${2*E}" clip-path="url(#cp-casa)"/>`; }
   // zonas húmedas
   (pl.zonas||[]).forEach(z=>{ g+=`<rect x="${z.x0}" y="${z.y0}" width="${z.x1-z.x0}" height="${z.y1-z.y0}" fill="var(--vol-soft)" stroke="var(--vol)" stroke-dasharray="6 4"/>`; });
   // tabiques interiores con su espesor real
@@ -2141,7 +2413,7 @@ function pintarPlano(R,info){
   // vanos sobre los muros
   const nPorMuro={};
   pl.vanos.slice().sort((a,b)=>a.desde-b.desde).forEach(v=>{ const k=v.muro; const alt=(nPorMuro[k]=(nPorMuro[k]||0)+1)%2===0; const col=v.tipo==='puerta'?'var(--accent)':'var(--vol)'; let r=null, lx, ly;
-    if(LAD&&LAD[k]&&(enL||k==='E'||k==='F')){ const l=LAD[k], dx=Math.sign(l.F[0]-l.S[0]), dy=Math.sign(l.F[1]-l.S[1]), nx=-dy, ny=dx;
+    if(LAD&&LAD[k]&&(enL||VAR||k==='E'||k==='F')){ const l=LAD[k], dx=Math.sign(l.F[0]-l.S[0]), dy=Math.sign(l.F[1]-l.S[1]), nx=-dy, ny=dx;
       const x0=l.S[0]+dx*v.desde, y0=l.S[1]+dy*v.desde, x1=l.S[0]+dx*(v.desde+v.ancho), y1=l.S[1]+dy*(v.desde+v.ancho);
       r=dy===0?[Math.min(x0,x1),ny>0?l.S[1]:l.S[1]-E,v.ancho,E]:[nx>0?l.S[0]:l.S[0]-E,Math.min(y0,y1),E,v.ancho];
       lx=(x0+x1)/2-nx*(alt?44:22); ly=(y0+y1)/2-ny*(alt?44:22)+(dy===0?6:0); }
@@ -2160,7 +2432,7 @@ function pintarPlano(R,info){
   (info?info.regiones:[]).forEach(r=>{ g+=`<text x="${(r.x0+r.x1)/2}" y="${(r.y0+r.y1)/2-6}" text-anchor="middle" font-size="27" font-weight="600" fill="var(--ink)" font-family="Barlow Condensed,Arial Narrow,sans-serif">${esc(r.nombre)}</text><text x="${(r.x0+r.x1)/2}" y="${(r.y0+r.y1)/2+12}" text-anchor="middle" font-size="19" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${fm(r.x1-r.x0)} × ${fm(r.y1-r.y0)}</text>`; });
   pl.recintos.forEach(r=>{ g+=`<circle cx="${r.x}" cy="${r.y}" r="7" fill="${r.tipo==='baño'||r.tipo==='cocina'?'var(--vol)':'var(--accent)'}"/>`; });
   // letras de los muros
-  (LAD&&enL?info.lados.map(l=>{ const dx=Math.sign(l.F[0]-l.S[0]), dy=Math.sign(l.F[1]-l.S[1]); return [l.letra,(l.S[0]+l.F[0])/2+dy*70,(l.S[1]+l.F[1])/2-dx*70]; }):[['A',W/2,-60],['B',W+150,H/2],['C',W/2,H+70],['D',-150,H/2]]).forEach(([k,x,y])=>{ g+=`<circle cx="${x}" cy="${y}" r="17" fill="var(--accent)"/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="23" font-weight="700" fill="#fff" font-family="Barlow Condensed,Arial,sans-serif">${k}</text>`; });
+  (LAD&&(enL||VAR)?info.lados.map(l=>{ const dx=Math.sign(l.F[0]-l.S[0]), dy=Math.sign(l.F[1]-l.S[1]); return [l.letra,(l.S[0]+l.F[0])/2+dy*70,(l.S[1]+l.F[1])/2-dx*70]; }):[['A',W/2,-60],['B',W+150,H/2],['C',W/2,H+70],['D',-150,H/2]]).forEach(([k,x,y])=>{ g+=`<circle cx="${x}" cy="${y}" r="17" fill="var(--accent)"/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="23" font-weight="700" fill="#fff" font-family="Barlow Condensed,Arial,sans-serif">${k}</text>`; });
   // cotas generales
   g+=`<line x1="0" y1="${H+96}" x2="${W}" y2="${H+96}" stroke="var(--ink)"/><text x="${W/2}" y="${H+122}" text-anchor="middle" font-size="23" fill="var(--ink)" font-family="IBM Plex Mono,monospace">${fm(W)}</text>`;
   g+=`<line x1="${W+70}" y1="0" x2="${W+70}" y2="${H}" stroke="var(--ink)"/><text x="${W+80}" y="${H/2}" font-size="23" fill="var(--ink)" font-family="IBM Plex Mono,monospace" transform="rotate(90 ${W+80} ${H/2})" text-anchor="middle">${fm(H)}</text>`;
@@ -2191,7 +2463,7 @@ function calcularYMostrar(){
     (det.length?`<li style="padding:0"><details><summary style="font-size:15px;font-family:var(--body)">Pies derechos muy juntos (${det.length}): para revisar en obra</summary><ul class="notes" style="margin-top:6px">${det.map(([t,m])=>`<li class="info">${esc(m)}</li>`).join('')}</ul></details></li>`:'');
 
   const fl=R.fle.out;
-  $('#elevs').innerHTML=R.walls.map((r,i)=>{ const f=fl.filter(x=>x.w===i); const ftxt=f.map(x=>`${x.lado==='ini'?'inicio':'final'}: ${x.ancho?`X de ${fm(x.ancho)} = ${(x.m/100).toFixed(2).replace('.',',')} m`:`sin fleje (quedan ${fm(x.lib)} m)`}`).join(' · ');
+  $('#elevs').innerHTML=R.walls.map((r,i)=>{ const f=fl.filter(x=>x.w===i); const ftxt=f.map(x=>`${x.lado==='ini'?'inicio':x.lado==='fin'?'final':'paño lleno (propuesta)'}: ${x.ancho?`X de ${fm(x.ancho)} = ${(x.m/100).toFixed(2).replace('.',',')} m`:`sin fleje (quedan ${fm(x.lib)} m)`}`).join(' · ');
     return `<div><h3>${r.letra} · ${esc(r.w.name)}<span class="pill">perimetral · ${r.prof.C} · ${r.codes.join(', ')}</span></h3><div class="elev">${svgWall(r,f,p)}</div><div class="mini">Fleje · ${ftxt}</div><div class="cotas">${cotasHTML(r)}</div></div>`; }).join('')+
     R.ints.map(r=>`<div><h3>${r.letra} · ${esc(r.w.name)}<span class="pill">interior · ${r.prof.C} · ${r.codes.join(', ')}</span></h3><div class="elev">${svgWall(r,null,p)}</div><div class="cotas">${cotasHTML(r)}</div></div>`).join('');
   // Cristian, 12-oct: el pilar dibujado (para que los chicos digan «ahh, así va») y las lentejas de todo en una línea
@@ -2200,6 +2472,7 @@ function calcularYMostrar(){
   const nLen=lentejasTotal([...R.walls,...R.ints]);
   $('#elevs').insertAdjacentHTML('beforeend',`<div><p style="font-size:17px;margin:0;padding:10px 12px;border-radius:10px;background:var(--panel2)"><b>Lentejas para todos los tabiques: ${nLen.toLocaleString('es-CL')}</b> <span class="mini">(tornillo cabeza lenteja ½": 4 por cada pie derecho o pieza + ${LENTEJAS_PILAR} por cada pilar)</span></p></div>`);
   if(R.techo) $('#techo-out').innerHTML=techoHTML(R.techo,p);
+  else if((pl.recortes||[]).length) $('#techo-out').innerHTML='<p class="mini">Planta con varias esquinas: el techo no se arma solo. En «Planta → Techo» elige «Las cerchas vienen en el plano» y copia las cerchas del arquitecto.</p>';
   else { // sin techo elegido: mostrar las opciones lado a lado para decidir
     const ops=[['frente','Dos aguas · caen hacia el frente y el fondo'],['costados','Dos aguas · caen hacia los costados']].map(([k,n])=>{
       const c=JSON.parse(JSON.stringify(pl)); c.techo=Object.assign({},c.techo,{on:true,caidas:k}); const inf=plantaAEstado(aPlanta(c),p); const st=Object.assign({},inf.estado,{p}); const RR=calcular(st); const T=RR.techo;
@@ -2244,15 +2517,29 @@ function pintarValor(){ D.precios=D.precios||{}; if(!D.preciosRef){ Object.entri
     const cab=x.sec!==secAnt?`<tr><td colspan="4" style="padding-top:14px"><b style="font-family:var(--display);font-size:17px;color:var(--steel)">${esc(x.sec||'')}</b></td></tr>`:''; secAnt=x.sec;
     return cab+`<tr><td>${esc(x.nombre)}</td><td class="m">${x.cant} ${x.un}</td><td><input type="text" class="n" inputmode="numeric" data-precio="${esc(x.key)}" value="${D.precios[x.key]!=null?pu.toLocaleString('es-CL'):''}" placeholder="$" style="width:110px"></td><td class="m" data-sub="${i}">${D.precios[x.key]===0?'ya lo tengo':pu?plata(sub):'—'}</td></tr>`; }).join('');
   // MANO DE OBRA (Cristian, 4-oct): se paga por día; en sueldos se gastan $160.000 al día
-  const J0=J(); const dias=+J0.dias||0, porDia=J0.porDia!=null?+J0.porDia:160000, mo=dias*porDia;
+  const J0=J(); const dias=+J0.dias||0, porDia=J0.porDia!=null?+J0.porDia:160000, resp=!!J0.respaldo, moG=+J0.moGlobal||0, mo=resp?moG:dias*porDia;
   const netoMat=neto; neto+=mo;
   const iva=D.conIVA?neto*0.19:0, falta=ITEMS.filter(x=>D.precios[x.key]==null).length;
   $('#tabla-valor').innerHTML=`<thead><tr><th>Material</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead><tbody>${filas}</tbody>
     <tfoot><tr><td colspan="3">Materiales</td><td class="m">${plata(netoMat)}</td></tr>
-    <tr><td>Mano de obra</td><td colspan="2"><input type="text" class="n" inputmode="numeric" id="mo-dias" value="${dias||''}" placeholder="días" style="width:64px"> días × <input type="text" class="n" inputmode="numeric" id="mo-dia" value="${porDia.toLocaleString('es-CL')}" style="width:96px"> al día</td><td class="m">${mo?plata(mo):'—'}</td></tr>
+    <tr><td>Mano de obra</td><td colspan="2">${resp?`<input type="text" class="n" inputmode="numeric" id="mo-global" value="${moG?moG.toLocaleString('es-CL'):''}" placeholder="$ sueldos y traslados" style="width:150px"> en total (sueldos y traslados)`:`<input type="text" class="n" inputmode="numeric" id="mo-dias" value="${dias||''}" placeholder="días" style="width:64px"> días × <input type="text" class="n" inputmode="numeric" id="mo-dia" value="${porDia.toLocaleString('es-CL')}" style="width:96px"> al día`}</td><td class="m">${mo?plata(mo):'—'}</td></tr>
     <tr><td colspan="3"><b>Neto</b></td><td class="m"><b>${plata(neto)}</b></td></tr>${D.conIVA?`<tr><td colspan="3">IVA 19 %</td><td class="m">${plata(iva)}</td></tr>`:''}<tr><td colspan="3"><b style="font-size:18px">Total</b></td><td class="m"><b style="font-size:18px">${plata(neto+iva)}</b></td></tr>${netoEx?`<tr><td colspan="3"><b>Trabajos aparte</b>${D.conIVA?' + IVA':''}</td><td class="m"><b>${plata(netoEx*(D.conIVA?1.19:1))}</b></td></tr>`:''}</tfoot>`;
   // PRECIO AL CLIENTE (Cristian, 4-oct): materiales a costo + 35 % como mínimo; la mano de obra se cobra casi lo mismo que
   // cuestan los materiales. Va en su propio apartado, no se mezcla con el costo.
+  // PRECIOS CON RESPALDO (Cristian, 17-oct): sus precios ya vienen más caros a propósito (material perdido, errores);
+  // entonces el precio al cliente es materiales + mano de obra, sin recargo, y se muestra por m²
+  const m2c=J0.m2Cliente>0?+J0.m2Cliente:(ultimaInfo&&ultimaInfo.estado.area?Math.round(ultimaInfo.estado.area/1e4*100)/100:0);
+  if(resp){ const tot=netoMat+moG, totI=tot*(D.conIVA?1.19:1);
+    $('#precio-cliente').innerHTML=netoMat?`<table><tbody>
+      <tr><td>Materiales (tus precios, ya con respaldo)</td><td class="m">${plata(netoMat)}</td></tr>
+      <tr><td>Mano de obra (sueldos y traslados)</td><td class="m">${moG?plata(moG):'— (escríbela arriba)'}</td></tr>
+      <tr><td><b>Precio al cliente${D.conIVA?' + IVA':''}</b></td><td class="m"><b>${plata(totI)}</b></td></tr>
+      <tr><td>Por m² de obra (<input type="text" class="n" inputmode="decimal" id="cli-m2" value="${String(m2c).replace('.',',')}" style="width:64px"> m²)</td><td class="m"><b>${m2c?plata(totI/m2c):'—'}</b></td></tr></tbody></table>${falta?`<p class="mini">⚠️ Faltan ${falta} precios de materiales.</p>`:''}`:'<p class="mini">Pon los precios de los materiales para ver el precio al cliente.</p>';
+    $('#con-iva').checked=!!D.conIVA; $('#con-resp').checked=true;
+    $('#msg-valor').textContent=falta?`Faltan ${falta} precio${falta>1?'s':''} por poner: el total todavía no los incluye.`:'Todos los materiales tienen precio.';
+    valorTexto=`${J().nombre}\n`+ITEMS.map(x=>`${x.cant} ${x.un} · ${x.nombre}${D.precios[x.key]?` · ${plata(D.precios[x.key])} c/u = ${plata(D.precios[x.key]*x.cant)}`:''}`).join('\n')+`\nMateriales: ${plata(netoMat)}\nMano de obra (sueldos y traslados): ${plata(moG)}\nTotal: ${plata(totI)}${D.conIVA?' (con IVA)':''}${m2c?`\nPor m² (${String(m2c).replace('.',',')} m²): ${plata(totI/m2c)}`:''}${netoEx?`\nTrabajos aparte: ${plata(netoEx*(D.conIVA?1.19:1))}`:''}${falta?`\n(Faltan ${falta} precios)`:''}`;
+    return; }
+  $('#con-resp').checked=false;
   const rec=J0.recargo!=null?+J0.recargo:35, fmo=J0.moFactor!=null?+J0.moFactor:100;
   const matCli=netoMat*(1+rec/100), moCli=netoMat*fmo/100, totCli=matCli+moCli, costo=netoMat+mo, gan=totCli-costo;
   $('#precio-cliente').innerHTML=netoMat?`<table><tbody>
@@ -2267,6 +2554,9 @@ function pintarValor(){ D.precios=D.precios||{}; if(!D.preciosRef){ Object.entri
 let valorTexto='';
 document.addEventListener('change',e=>{ const el=e.target;
   if(el.id==='cli-rec'||el.id==='cli-mo'){ const v=num(el.value); const J0=J(); if(el.id==='cli-rec') J0.recargo=isNaN(v)?35:v; else J0.moFactor=isNaN(v)?100:v; guardar(); pintarValor(); return; }
+  if(el.id==='con-resp'){ J().respaldo=el.checked; guardar(); pintarValor(); return; }
+  if(el.id==='mo-global'){ const v=num(String(el.value).replace(/\./g,'').replace(/\$/g,'')); J().moGlobal=isNaN(v)?0:v; guardar(); pintarValor(); return; }
+  if(el.id==='cli-m2'){ const v=num(el.value); J().m2Cliente=isNaN(v)?0:v; guardar(); pintarValor(); return; }
   if(el.id==='mo-dias'||el.id==='mo-dia'){ const v=num(String(el.value).replace(/\./g,'').replace(/\$/g,'')); const J0=J(); if(el.id==='mo-dias') J0.dias=isNaN(v)?0:v; else J0.porDia=isNaN(v)?160000:v; guardar(); pintarValor(); return; }
   if(el.dataset.precio!==undefined){ const v=num(String(el.value).replace(/\./g,'').replace(/\$/g,'')); D.precios=D.precios||{}; if(String(el.value).trim()===''||isNaN(v)||v<0) delete D.precios[el.dataset.precio]; else D.precios[el.dataset.precio]=v; guardar(); pintarValor(); }
   if(el.id==='con-iva'){ D.conIVA=el.checked; guardar(); pintarValor(); } });
@@ -2342,7 +2632,7 @@ function baseHTML(BA){
 function materiales(R,p){
   const cuts=Object.entries(R.groups).filter(([,v])=>v.length).map(([k,v])=>[k,cortar(v,p,k==='Ángulo perimetral'?p.perBar:((k==='Omega cielo'||k==='Omega estructural')?p.omBar:largoPerfil(k,p)))]);
   const todos=[...R.walls,...R.ints];
-  const plOsb=todos.reduce((s,r)=>s+r.pl.osb,0), plIntExt=todos.reduce((s,r)=>s+(r.pl.intExt||0),0), plVolC=R.cielos.reduce((s,c)=>s+c.n,0);
+  const plOsb=R.osbTotal!=null?R.osbTotal:todos.reduce((s,r)=>s+r.pl.osb,0), plIntExt=todos.reduce((s,r)=>s+(r.pl.intExt||0),0), plVolC=R.cielos.reduce((s,c)=>s+c.n,0);
   const plInt={terciado:0,internit:0,volcanita:0}; todos.forEach(r=>Object.entries(r.pl.int).forEach(([m,n])=>plInt[m]=(plInt[m]||0)+n));
   const margT=plInt.terciado?Math.ceil(plInt.terciado/30)*3:0;
   const plTecho=R.techo?(()=>{ const m=new Map(); R.techo.planchas.lados.forEach(l=>l.piezas.forEach(x=>m.set(x,(m.get(x)||0)+(l.cols||R.techo.planchas.cols)))); return [...m].sort((a,b)=>b[0]-a[0]); })():[];
@@ -2359,15 +2649,22 @@ function materiales(R,p){
   const despiece=(arr,B)=>arr.length?cortar(arr.map(x=>({len:x.len,lab:x.lab})),p,B).bars.length:0;
 
   abrir('estructura','Estructura','Perfiles Metalcon de muros, tabiques, cielos y techo; el despiece perfil por perfil está más abajo.');
-  cuts.filter(([k])=>!/^Perfil cuadrado/.test(k)).forEach(([k,c])=>item(`perfil|${k}|${c.B}`,`${k==='Ángulo perimetral'?'Ángulo perimetral':'Perfil '+k} de ${fm(c.B)} m`,c.bars.length,'un',`${k==='Ángulo perimetral'?'tiras':'perfiles'} ${k} de ${fm(c.B)} m`));
+  // cerchas del plano (17-oct): sus piezas se suman al mismo perfil si es del mismo largo; si no, van en su propia línea
+  const TP=(R.techo&&R.techo.plano?R.techo.piezas:[]).map(z=>Object.assign({},z)), usar=(k,B)=>{ const z=TP.find(q=>q.k===k&&q.B===B&&!q.ok); if(!z) return 0; z.ok=true; return z.n; };
+  cuts.filter(([k])=>!/^Perfil cuadrado/.test(k)).forEach(([k,c])=>{ const ex=usar(k,c.B); item(`perfil|${k}|${c.B}`,`${k==='Ángulo perimetral'?'Ángulo perimetral':'Perfil '+k} de ${fm(c.B)} m`,c.bars.length+ex,'un',`${k==='Ángulo perimetral'?'tiras':'perfiles'} ${k} de ${fm(c.B)} m${ex?` (${c.bars.length} de muros y tabiques + ${ex} de las cerchas del plano)`:''}`); });
+  TP.filter(z=>!z.ok).forEach(z=>item(`perfil|${z.k}|${z.B}`,`Perfil ${z.k} de ${fm(z.B)} m`,z.n,'un',`perfiles ${z.k} de ${fm(z.B)} m (${z.lab})`));
   const flejeTot=R.fle.tot+(R.techo?R.techo.flejeX:0);
   item('fleje|50','Fleje galvanizado (rollo de 50 m)',Math.ceil(flejeTot/5000),'un',`rollo de fleje de 50 m (${(flejeTot/100).toFixed(1).replace('.',',')} m: esquinas${R.techo?' y cruces entre cerchas':''})`,'f');
+  if(p.plFleje!==false&&R.fle.nX){ item('pletina-fleje|200x200','Pletina 200 × 200 × 0,85 (esquinas de la X de fleje, EETT III.6.1)',4*R.fle.nX,'un',`pletinas de 200 × 200 (4 por X; ${R.fle.nX} X de fleje). Donde llega a un pilar, se atornilla al pilar según el manual`);
+    item('tensor-fleje|un','Tensor (ángulo tensor) del fleje',2*R.fle.nX,'un',`tensores del fleje (2 por X)`); }
+  if(R.extras&&R.extras.anclajes&&R.extras.anclajes.suple) sec.tiles.push(`<div class="tile"><b>${R.extras.anclajes.suple}</b><span>suples de anclaje de 10 cm de C 90 (uno por perno, Cintac fig. 3): salen de los despuntes y ya están en el despiece de C 90</span></div>`);
   if(R.techo&&R.techo.hexTotal) item('hexagonal|cerchas','Tornillo hexagonal (uniones de las cerchas)',R.techo.hexTotal,'un',`hexagonales para las cerchas (${R.techo.hexUnion} por unión × ${R.techo.nudos} uniones = ${R.techo.hexCercha} por cercha)`);
   if(R.techo&&R.techo.lentEmp) item('lenteja|empalme-cercha','Tornillo cabeza lenteja ½" (empalmes del cordón inferior de las cerchas)',R.techo.lentEmp,'un',`lentejas para los empalmes de las cerchas (${R.techo.empalme?R.techo.empalme.lent:20} por cercha)`);
-  if(R.techo) item('pletina|cumbrera','Pletina de refuerzo de cumbrera',R.techo.n,'un',`pletinas de cumbrera (una por cercha; ${R.techo.n} cerchas)`);
+  if(R.techo&&!R.techo.plano) item('pletina|cumbrera','Pletina de refuerzo de cumbrera',R.techo.n,'un',`pletinas de cumbrera (una por cercha; ${R.techo.n} cerchas)`);
 
   abrir('forros','Forros (planchas de muros y cielos)','');
-  item('osb|122x244',`OSB ${fm(p.osb)} × ${fm(p.osbH)} (muros y frontones)`,plOsb+(X.frontones?X.frontones.osb:0),'un',`OSB ${fm(p.osb)} × ${fm(p.osbH)} (vertical, por fuera${X.frontones?`; ${X.frontones.osb} son de frontones`:''})`,'o');
+  const osbTecho=R.techo&&R.techo.plano?R.techo.osbPl:0;
+  item('osb|122x244',`OSB ${fm(p.osb)} × ${fm(p.osbH)} (muros${osbTecho?', techo':''} y frontones)`,plOsb+(X.frontones?X.frontones.osb:0)+osbTecho,'un',`OSB ${fm(p.osb)} × ${fm(p.osbH)} (vertical, por fuera${X.frontones?`; ${X.frontones.osb} son de frontones`:''}${osbTecho?`; ${osbTecho} del techo`:''})`,'o');
   item('internit4|120x240',`Internit 4 mm ${fm(p.vol)} × ${fm(p.volH)} (exterior, aleros y frontones)`,plIntExt+(R.techo?R.techo.al.planchas:0)+(X.frontones?X.frontones.internit:0),'un',`internit 4 mm exterior (horizontal sobre la OSB, aleros y frontones)`,'o');
   item('terciado|122x244',`Terciado ranurado ${fm(p.osb)} × ${fm(p.osbH)} (con margen)`,plInt.terciado+margT,'un',`terciado ranurado (incluye ${margT} de margen)`,'o');
   item('internit|interior',`Internit interior ${fm(p.vol)} × ${fm(p.volH)} (baños y cocina)`,plInt.internit,'un','internit interior en baños y cocina','v');
@@ -2375,7 +2672,7 @@ function materiales(R,p){
 
   if(X.mallaMuro) item('malla-muro|m2','Malla hidrófuga muros (m²)',X.mallaMuro.compra,'m²',`m² de malla hidrófuga sobre el OSB (${Math.round(X.mallaMuro.m2)} m² de muro + 10 % de traslapo)`);
   abrir('aislacion','Aislación','Lana de poliéster en la tabiquería perimetral (piso y cielo van en «Extras», se cobran aparte) (contrato). El rollo se compra por m² (ancho × largo), no por metros lineales: pon su medida en «Medidas base y reglas».');
-  if(X.aislacion){ const A=X.aislacion, k=v=>v.toFixed(1).replace('.',',');
+  if(X.aislacion&&!pl.sinAislacion){ const A=X.aislacion, k=v=>v.toFixed(1).replace('.',',');
     item(`lana|${A.ancho}x${A.largo}`,`Lana de poliéster, rollo ${fm(A.ancho*100)} × ${fm(A.largo*100)} m (${k(A.m2Rollo)} m²)`,A.rollos,'un',`rollos de ${fm(A.ancho*100)} × ${fm(A.largo*100)} m = ${k(A.m2Rollo)} m² cada uno`,'v');
     sec.tiles.push(`<div class="tile"><b>${k(A.m2)}</b><span>m² de muro a aislar (${k(A.ml)} m lineales de muro × ${fm(p.H)} de alto, menos puertas y ventanas)</span></div>`); }
 
@@ -2393,7 +2690,7 @@ function materiales(R,p){
     else item('tornillo-hex|unidad','Tornillo hexagonal solera a fierro',AN.n,'un',`tornillos hexagonales solera–fierro (cada ${fm(AN.sep)} y ${AN.nVanos} a los lados de puertas y ventanas)`); };
   if(BA&&BA.tipo==='radier'){ const k1=v=>v.toFixed(1).replace('.',','), k2=v=>v.toFixed(2).replace('.',',');
     abrir('base','Base (radier)',`Losa de ${BA.esp} cm (${k1(BA.m2Losa)} m²) dentro de ${k1(BA.mlCim/100)} m de cimiento y sobrecimiento de ${BA.c} cm de ancho (${BA.prof} bajo tierra + ${BA.sobre} sobre el suelo)${BA.central?', incluida la fundación corrida bajo el tabique de apoyo':''}. El cimiento va contra la zanja, en suelo natural firme; si el suelo es malo, estudio de suelo.`);
-    item('hormigon|H20|m3','Hormigón premezclado H20 (m³)',BA.m3Pedir,'m³',`m³ de hormigón H20 (cimientos ${k2(BA.m3Cim)} + losa ${k2(BA.m3Losa)} + ${BA.perdida}% de pérdida = ${k2(BA.m3)})`,'f');
+    item('hormigon|H20|m3','Hormigón premezclado H20 (m³, por vaciado)',BA.m3Vac||BA.m3Pedir,'m³',BA.vaciados?`m³ de hormigón, cada vaciado redondeado hacia arriba (no venden medios cubos): ${BA.vaciados.map(v=>`${v.nom.toLowerCase()} ${k2(v.m3)} → ${v.pedir}`).join(' · ')} · ${BA.camiones} ${BA.camiones>1?'camiones':'camión'} de ${BA.cam} m³ como máximo`:`m³ de hormigón H20 (cimientos ${k2(BA.m3Cim)} + losa ${k2(BA.m3Losa)} + ${BA.perdida}% de pérdida = ${k2(BA.m3)})`,'f');
     item('malla|C92','Malla ACMA C92 2,60 × 5,00',BA.mallas,'un',`mallas C92 2,60 × 5,00 (rinden ~${BA.rinde} m² cada una con traslapo)`);
     sec.tiles.push(`<div class="tile"><b>${k1(BA.m3Escarpe)}</b><span>m³ de escarpe (sacar ${BA.escarpe} cm de tierra vegetal en toda la casa)</span></div>`);
     item('relleno|m3','Material de relleno (m³)',BA.m3Relleno,'m³',`m³ de relleno nuevo bajo la cama de ripio (con compactación)`);
@@ -2434,7 +2731,14 @@ function materiales(R,p){
     anclar(); sec.extra=`<div class="row" style="margin-top:10px"><button class="b pri" data-dl="base">⬇️ Descargar solo la base para armar</button><span class="mini no-dl" style="align-self:center">pollos, distancias y entrepiso · sin materiales (para mandar al grupo)</span></div>`+baseHTML(BA)+(EP?pisoHTML(EP):'');
   }
   abrir('techo','Techo','Cerchas, cubierta, caballete, frontones y aleros. Los perfiles de cerchas, costaneras y frontones ya están sumados en «Estructura».');
-  if(R.techo){
+  if(R.techo&&R.techo.plano){ const TT=R.techo, k1=v=>(Math.round(v*10)/10).toString().replace('.',',');
+    sec.tiles.push(`<div class="tile"><b>${TT.n}</b><span>cerchas del plano (${TT.tipos.map(x=>x.cant+' × '+esc(x.nombre||'')).join(' · ')}); sus perfiles ya están en «Estructura»</span></div>`);
+    if(TT.m2) item('malla|m2','Malla hidrófuga techo (m²)',Math.ceil(TT.m2),'m²',`m² de malla hidrófuga (${k1(TT.m2)} m² de cubierta)`);
+    if(TT.cubML) item(`cubierta|${TT.cubNom}|ml`,`${TT.cubNom} (metro lineal)`,Math.ceil(TT.cubML),'m',`metros lineales de ${esc(TT.cubNom)}`,'f');
+    if(TT.hojaML) item('hojalateria|ml','Hojalatería: limahoyas, cumbrera y remates (m)',Math.ceil(TT.hojaML),'m','metros de hojalatería (limahoyas, cumbrera, remates)');
+    if(TT.canalML) item('canal|ml','Canal de aguas lluvia (m)',Math.ceil(TT.canalML),'m','metros de canal');
+    if(TT.bajadas) item('bajada|un','Bajada de aguas lluvia',TT.bajadas,'un','bajadas de aguas lluvia');
+  } else if(R.techo){
     sec.tiles.push(`<div class="tile"><b>${R.techo.n}</b><span>cerchas${R.techo.ala?`: ${R.techo.n-R.techo.ala.n} del cuerpo (${fm(R.techo.L)} de luz) y ${R.techo.ala.n} del ala (${fm(R.techo.ala.L)} de luz)`:` de ${fm(R.techo.L)} de luz`} (ver «Techo»)</span></div>`);
     if(R.techo.ala) sec.tiles.push(`<div class="tile o"><b>L</b><span>Casa en L: dos techos de dos aguas con la misma pendiente. El encuentro de los dos (limahoya, su forro y los cortes de plancha) es pendiente de lección: todavía no está sumado.</span></div>`);
     plTecho.forEach(([l,n])=>item(`acanalada|${l}`,`Plancha acanalada ${fm(l)} m`,n,'un',`planchas acanaladas de ${fm(l)}`,'f'));
