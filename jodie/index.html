@@ -31,7 +31,7 @@ body{
     radial-gradient(1200px 600px at 20% -10%, #F7DED9 0%, transparent 60%),
     radial-gradient(1000px 700px at 120% 30%, #F3D3CF 0%, transparent 55%),
     linear-gradient(160deg,#EFD9D6,#E7CFCf 60%,#EAD6C6);
-  min-height:100dvh;display:flex;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
 }
 .serif{font-family:'Playfair Display',serif}
 
@@ -155,12 +155,12 @@ body{
 
 /* ---------- PHONE FRAME ---------- */
 .phone{
-  position:relative;width:100%;max-width:412px;height:min(890px,100dvh);
+  position:relative;width:100%;max-width:412px;height:min(890px,100vh);height:min(890px,100dvh);
   background:var(--blush);overflow:hidden;
   border-radius:44px;box-shadow:0 40px 90px rgba(120,50,60,.35),0 0 0 11px #1c1416,0 0 0 13px #2c2124;
 }
 @media(max-width:460px){
-  .phone{border-radius:0;height:100dvh;box-shadow:none}
+  .phone{border-radius:0;height:100vh;height:100svh;box-shadow:none}
   body{background:var(--blush)}
   .notch{display:none!important}       /* en el celular real no duplicamos el notch */
   .status{display:none!important}      /* ni la barra falsa 9:41 */
