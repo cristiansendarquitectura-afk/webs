@@ -690,7 +690,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
         <button id="tabPub" onclick="showRes('pub')">Resultados reales</button>
       </div>
       <div id="resBody"></div>
-      <div class="resnote">Los resultados pueden variar entre pacientes · Fotografías sin filtro</div>
+      <div class="resnote">Los resultados pueden variar entre pacientes</div>
     </div>
   </section>
 
@@ -718,7 +718,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
       <div class="sec-title" style="font-size:16px;margin-bottom:8px">Ayuda e información</div>
       <div class="mlist">
         <div class="mrow" onclick="go('faq')"><div class="mi">${clip}</div><span>Preguntas frecuentes</span><span class="chev">›</span></div>
-        <div class="mrow" onclick="go('resenas')"><div class="mi">${heart}</div><span>Reseñas</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('resenas')"><div class="mi">${heart}</div><span>Opiniones</span><span class="chev">›</span></div>
         <div class="mrow" onclick="go('sobre')"><div class="mi">${user}</div><span>Sobre Patagonia Glow</span><span class="chev">›</span></div>
         <div class="mrow" onclick="toast('Consentimientos y documentos 📄 (pronto)')"><div class="mi">${clip}</div><span>Consentimientos y documentos</span><span class="chev">›</span></div>
         <div class="mrow" onclick="go('privacidad')"><div class="mi">${clip}</div><span>Política de privacidad</span><span class="chev">›</span></div>
@@ -918,7 +918,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
   <section class="screen" id="resenas">
     <div class="head"><button class="back" onclick="go('perfil')">‹</button><h3>Reseñas</h3></div>
     <div class="scroll" style="padding-top:16px"><div id="revList"></div>
-      <div class="rdisc" style="text-align:center">Reseñas de pacientes verificados que asistieron a su cita.</div></div>
+      <div class="rdisc" style="text-align:center">Opiniones reales de nuestras pacientes, con su autorización (próximamente).</div></div>
   </section>
 
   <!-- ============ FAVORITOS ============ -->
@@ -1467,11 +1467,11 @@ window.addToCalendar=addToCalendar;
 /* ---- cuidados post automáticos (home, punto 10) ---- */
 function renderPostHome(){
   var el=document.getElementById('postHome'); if(!el)return;
-  var t=TREATMENTS[1]; // demo: última sesión realizada = BB Glow
+  var bi=TI('BB Glow'); var t=TREATMENTS[bi]; // última sesión realizada = BB Glow
   /* 14-sep: BB Glow ahora trae 12 cuidados; unirlos todos llenaba la tarjeta
      del inicio. Se muestran los 2 primeros y el boton abre la lista completa. */
   var cuidado=(t.posteriores&&t.posteriores.length)?t.posteriores.slice(0,2).join(' '):'';
-  var abrir = t.plantilla==='dermapen' ? 'openDetail(1);dpVerCuidados()' : 'openDetail(1)';
+  var abrir = t.plantilla==='dermapen' ? 'openDetail('+bi+');dpVerCuidados()' : 'openDetail('+bi+')';
   el.innerHTML='<div class="postcard fade-up"><div class="pt">🌿 Después de tu sesión</div>'
     +'<p>Hoy te realizaste <b>'+t.n+'</b>. '+cuidado+'</p>'
     +'<button class="pa" onclick="'+abrir+'">Ver cuidados completos</button></div>';
@@ -1500,7 +1500,7 @@ function toast(msg){const t=document.getElementById('toast');t.innerHTML='✨ '+
 window.go=go;window.toast=toast;
 
 /* ---- WhatsApp (Jodie: pon el número real con código país en WA_NUM) ---- */
-const WA_NUM=''; // ej: '56912345678'
+const WA_NUM='56974365285'; // Jodie Berríos (+56 9 7436 5285)
 function waLink(msg){ return (WA_NUM?('https://wa.me/'+WA_NUM):'https://wa.me/')+'?text='+encodeURIComponent(msg); }
 function waTratamiento(n){ window.open(waLink('¡Hola Patagonia Glow! Quiero consultar por el tratamiento: '+n),'_blank'); }
 function waGeneral(){ window.open(waLink('¡Hola Patagonia Glow! Quiero hacer una consulta 💗'),'_blank'); }
@@ -1523,7 +1523,7 @@ function startQuiz(){ qi=0; qans={}; renderQuiz(); }
 function answer(v){ qans[QUIZ[qi].k]=v; qi++; renderQuiz(); }
 function renderQuiz(){
   var wrap=document.getElementById('quizWrap'); if(!wrap)return;
-  if(qi<0){ wrap.innerHTML='<div class="qintro"><div class="bb">🤖💗</div><div class="tt">Descubre qué necesita tu piel</div><p>Responde 7 preguntas rápidas y te oriento sobre el tratamiento que podría ir mejor contigo.</p><button class="cta" style="margin-top:20px" onclick="startQuiz()">Comenzar test ✨</button></div>'; return; }
+  if(qi<0){ wrap.innerHTML='<div class="qintro"><div class="bb">🤖💗</div><div class="tt">Descubre qué necesita tu piel</div><p>Responde unas preguntas rápidas y te oriento sobre el tratamiento que podría ir mejor contigo.</p><button class="cta" style="margin-top:20px" onclick="startQuiz()">Comenzar test ✨</button></div>'; return; }
   if(qi>=QUIZ.length){ renderResult(); return; }
   var Q=QUIZ[qi], pct=Math.round(qi/QUIZ.length*100);
   wrap.innerHTML='<div class="qprog"><i style="width:'+pct+'%"></i></div><div class="qnum">Pregunta '+(qi+1)+' de '+QUIZ.length+'</div><div class="qq">'+Q.q+'</div>'+
@@ -1589,24 +1589,22 @@ function renderCare(){ var c=CUIDADOS[careSel], el=document.getElementById('care
 /* ===================== FASE 4 ===================== */
 /* --- Mi evolución --- */
 const MISRESULT=[
- {t:'Recuperación Capilar (PRP)',fecha:'12 mar 2026',ses:'Sesión 3 de 6',prog:66},
- {t:'PRP Facial',fecha:'2 abr 2026',ses:'Sesión 4 de 6',prog:80},
- {t:'Lipólisis Enzimática',fecha:'20 abr 2026',ses:'Sesión 2 de 6',prog:48}
+ {t:'Recuperación Capilar (PRP)',fecha:'12 mar 2026',ses:'Sesión 3 de 6',prog:50},
+ {t:'PRP Facial',fecha:'2 abr 2026',ses:'Sesión 4 de 6',prog:67},
+ {t:'Lipólisis Enzimática',fecha:'20 abr 2026',ses:'Sesión 2 de 6',prog:33}
 ];
-const PUBRESULT=[
- {t:'BB Glow',fecha:'Caso real',ses:'Después de 3 sesiones',prog:75},
- {t:'Limpieza Facial Profunda',fecha:'Caso real',ses:'Sesión única',prog:58},
- {t:'ADN de salmón con Dermapen',fecha:'Caso real',ses:'Después de 4 sesiones',prog:70}
-];
+const PUBRESULT=[]; // resultados reales: se cargan cuando haya fotos de pacientes CON su autorización
 function resCard(r){
   return '<div class="rescard fade-up"><h4>'+r.t+'</h4>'
-   +'<div class="resmeta"><span>📅 '+r.fecha+'</span><span>· '+r.ses+'</span><span class="nof">📷 Sin filtro</span></div>'
-   +'<div class="ba"><div class="im before">ANTES</div><div class="im after">DESPUÉS</div></div>'
+   +'<div class="resmeta"><span>📅 '+r.fecha+'</span><span>· '+r.ses+'</span></div>'
+   +'<div style="background:#F7E7E2;border-radius:14px;padding:22px 14px;text-align:center;color:#B5726F;font-size:13px;margin:4px 0 10px">📷 Aquí irán tus fotos de seguimiento reales</div>'
    +'<div class="track"><div class="bar"><i style="width:'+r.prog+'%"></i></div><div class="lbls"><span>Inicio</span><span>Ahora</span></div></div></div>';
 }
 function showRes(which){
   var data=which==='pub'?PUBRESULT:MISRESULT;
-  document.getElementById('resBody').innerHTML=data.map(resCard).join('');
+  var body=document.getElementById('resBody');
+  if(which==='pub' && !data.length){ body.innerHTML='<div class="carecard"><b>Resultados reales, pronto</b><div class="li"><i>✿</i><span>Aquí publicaremos resultados de pacientes reales, siempre con su autorización.</span></div></div>'; }
+  else { body.innerHTML=data.map(resCard).join(''); }
   document.getElementById('tabMis').classList.toggle('sel',which==='mis');
   document.getElementById('tabPub').classList.toggle('sel',which==='pub');
 }
@@ -1665,14 +1663,10 @@ function toggleFaq(i){ document.getElementById('faq'+i).classList.toggle('open')
 window.toggleFaq=toggleFaq;
 
 /* --- Reseñas verificadas --- */
-const REVIEWS=[
- ['Camila V.','BB Glow','La piel me quedó luminosa y súper natural. Jodie explica todo con calma.'],
- ['Fernanda R.','Limpieza facial','Atención impecable y muy profesional. Volveré segura.'],
- ['Antonia S.','ADN de salmón','Noté mi piel más firme después de las sesiones. Muy contenta.'],
- ['Paula M.','PRP capilar','Me sentí acompañada en todo el proceso. 100% recomendada.']
-];
+const REVIEWS=[]; // reseñas reales: se cargan con la autorización de cada paciente
 (function renderReviews(){
   var el=document.getElementById('revList'); if(!el)return;
+  if(!REVIEWS.length){ el.innerHTML='<div class="carecard"><b>Pronto, opiniones de nuestras pacientes</b><div class="li"><i>✿</i><span>Publicaremos opiniones reales, con la autorización de cada paciente.</span></div></div>'; return; }
   el.innerHTML=REVIEWS.map(function(r){return '<div class="review"><div class="rvh"><div class="rva">'+r[0][0]+'</div><div class="rvn"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="rvver">✓ Verificada</span></div><div class="stars">★★★★★</div><p>'+r[2]+'</p></div>';}).join('');
 })();
 
