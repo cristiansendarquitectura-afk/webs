@@ -339,6 +339,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .rsafe{background:#FFF6E9;border:1px solid #F0D9A8;border-radius:14px;padding:12px 14px;margin-top:12px;font-size:12.5px;color:#8a6a30;line-height:1.5;text-align:left}
 .rtip{background:#FBEFF0;border:1px solid #F0D0D4;border-radius:14px;padding:11px 14px;margin-top:10px;font-size:12.5px;color:#8a4a55;line-height:1.5;text-align:left}
 .rdisc{font-size:11px;color:var(--muted);margin-top:15px;line-height:1.5}
+.galeria{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 8px;-webkit-overflow-scrolling:touch}
+.galeria img{flex:0 0 72%;max-width:260px;border-radius:14px;scroll-snap-align:start;cursor:zoom-in;box-shadow:0 4px 14px rgba(181,114,111,.18)}
+.galeria.grid{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+.galeria.grid img{max-width:100%;width:100%}
+#fotoGrande{position:fixed;inset:0;background:rgba(30,20,20,.88);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
+#fotoGrande.on{display:flex}
+#fotoGrande img{max-width:100%;max-height:92vh;border-radius:12px}
+#fotoGrande span{position:absolute;top:14px;right:18px;color:#fff;font-size:26px;cursor:pointer}
 .btn2{display:block;width:100%;border:1.5px solid var(--line);background:var(--white);color:var(--rose-deep);font-family:'Poppins';font-weight:500;font-size:14px;padding:14px;border-radius:34px;margin-top:10px;cursor:pointer}
 /* ---------- CATALOGO ---------- */
 .tcard{background:var(--white);border-radius:20px;padding:15px 17px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
@@ -1057,21 +1065,6 @@ const TREATMENTS=[
   previos:['Llega sin maquillaje si es posible.'],
   posteriores:['Evita maquillaje y sol directo por unas horas.','Hidrata y usa protector solar.'],
   contra:['Lesiones o infección activa en la piel.','Rosácea o irritación marcada (se valora antes).']},
- {e:'💉',n:'Mesoterapia Facial',cat:['hidratacion','luminosidad','rejuvenecimiento'],dur:'45 min',precio:'',eval:true,
-  d:'Microinfiltraciones de activos elegidos según tu piel: hidratación, poros o luminosidad.',
-  b:['Personalizada','Revitaliza'],
-  quees:'Aplicación de activos mediante microinfiltraciones, seleccionados según las necesidades de tu piel.',
-  sirve:'Favorece la hidratación, la luminosidad y la revitalización de la piel de forma personalizada.',
-  mejora:['Deshidratación','Falta de luminosidad','Signos leves de fatiga en la piel'],
-  paraquien:'Para quienes buscan un tratamiento a medida; requiere evaluación previa.',
-  incluye:'Preparación de la piel, aplicación de los activos seleccionados y finalización.',
-  sesiones:'Suele trabajarse en plan de sesiones; se define en tu evaluación.',
-  recup:'Puede quedar un leve enrojecimiento temporal.',
-  previos:['Evita antiinflamatorios el día previo si no son indispensables.','Llega sin maquillaje.'],
-  posteriores:['Evita maquillaje y sol directo por unas horas.','Usa protector solar.'],
-  contra:['Embarazo o lactancia.','Lesiones o infección en la piel.','Alergias a los activos.']},
- /* PDRN separado en dos servicios (correo de Jodie del 14-sep, «Pdrn aplicacion"):
-    el que existía pasa a ser «con Dermapen» y se agrega el «inyectable». */
  {e:'🧬',n:'ADN de salmón con Dermapen',cat:['rejuvenecimiento','lineas','hidratacion'],dur:'45 min',precio:'',eval:true,
   d:'Apoya la hidratación, la elasticidad y la calidad de la piel. Resultados graduales.',
   b:['Elasticidad','Calidad de piel'],
@@ -1136,7 +1129,8 @@ const TREATMENTS=[
   recup:'Puede quedar leve inflamación o pequeños hematomas temporales.',
   previos:['Evita alcohol y antiinflamatorios el día previo si no son indispensables.'],
   posteriores:['Evita calor intenso, ejercicio y masajear la zona por 24–48 h.','Sigue las indicaciones entregadas.'],
-  contra:['Embarazo o lactancia.','Infección activa en la zona.','Alergias o alteraciones de coagulación.']},
+  contra:['Embarazo o lactancia.','Infección activa en la zona.','Alergias o alteraciones de coagulación.'],
+  galeria:{t:'Aumento y perfilado de labios',n:10}},
  {e:'✨',n:'Toxina Botulínica',cat:['lineas','rejuvenecimiento'],dur:'30 min',precio:'',eval:true,
   d:'Ayuda a suavizar las líneas de expresión de forma natural.',
   b:['Líneas suaves'],
@@ -1368,7 +1362,7 @@ function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'
   var evalBadge = t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '';
   b.innerHTML='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
    +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
-   +meta+evalBadge
+   +meta+evalBadge+fgaleria(t)
    +(t.secciones ? t.secciones.map(fseccion).join('') : (
     fsec('Qué es', t.quees)
    +fsec('Para qué sirve', t.sirve)
@@ -1386,6 +1380,11 @@ function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'
   document.getElementById('sheet').classList.add('on'); document.getElementById('sheetBg').classList.add('on');
   var sh=document.getElementById('sheet'); if(sh) sh.scrollTop=0;
 }
+/* Fotos reales antes/después enviadas por Jodie (30-oct): img/labios/labios-01..10.jpg */
+function galFotos(g){ var h=''; for(var k=1;k<=g.n;k++){ var u='img/labios/labios-'+(k<10?'0':'')+k+'.jpg'; h+='<img src="'+u+'" loading="lazy" alt="'+g.t+', antes y después" onclick="verFoto(this.src)">'; } return h; }
+function fgaleria(t){ if(!t.galeria) return ''; return '<div class="dp-h">Resultados reales · '+t.galeria.t+'</div><div class="galeria">'+galFotos(t.galeria)+'</div><div class="rdisc" style="margin-top:4px">Pacientes reales de Patagonia Glow, publicadas con su autorización. Toca una foto para verla grande.</div>'; }
+function verFoto(u){ var v=document.getElementById('fotoGrande'); if(!v){ v=document.createElement('div'); v.id='fotoGrande'; v.onclick=function(){ v.classList.remove('on'); }; document.body.appendChild(v); } v.innerHTML='<img src="'+u+'" alt=""><span>✕</span>'; v.classList.add('on'); }
+window.verFoto=verFoto;
 function closeDetail(){ document.getElementById('sheet').classList.remove('on'); document.getElementById('sheetBg').classList.remove('on'); }
 function agendarDe(i){ closeDetail(); go('agenda'); selService(i); }
 
@@ -1535,10 +1534,10 @@ function TI(nombre){ var i=TREATMENTS.findIndex(function(t){return t.n===nombre;
 function renderResult(){
   var a=qans;
   var MAP={
-   hidratacion:{ti:TI('Pink Glow'),d:'Hidratación profunda, luminosidad y piel más suave.',needle:false,alt:'También puede sumar mesoterapia hidratante o ADN de salmón, según tu evaluación.'},
+   hidratacion:{ti:TI('Pink Glow'),d:'Hidratación profunda, luminosidad y piel más suave.',needle:false,alt:'También puede sumar ADN de salmón, según tu evaluación.'},
    luminosidad:{ti:TI('Pink Glow'),d:'Aporta luz y frescura al rostro. Para más uniformidad de tono se evalúa BB Glow.',needle:false,alt:'BB Glow ayuda a emparejar el tono, con microagujas.'},
-   manchas:{ti:TI('BB Glow'),d:'Ayuda a mejorar la uniformidad del tono, siempre con evaluación previa de tus manchas.',needle:true,alt:'También: mesoterapia con activos seleccionados para tu piel.'},
-   poros:{ti:TI('Mesoterapia Facial'),d:'Trabaja poros y grasa; se complementa con una limpieza facial profunda.',needle:true,alt:'Un buen punto de partida es la limpieza facial profunda.'},
+   manchas:{ti:TI('BB Glow'),d:'Ayuda a mejorar la uniformidad del tono, siempre con evaluación previa de tus manchas.',needle:true,alt:'Para aportar luz mientras tanto: Pink Glow, sin agujas.'},
+   poros:{ti:TI('Limpieza Facial Profunda'),d:'Trabaja poros y grasa con una limpieza profunda de la piel.',needle:false,alt:'Según tu evaluación, se puede complementar con otros tratamientos.'},
    textura:{ti:TI('PRP Facial'),d:'Ayuda a mejorar la textura y las marcas superficiales de acné.',needle:true,alt:'También: ADN de salmón, según evaluación.'},
    lineas:{ti:TI('ADN de salmón con Dermapen'),d:'Apoya la hidratación, la elasticidad y las líneas finas de forma gradual.',needle:true,alt:'Complemento: radiofrecuencia para firmeza.'},
    firmeza:{ti:TI('Radiofrecuencia'),d:'Trabaja firmeza y flacidez leve; resultados graduales y variables.',needle:false,alt:'También: ADN de salmón o PRP, según evaluación.'}
@@ -1603,7 +1602,9 @@ function resCard(r){
 function showRes(which){
   var data=which==='pub'?PUBRESULT:MISRESULT;
   var body=document.getElementById('resBody');
-  if(which==='pub' && !data.length){ body.innerHTML='<div class="carecard"><b>Resultados reales, pronto</b><div class="li"><i>✿</i><span>Aquí publicaremos resultados de pacientes reales, siempre con su autorización.</span></div></div>'; }
+  var conGal=TREATMENTS.filter(function(t){ return t.galeria; });
+  if(which==='pub' && conGal.length){ body.innerHTML=conGal.map(function(t){ return '<div class="rescard fade-up"><h4>'+t.galeria.t+'</h4><div class="resmeta"><span>'+t.n+'</span></div><div class="galeria grid">'+galFotos(t.galeria)+'</div></div>'; }).join('')+'<div class="rdisc" style="text-align:center">Pacientes reales de Patagonia Glow, publicadas con su autorización. Los resultados pueden variar entre personas.</div>'; }
+  else if(which==='pub' && !data.length){ body.innerHTML='<div class="carecard"><b>Resultados reales, pronto</b><div class="li"><i>✿</i><span>Aquí publicaremos resultados de pacientes reales, siempre con su autorización.</span></div></div>'; }
   else { body.innerHTML=data.map(resCard).join(''); }
   document.getElementById('tabMis').classList.toggle('sel',which==='mis');
   document.getElementById('tabPub').classList.toggle('sel',which==='pub');
