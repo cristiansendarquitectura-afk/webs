@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#C97F88">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<meta name="description" content="Patagonia Glow · Estética, salud y bienestar. Agenda tu evaluación con Jodie Berríos, enfermera.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23C97F88'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='30' font-weight='700' fill='%23fff' text-anchor='middle'%3EPG%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23BE6C77'/%3E%3Ctext x='90' y='120' font-family='Georgia,serif' font-size='84' font-weight='700' fill='%23fff' text-anchor='middle'%3EPG%3C/text%3E%3C/svg%3E">
+<title>Patagonia Glow · Estética, salud y bienestar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blush:#FBEAE8; --blush2:#F6DBD9; --cream:#FFF9F8; --white:#FFFFFF;
+  --rose:#C97F88; --rose-deep:#A54C5C; --rose-mid:#BE6C77; --rose-soft:#F3C9CD;
+  --rose-ghost:#FCEFEF; --gold:#C9A063; --gold-lite:#E7CB98;
+  --ink:#5B393E; --muted:#A5848A; --line:#F0D9D8;
+  --shadow:0 12px 30px rgba(165,76,92,.12); --shadow-sm:0 6px 16px rgba(165,76,92,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Poppins',sans-serif;color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 20% -10%, #F7DED9 0%, transparent 60%),
+    radial-gradient(1000px 700px at 120% 30%, #F3D3CF 0%, transparent 55%),
+    linear-gradient(160deg,#EFD9D6,#E7CFCf 60%,#EAD6C6);
+  min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+}
+.serif{font-family:'Playfair Display',serif}
+
+/* ===== SPLASH v2 (21-ago) — según referencia de Jodie ===== */
+#splash{
+  background:linear-gradient(168deg,#FBE7DE 0%,#F7DDD5 42%,#F1CFC8 100%);
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 30px;overflow:hidden;
+}
+.sp-curves{position:absolute;inset:0;z-index:0;pointer-events:none}
+.sp-curves svg{width:100%;height:100%;filter:blur(1.5px)}
+.sp-brand{position:relative;z-index:1;text-align:center;margin-top:16%}
+/* logo real de la marca (logo-montana.png), extraído de la referencia de Jodie */
+.mtn{width:168px;height:auto;display:block;margin:0 auto 12px}
+/* sobre el fondo rosa de "Sobre" el dorado se aclara para que resalte */
+.mtn.sm{width:132px;margin-bottom:10px;filter:brightness(1.5) saturate(.75)}
+#splash .logo-name{
+  font-family:'Playfair Display',serif;font-size:23px;letter-spacing:.16em;
+  color:#B8935A;font-weight:500;line-height:1.1
+}
+#splash .logo-sub{
+  font-size:9.5px;letter-spacing:.30em;color:#A78468;margin-top:9px;font-weight:400
+}
+.sp-copy{position:relative;z-index:1;width:100%;margin-top:auto;padding-bottom:6px}
+.sp-h1{
+  font-size:44px;line-height:1.06;color:var(--rose-deep);
+  font-weight:500;letter-spacing:-.015em;text-align:center
+}
+.sp-h1 em{font-style:italic;font-weight:400}
+.sp-sub{
+  text-align:center;font-size:14px;color:var(--muted);
+  margin:22px 0 30px;font-weight:300
+}
+.sp-cta{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  background:#B5726F;border-radius:40px;padding:19px 20px;font-size:16px;font-weight:400;
+  box-shadow:0 10px 26px rgba(165,76,92,.22)
+}
+.sp-ar{font-size:19px;line-height:1}
+.sp-login{
+  display:block;margin:20px auto 0;background:none;border:none;
+  font-family:'Poppins',sans-serif;font-size:13.5px;color:#A87C6B;
+  text-decoration:underline;text-underline-offset:4px;cursor:pointer
+}
+.sp-sedes{
+  position:relative;z-index:1;font-size:12px;color:var(--muted);
+  letter-spacing:.02em;margin:auto 0 26px
+}
+
+/* ===== SOBRE v2 (21-ago) ===== */
+.ab-hero{
+  background:linear-gradient(150deg,#C88B8E,#B5726F 70%);
+  border-radius:20px;padding:22px 18px 20px;text-align:center;
+  box-shadow:var(--shadow);margin-bottom:18px
+}
+.ab-name{
+  font-family:'Playfair Display',serif;font-size:20px;letter-spacing:.15em;
+  color:#F7E7CE;font-weight:500;margin-top:2px
+}
+.ab-sub{font-size:8.5px;letter-spacing:.28em;color:#F0D6C8;margin-top:8px}
+.ab-card{
+  background:var(--white);border-radius:16px;padding:16px 16px 17px;
+  display:flex;gap:14px;align-items:flex-start;box-shadow:var(--shadow-sm);
+  border:1px solid var(--line);margin-bottom:22px
+}
+.ab-ico{
+  flex:0 0 62px;height:62px;border-radius:50%;background:#FBF1E6;
+  display:grid;place-items:center
+}
+.ab-ico svg{width:40px;height:40px}
+.ab-t{font-size:19px;color:var(--ink);margin-bottom:6px;font-weight:500}
+.ab-card p{font-size:13.5px;line-height:1.55;color:#7A5B60;font-weight:300}
+.ab-h{
+  font-size:19px;color:var(--ink);font-weight:500;
+  margin:0 2px 11px;letter-spacing:-.01em
+}
+.ab-step{
+  background:var(--white);border:1px solid var(--line);border-radius:14px;
+  padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:9px;
+  box-shadow:0 3px 10px rgba(165,76,92,.05)
+}
+.ab-n{
+  flex:0 0 30px;height:30px;border-radius:50%;background:#B5726F;color:#fff;
+  display:grid;place-items:center;font-size:14px;font-weight:500
+}
+.ab-si{flex:0 0 30px;display:grid;place-items:center}
+.ab-si svg{width:27px;height:27px}
+.ab-sl{width:1px;height:26px;background:var(--line);flex:0 0 1px}
+.ab-stx{font-size:13.5px;color:#6B4A50;font-weight:300;line-height:1.35}
+.ab-sedes{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:22px}
+.ab-sede{
+  background:var(--white);border:1px solid var(--line);border-radius:16px;
+  padding:14px 10px 13px;text-align:center;box-shadow:0 3px 10px rgba(165,76,92,.05)
+}
+.ab-sede svg{width:100%;max-width:118px;height:auto;display:block;margin:0 auto 6px}
+.ab-sn{font-family:'Playfair Display',serif;font-size:14.5px;color:var(--ink)}
+.ab-cta{
+  background:#B5726F;border-radius:40px;padding:18px;font-size:16px;
+  font-weight:400;box-shadow:0 8px 22px rgba(165,76,92,.20)
+}
+.ab-wa{
+  display:block;margin:16px auto 4px;background:none;border:none;
+  font-family:'Poppins',sans-serif;font-size:13.5px;color:#B5726F;
+  text-decoration:underline;text-underline-offset:4px;cursor:pointer
+}
+/* enlace del home hacia "Sobre" — antes solo se llegaba haciendo scroll */
+.ab-link{
+  display:inline-flex;align-items:center;gap:7px;margin:12px 0 2px;
+  background:var(--white);border:1px solid var(--line);border-radius:30px;
+  padding:10px 17px;font-family:'Poppins',sans-serif;font-size:13.5px;
+  color:#B5726F;cursor:pointer;box-shadow:0 3px 10px rgba(165,76,92,.06)
+}
+.ab-link span{font-size:17px;line-height:1}
+.ab-link:active{transform:scale(.98)}
+/* "Cerrar sesión": vuelve a la portada, que es donde está el Iniciar sesión.
+   Va en su propia .mlist para que se vea como tarjeta igual que las demás. */
+.mrow.salir .mi svg{width:19px;height:19px}
+.mtn.tiny{width:74px;margin-bottom:6px}
+/* volver a la portada desde el botón ‹ de "Sobre" no aplica: ese va a home */
+#splash{cursor:default}
+
+/* ---------- PHONE FRAME ---------- */
+.phone{
+  position:relative;width:100%;max-width:412px;height:min(890px,100vh);height:min(890px,100dvh);
+  background:var(--blush);overflow:hidden;
+  border-radius:44px;box-shadow:0 40px 90px rgba(120,50,60,.35),0 0 0 11px #1c1416,0 0 0 13px #2c2124;
+}
+@media(max-width:460px){
+  .phone{border-radius:0;height:100vh;height:100svh;box-shadow:none}
+  body{background:var(--blush)}
+  .notch{display:none!important}       /* en el celular real no duplicamos el notch */
+  .status{display:none!important}      /* ni la barra falsa 9:41 */
+  .scroll{padding-top:max(22px,env(safe-area-inset-top))}
+  .head{padding-top:max(22px,env(safe-area-inset-top))}
+  .head .back{top:max(20px,env(safe-area-inset-top))}
+  .nav{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+}
+/* accesibilidad: respeta "reducir movimiento" */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+/* accesibilidad: foco visible por teclado */
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2.5px solid var(--rose-deep);outline-offset:2px;border-radius:8px}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#160f11;border-radius:20px;z-index:60}
+.status{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:13px;font-weight:600;color:var(--ink);z-index:50;pointer-events:none}
+.status .r{display:flex;gap:6px;align-items:center;font-size:12px}
+
+/* ---------- SCREENS ---------- */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;opacity:0;transition:opacity .4s ease}
+.screen.on{display:flex;opacity:1}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:58px 20px 108px;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{width:0}
+
+/* ---------- SPLASH ----------
+   Rediseñado el 21-ago-2026 según la referencia de Jodie. El bloque nuevo
+   está más arriba (buscar "SPLASH v2"). Acá solo quedan las clases que
+   se siguen usando en OTRAS pantallas (.pg, .logo-mono en .top-brand,
+   .logo-name, .logo-sub, .divider-heart). Las reglas propias del splash
+   viejo se quitaron porque iban después y pisaban al diseño nuevo. */
+.pg{font-family:'Playfair Display',serif;font-weight:600;letter-spacing:2px;
+   background:linear-gradient(120deg,#B87A55,#E7C892 45%,#B0693F);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo-mono{font-size:74px;line-height:.9;font-weight:700;letter-spacing:-4px}
+.logo-name{font-size:23px;letter-spacing:7px;margin-top:10px}
+.logo-sub{font-family:'Poppins';font-size:9.5px;letter-spacing:4.5px;color:#B27A70;margin-top:7px;font-weight:500}
+.divider-heart{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0}
+.divider-heart .ln{height:1.5px;width:46px;background:linear-gradient(90deg,transparent,var(--gold-lite))}
+.divider-heart .ln.r{background:linear-gradient(90deg,var(--gold-lite),transparent)}
+.cta{display:block;width:100%;border:none;cursor:pointer;font-family:'Poppins';font-weight:500;font-size:16px;
+   color:#fff;padding:17px;border-radius:40px;margin-top:26px;
+   background:linear-gradient(120deg,var(--rose),var(--rose-mid));box-shadow:0 12px 26px rgba(165,76,92,.4)}
+.cta.gold{background:linear-gradient(120deg,#D9AE6B,#C79150);box-shadow:0 12px 26px rgba(180,140,70,.35)}
+.cta:active{transform:scale(.98)}
+
+/* ---------- HOME ---------- */
+.top-brand{display:flex;flex-direction:column;align-items:center;margin-bottom:18px}
+.top-brand .logo-mono{font-size:34px}
+.top-brand .logo-name{font-size:13px;letter-spacing:5px;margin-top:4px}
+.top-brand .logo-sub{font-size:7.5px;letter-spacing:3px;margin-top:4px}
+.hello{font-family:'Playfair Display',serif;font-size:29px;font-weight:600;color:var(--rose-deep);line-height:1.1}
+.hello .hh{display:inline-block;color:var(--gold)}
+.subhello{font-size:13.5px;color:var(--rose-mid);margin-top:3px;margin-bottom:18px}
+.subhello b{font-weight:600;color:var(--rose-deep)}
+
+.appt{background:linear-gradient(125deg,var(--rose),var(--rose-mid));border-radius:24px;padding:18px 20px;color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.appt::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.10)}
+.appt .lbl{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;font-weight:500}
+.appt .svc{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin:4px 0 6px}
+.appt .when{font-size:13px;opacity:.95;display:flex;align-items:center;gap:7px}
+.appt .det{margin-top:14px;background:rgba(255,255,255,.22);border:none;color:#fff;font-family:'Poppins';font-size:12.5px;font-weight:500;padding:9px 16px;border-radius:30px;cursor:pointer;backdrop-filter:blur(4px)}
+
+.sec-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--ink);margin:26px 2px 14px;display:flex;align-items:center;justify-content:space-between}
+.sec-title a{font-family:'Poppins';font-size:12px;color:var(--rose);font-weight:500;text-decoration:none}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tile{background:var(--white);border-radius:20px;padding:16px 8px;text-align:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .18s}
+.tile:active{transform:scale(.95)}
+.tile .ic{width:44px;height:44px;margin:0 auto 8px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+   background:linear-gradient(135deg,var(--rose-ghost),#F7D7D9);color:var(--rose-deep)}
+.tile .ic svg{width:23px;height:23px}
+.tile span{font-size:11.5px;font-weight:500;color:var(--ink);line-height:1.2;display:block}
+
+.ia{margin-top:16px;background:linear-gradient(120deg,#FBE4D4,#F7D9DD);border-radius:22px;padding:15px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:var(--shadow-sm)}
+.ia .bot{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#fff,#FBEAE8);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(165,76,92,.15)}
+.ia .tt{flex:1}
+.ia .tt b{font-family:'Playfair Display',serif;font-size:15px;color:var(--rose-deep);font-weight:600}
+.ia .tt p{font-size:11.5px;color:var(--rose-mid);margin-top:2px}
+
+/* service list rows */
+.srow{display:flex;align-items:center;gap:15px;background:var(--white);border-radius:20px;padding:13px 15px;margin-bottom:11px;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .18s}
+.srow:active{transform:scale(.98)}
+.srow .circ{width:52px;height:52px;border-radius:50%;flex:0 0 52px;display:flex;align-items:center;justify-content:center;
+   background:radial-gradient(circle at 35% 30%,#F7D3D6,#EDA9B0);color:#fff}
+.srow .circ svg{width:26px;height:26px}
+.srow .nm{flex:1}
+.srow .nm b{font-size:14.5px;font-weight:500;color:var(--ink);display:block}
+.srow .nm small{font-size:11.5px;color:var(--muted)}
+.srow .chev{color:var(--rose);font-size:20px}
+
+/* ---------- AGENDA ---------- */
+.head{padding:58px 20px 6px;text-align:center;position:relative}
+.head .back{position:absolute;left:18px;top:56px;font-size:22px;color:var(--rose-deep);cursor:pointer;background:none;border:none}
+.head h3{font-family:'Playfair Display',serif;font-size:17px;letter-spacing:3px;text-transform:uppercase;color:var(--rose-deep);font-weight:600}
+.pick{font-size:14px;font-weight:500;color:var(--ink);margin:6px 2px 12px}
+
+.chipwrap{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 14px}
+.chipwrap::-webkit-scrollbar{height:0}
+.daychip{flex:0 0 auto;min-width:56px;text-align:center;background:var(--white);border-radius:16px;padding:10px 6px;cursor:pointer;box-shadow:var(--shadow-sm);border:1.5px solid transparent}
+.daychip small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.daychip b{display:block;font-size:19px;font-family:'Playfair Display',serif;color:var(--ink);margin-top:2px}
+.daychip.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));border-color:var(--rose)}
+.daychip.sel small,.daychip.sel b{color:#fff}
+
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:6px}
+.tchip{background:var(--white);border:1.5px solid var(--line);border-radius:14px;padding:12px 0;text-align:center;font-size:14px;font-weight:500;color:var(--ink);cursor:pointer;transition:.15s}
+.tchip.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));color:#fff;border-color:var(--rose)}
+.tchip.off{opacity:.38;text-decoration:line-through;cursor:not-allowed}
+
+/* ---------- RESULTADOS ---------- */
+.tabs{display:flex;background:var(--white);border-radius:16px;padding:5px;box-shadow:var(--shadow-sm);margin-bottom:18px}
+.tabs button{flex:1;border:none;background:none;font-family:'Poppins';font-size:13px;font-weight:500;color:var(--muted);padding:9px;border-radius:12px;cursor:pointer}
+.tabs button.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));color:#fff}
+.rescard{background:var(--white);border-radius:22px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.rescard h4{font-family:'Playfair Display',serif;font-size:16px;color:var(--rose-deep);margin-bottom:12px}
+.ba{display:flex;gap:10px}
+.ba .im{flex:1;border-radius:14px;height:96px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:11px;font-weight:600;color:#fff;letter-spacing:1px}
+.ba .before{background:linear-gradient(160deg,#cdb2a6,#a98a7e)}
+.ba .after{background:linear-gradient(160deg,#F2C9CC,#D98A93)}
+.track{margin-top:14px}
+.track .bar{height:6px;border-radius:6px;background:var(--line);position:relative}
+.track .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,var(--gold-lite),var(--rose));width:66%}
+.track .lbls{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:6px}
+
+/* ---------- PERFIL ---------- */
+.pavatar{width:88px;height:88px;border-radius:50%;margin:6px auto 12px;background:radial-gradient(circle at 35% 30%,#F7D3D6,#D98A93);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:34px;color:#fff;box-shadow:var(--shadow)}
+.pname{text-align:center;font-family:'Playfair Display',serif;font-size:22px;color:var(--rose-deep);font-weight:600}
+.pmail{text-align:center;font-size:12.5px;color:var(--muted);margin-bottom:18px}
+.points{background:linear-gradient(120deg,#E7CB98,#D9AE6B);border-radius:22px;padding:18px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+.points .big{font-family:'Playfair Display',serif;font-size:30px;font-weight:700}
+.points small{font-size:11px;opacity:.9;letter-spacing:1px;text-transform:uppercase}
+.mlist{margin-top:16px;background:var(--white);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.mrow{display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.mrow:last-child{border-bottom:none}
+.mrow .mi{width:36px;height:36px;border-radius:11px;background:var(--rose-ghost);color:var(--rose-deep);display:flex;align-items:center;justify-content:center}
+.mrow .mi svg{width:19px;height:19px}
+.mrow span{flex:1;font-size:14px;font-weight:500}
+.mrow .chev{color:var(--rose);font-size:19px}
+.branch{display:flex;gap:12px;margin-top:16px}
+.branch div{flex:1;background:var(--white);border-radius:18px;padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
+.branch b{font-family:'Playfair Display',serif;font-size:14px;color:var(--rose-deep);display:block}
+.branch small{font-size:11px;color:var(--muted)}
+
+/* ---------- BOTTOM NAV ---------- */
+.nav{position:absolute;bottom:0;left:0;right:0;height:78px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);
+   border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-around;padding:0 8px 14px;z-index:40}
+.nav button{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-family:'Poppins';font-size:10px;font-weight:500;flex:1}
+.nav button svg{width:23px;height:23px}
+.nav button.sel{color:var(--rose-deep)}
+.nav button.sel .nic{background:var(--rose-ghost)}
+.nav .nic{width:40px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:12px;transition:.2s}
+
+/* toast */
+.toast{position:absolute;left:20px;right:20px;bottom:96px;background:linear-gradient(120deg,var(--rose-deep),var(--rose));color:#fff;padding:15px 18px;border-radius:18px;box-shadow:var(--shadow);z-index:80;display:flex;align-items:center;gap:10px;font-size:13.5px;transform:translateY(140%);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.9,.3,1.3),opacity .3s ease}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.fade-up{animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- TEST DE PIEL ---------- */
+.qintro{background:var(--white);border-radius:24px;padding:24px 20px;text-align:center;box-shadow:var(--shadow);margin-top:6px}
+.qintro .bb{font-size:46px}
+.qintro .tt{font-family:'Playfair Display',serif;font-size:23px;color:var(--rose-deep);font-weight:700;margin:10px 6px 8px;line-height:1.2}
+.qintro p{font-size:13.5px;color:var(--rose-mid);line-height:1.55}
+.qprog{height:6px;background:var(--line);border-radius:6px;margin:2px 2px 20px;overflow:hidden}
+.qprog i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-lite),var(--rose));border-radius:6px;transition:width .3s}
+.qnum{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--rose-mid);font-weight:600;text-align:center}
+.qq{font-family:'Playfair Display',serif;font-size:21px;font-weight:600;color:var(--rose-deep);text-align:center;margin:8px 6px 20px;line-height:1.3}
+.qopt{background:var(--white);border:1.6px solid var(--line);border-radius:16px;padding:15px 18px;margin-bottom:11px;font-size:14.5px;font-weight:500;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:12px;transition:.15s}
+.qopt:active{transform:scale(.98);border-color:var(--rose);background:var(--rose-ghost)}
+.qopt .em{font-size:20px;flex:0 0 auto}
+.rcard{background:linear-gradient(135deg,#fff,var(--rose-ghost));border-radius:24px;padding:22px 20px;box-shadow:var(--shadow);text-align:center;margin-top:6px}
+.rcard .tag{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--rose-mid);font-weight:600}
+.rcard .tname{font-family:'Playfair Display',serif;font-size:25px;color:var(--rose-deep);font-weight:700;margin:6px 0 5px;line-height:1.15}
+.rcard .tdesc{font-size:13.5px;color:var(--ink);line-height:1.55}
+.rextra{background:var(--white);border-radius:14px;padding:12px 15px;margin-top:13px;text-align:left;font-size:12.8px;color:var(--ink);line-height:1.5;box-shadow:var(--shadow-sm)}
+.rextra b{color:var(--rose-deep)}
+.rsafe{background:#FFF6E9;border:1px solid #F0D9A8;border-radius:14px;padding:12px 14px;margin-top:12px;font-size:12.5px;color:#8a6a30;line-height:1.5;text-align:left}
+.rtip{background:#FBEFF0;border:1px solid #F0D0D4;border-radius:14px;padding:11px 14px;margin-top:10px;font-size:12.5px;color:#8a4a55;line-height:1.5;text-align:left}
+.rdisc{font-size:11px;color:var(--muted);margin-top:15px;line-height:1.5}
+.galeria{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 8px;-webkit-overflow-scrolling:touch}
+.galeria img{flex:0 0 72%;max-width:260px;border-radius:14px;scroll-snap-align:start;cursor:zoom-in;box-shadow:0 4px 14px rgba(181,114,111,.18)}
+.galeria.grid{display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+.galeria.grid img{max-width:100%;width:100%}
+#fotoGrande{position:fixed;inset:0;background:rgba(30,20,20,.88);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
+#fotoGrande.on{display:flex}
+#fotoGrande img{max-width:100%;max-height:92vh;border-radius:12px}
+#fotoGrande span{position:absolute;top:14px;right:18px;color:#fff;font-size:26px;cursor:pointer}
+.btn2{display:block;width:100%;border:1.5px solid var(--line);background:var(--white);color:var(--rose-deep);font-family:'Poppins';font-weight:500;font-size:14px;padding:14px;border-radius:34px;margin-top:10px;cursor:pointer}
+/* ---------- CATALOGO ---------- */
+.tcard{background:var(--white);border-radius:20px;padding:15px 17px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+.tcard h5{font-family:'Playfair Display',serif;font-size:16px;color:var(--rose-deep);font-weight:600;display:flex;align-items:center;gap:9px}
+.tcard p{font-size:12.8px;color:var(--muted);margin-top:5px;line-height:1.5}
+.tcard .promo{display:inline-block;margin-top:9px;background:linear-gradient(120deg,#E7CB98,#D9AE6B);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+/* ---------- CUIDADOS ---------- */
+.skinpick{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 16px}
+.skinpick::-webkit-scrollbar{height:0}
+.skinpick button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--white);border-radius:20px;padding:9px 16px;font-family:'Poppins';font-size:13px;font-weight:500;color:var(--ink);cursor:pointer}
+.skinpick button.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));color:#fff;border-color:var(--rose)}
+.carecard{background:var(--white);border-radius:18px;padding:16px 17px;box-shadow:var(--shadow-sm)}
+.carecard b{display:block;font-size:15px;color:var(--rose-deep);margin-bottom:10px;font-family:'Playfair Display',serif}
+.carecard .li{display:flex;gap:9px;font-size:13px;color:var(--ink);line-height:1.45;margin:8px 0}
+.carecard .li i{color:var(--gold);font-style:normal}
+/* ---------- selección de servicio + ficha ---------- */
+.srow.sel{border:2px solid var(--rose);box-shadow:0 8px 20px rgba(197,127,136,.28)}
+.srow .badge{margin-left:auto;font-size:11px;color:var(--rose-deep);font-weight:600;display:none;white-space:nowrap}
+.srow.sel .badge{display:inline}
+.srow .info{margin-left:8px;color:var(--rose);font-size:17px;font-weight:700}
+.selsum{background:var(--rose-ghost);border:1px solid var(--rose-soft);border-radius:16px;padding:13px 15px;margin:0 0 14px;font-size:13px;color:var(--ink);line-height:1.5}
+.selsum b{color:var(--rose-deep);font-family:'Playfair Display',serif;font-size:15px;display:block;margin-bottom:3px}
+.tcard{cursor:pointer;transition:transform .15s}
+.tcard:active{transform:scale(.98)}
+.sheet-bg{position:absolute;inset:0;background:rgba(70,30,40,.42);opacity:0;pointer-events:none;transition:.3s;z-index:90}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--cream);border-radius:28px 28px 0 0;padding:6px 22px 26px;z-index:95;transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.9,.3,1.1);max-height:84%;overflow-y:auto;box-shadow:0 -14px 40px rgba(120,50,60,.28)}
+.sheet.on{transform:translateY(0)}
+.sheet::-webkit-scrollbar{width:0}
+.sheet .grab{width:44px;height:5px;border-radius:5px;background:var(--rose-soft);margin:8px auto 14px}
+.sheet .demoji{font-size:42px;text-align:center}
+.sheet h4{font-family:'Playfair Display',serif;font-size:25px;color:var(--rose-deep);font-weight:700;text-align:center;margin:6px 0 3px}
+.sheet .dur{text-align:center;font-size:12.5px;color:var(--rose-mid);margin-bottom:8px}
+.sheet .lbl2{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin:14px 0 6px}
+.sheet .dtext{font-size:14px;color:var(--ink);line-height:1.6}
+.sheet .benefs{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.sheet .benefs span{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;color:var(--rose-deep);font-weight:500}
+
+/* ---------- FICHA COMPLETA (bottom sheet) ---------- */
+.fmeta{display:flex;gap:10px;margin:10px 0 4px}
+.fmeta .fmi{flex:1;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.fmeta .fmi small{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fmeta .fmi b{display:block;font-size:13.5px;color:var(--rose-deep);font-family:'Playfair Display',serif;margin-top:2px}
+.fbadge{background:#FFF6E9;border:1px solid #F0D9A8;color:#8a6a30;border-radius:12px;padding:9px 13px;font-size:12.5px;font-weight:500;margin-top:10px;display:flex;align-items:center;gap:7px}
+.flist{margin-top:4px}
+.flist .fli{display:flex;gap:9px;font-size:13.5px;color:var(--ink);line-height:1.5;margin:6px 0;align-items:flex-start}
+.flist .fli i{color:var(--rose);font-style:normal;font-weight:700;line-height:1.4}
+.flist.contra{background:#FDF3F4;border:1px solid #F3D6DA;border-radius:14px;padding:10px 14px;margin-top:6px}
+.flist.contra .fli i{color:var(--rose-deep)}
+.fbtns{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.fbtns .cta{margin-top:0}
+
+/* ===== FICHA DERMAPEN (BB Glow) — correo de Jodie 29-ago =====
+   Vista corta arriba (resumen, pasos, viales, 5 cuidados, agendar) y todo el
+   detalle en desplegables abajo, para que la pantalla no sea eterna. */
+.dp-res{background:var(--white);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow-sm);margin-top:14px}
+.dp-res p{font-size:14px;line-height:1.55;color:var(--ink)}
+.dp-h{font-family:'Playfair Display',serif;font-size:17px;color:var(--rose-deep);font-weight:600;margin:22px 0 11px}
+.dp-pasos{position:relative}
+.dp-pasos::before{content:'';position:absolute;left:13px;top:10px;bottom:14px;width:2px;background:linear-gradient(var(--gold),var(--rose-soft))}
+.dp-paso{position:relative;display:flex;gap:13px;align-items:flex-start;margin:0 0 13px}
+.dp-num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--cream);border:2px solid var(--gold);color:var(--rose-deep);font-family:'Playfair Display',serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.dp-paso b{display:block;font-size:14px;color:var(--ink);font-weight:600;line-height:1.3;padding-top:3px}
+.dp-paso span{display:block;font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+.dp-viales{display:flex;flex-wrap:wrap;gap:7px}
+.dp-viales span{background:var(--rose-ghost);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;color:var(--rose-deep)}
+.dp-nota{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.5;font-style:italic}
+.dp-mas{background:none;border:1px solid var(--rose-soft);color:var(--rose-deep);border-radius:22px;padding:9px 16px;font-family:'Poppins';font-size:13px;font-weight:500;cursor:pointer;margin-top:8px}
+.dp-link{display:block;width:100%;text-align:center;margin-top:13px;background:none;border:none;color:#2F9E63;font-family:'Poppins';font-size:14px;font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.dp-acc{margin-top:26px;border-top:1px solid var(--line)}
+.dp-acc details{border-bottom:1px solid var(--line)}
+.dp-acc summary{list-style:none;cursor:pointer;padding:15px 2px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--ink)}
+.dp-acc summary::-webkit-details-marker{display:none}
+.dp-acc summary::after{content:'+';flex:none;font-size:21px;line-height:1;color:var(--gold);transition:transform .25s}
+.dp-acc details[open] summary::after{transform:rotate(45deg)}
+.dp-acc summary:focus-visible,.dp-mas:focus-visible,.dp-link:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
+.dp-in{padding:0 2px 17px}
+.dp-sub{font-size:12.5px;font-weight:600;color:var(--rose-deep);margin:12px 0 4px}
+.dp-sub:first-child{margin-top:0}
+.dp-vial{padding:9px 0;border-bottom:1px dashed var(--line)}
+.dp-vial:last-of-type{border-bottom:none}
+.dp-vial b{display:block;font-size:13.5px;color:var(--ink);font-weight:600}
+.dp-vial span{display:block;font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:2px}
+.dp-acc details.alerta summary{color:#9C3B3B}
+.dp-alerta{background:#FDF1F0;border:1px solid #EFC4C1;border-left:4px solid #B8474A;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:#6B2D2D}
+@media (prefers-reduced-motion:reduce){.dp-acc summary::after{transition:none}}
+.cta.wa{background:linear-gradient(120deg,#3EB073,#2F9E63);box-shadow:0 12px 26px rgba(47,158,99,.32);display:flex;align-items:center;justify-content:center;gap:9px}
+.cta.wa::before{content:"";width:19px;height:19px;background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.6.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.6-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5-.1-.2-.6-1.5-.9-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.7.7-1 1.6-1 2.6 0 .9.4 1.8.6 2.1.2.3 2.4 3.9 5.9 5.3 2.1.9 2.9.9 4 .8.6-.1 1.7-.7 2-1.4.2-.6.2-1.2.2-1.4-.1-.1-.2-.2-.5-.3z'/><path d='M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.4 1.3 4.9L2 22l5.3-1.4c1.4.8 3 1.2 4.7 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.5 0-3-.4-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.4 14.9 4 13.5 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8z'/></svg>")}
+
+/* ---------- WHATSAPP FLOTANTE ---------- */
+.wafab{position:absolute;right:16px;bottom:92px;width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;z-index:38;
+   background:linear-gradient(135deg,#43C476,#2F9E63);box-shadow:0 10px 24px rgba(47,158,99,.42);display:flex;align-items:center;justify-content:center}
+.wafab svg{width:28px;height:28px;fill:#fff}
+.wafab:active{transform:scale(.94)}
+
+/* ---------- SOBRE / QUIÉN TE ATENDERÁ ---------- */
+.provhero{background:linear-gradient(135deg,var(--rose),var(--rose-mid));border-radius:24px;padding:24px 20px;text-align:center;color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.provhero::after{content:"";position:absolute;right:-30px;bottom:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.10)}
+.provhero .ph{width:96px;height:96px;border-radius:50%;margin:0 auto 12px;background:radial-gradient(circle at 35% 30%,#F7D3D6,#D98A93);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:38px;color:#fff;border:3px solid rgba(255,255,255,.65);overflow:hidden}
+.provhero .ph img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.provhero .pnm{font-family:'Playfair Display',serif;font-size:24px;font-weight:700}
+.provhero .prol{font-size:12.5px;letter-spacing:2px;text-transform:uppercase;opacity:.92;margin-top:3px}
+.provcard{background:var(--white);border-radius:18px;padding:16px 17px;margin-top:14px;box-shadow:var(--shadow-sm)}
+.provcard .pt{font-family:'Playfair Display',serif;font-size:15px;color:var(--rose-deep);font-weight:600;margin-bottom:7px}
+.provcard p{font-size:13.5px;color:var(--ink);line-height:1.6}
+.provcard .ph-note{font-size:11.5px;color:var(--muted);margin-top:8px;font-style:italic}
+.loc{display:flex;gap:10px;margin-top:12px}
+.loc div{flex:1;background:var(--white);border-radius:16px;padding:13px 10px;text-align:center;box-shadow:var(--shadow-sm)}
+.loc b{font-family:'Playfair Display',serif;font-size:14px;color:var(--rose-deep);display:block}
+.loc small{font-size:10.5px;color:var(--muted)}
+.homephrase{font-family:'Playfair Display',serif;font-size:26px;font-weight:600;font-style:italic;color:var(--rose-deep);line-height:1.15;margin:2px 2px 4px}
+.homephrase2{font-size:13px;color:var(--rose-mid);margin:0 2px 18px;line-height:1.5}
+.bigbook{display:flex;align-items:center;gap:14px;background:linear-gradient(120deg,var(--rose),var(--rose-mid));border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow);color:#fff;margin-top:4px}
+.bigbook .bi{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.bigbook .bi svg{width:24px;height:24px}
+.bigbook .bt{flex:1}
+.bigbook .bt b{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;display:block}
+.bigbook .bt small{font-size:11.5px;opacity:.9}
+.provlink{display:flex;align-items:center;gap:13px;background:var(--white);border-radius:20px;padding:13px 15px;margin-top:14px;cursor:pointer;box-shadow:var(--shadow-sm)}
+.provlink .pl-av{width:46px;height:46px;border-radius:50%;flex:0 0 46px;background:radial-gradient(circle at 35% 30%,#F7D3D6,#D98A93);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Playfair Display',serif;font-size:20px}
+.provlink .pl-t{flex:1}
+.provlink .pl-t b{font-size:14px;color:var(--ink);display:block}
+.provlink .pl-t small{font-size:11.5px;color:var(--muted)}
+
+/* ---------- ¿QUÉ QUIERES MEJORAR? ---------- */
+.needgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
+.needcard{background:var(--white);border-radius:16px;padding:13px 13px;cursor:pointer;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:10px;transition:transform .15s;border:1px solid transparent}
+.needcard:active{transform:scale(.97);border-color:var(--rose-soft)}
+.needcard .ne{font-size:21px;flex:0 0 auto;line-height:1}
+.needcard b{font-size:12.4px;font-weight:500;color:var(--ink);line-height:1.2}
+.needhero{background:linear-gradient(135deg,#fff,var(--rose-ghost));border-radius:22px;padding:20px 18px;text-align:center;box-shadow:var(--shadow-sm);margin-bottom:14px}
+.needhero .nh-e{font-size:40px}
+.needhero .nh-t{font-family:'Playfair Display',serif;font-size:22px;color:var(--rose-deep);font-weight:700;margin:6px 0 6px}
+.needhero p{font-size:13px;color:var(--rose-mid);line-height:1.5}
+#mejorar .cta.wa{margin-top:10px}
+
+/* ---------- RESERVA MEJORADA ---------- */
+.sedechip{flex:0 0 auto;background:var(--white);border-radius:16px;padding:11px 18px;cursor:pointer;box-shadow:var(--shadow-sm);border:1.5px solid transparent;font-size:13.5px;font-weight:500;color:var(--ink)}
+.sedechip.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));color:#fff;border-color:var(--rose)}
+.prochip{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:18px;padding:12px 15px;box-shadow:var(--shadow-sm);border:1.5px solid var(--rose-soft)}
+.prochip .pa{width:42px;height:42px;border-radius:50%;flex:0 0 42px;background:radial-gradient(circle at 35% 30%,#F7D3D6,#D98A93);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Playfair Display',serif;font-size:17px}
+.prochip .pt b{font-size:14px;color:var(--ink);display:block}
+.prochip .pt small{font-size:11.5px;color:var(--muted)}
+.resumen{background:var(--white);border-radius:20px;padding:16px 17px;margin-top:18px;box-shadow:var(--shadow-sm)}
+.resumen .rh{font-family:'Playfair Display',serif;font-size:16px;color:var(--rose-deep);font-weight:600;margin-bottom:10px}
+.resumen .rr{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.resumen .rr:last-of-type{border-bottom:none}
+.resumen .rr span{color:var(--muted)}
+.resumen .rr b{color:var(--ink);font-weight:500;text-align:right}
+.polbox{background:var(--rose-ghost);border-radius:14px;padding:12px 14px;margin-top:12px}
+.polbox b{font-size:12px;color:var(--rose-deep);display:block;margin-bottom:2px}
+.polbox p{font-size:12px;color:var(--ink);line-height:1.45;margin-bottom:8px}
+.polbox p:last-child{margin-bottom:0}
+.confbtns{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.confbtns .btn2{margin-top:0}
+
+/* ---------- FORMULARIO (evaluación previa) ---------- */
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--rose-deep);margin-bottom:6px}
+.field input[type=text],.field textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font-family:'Poppins';font-size:14px;color:var(--ink);background:var(--white);resize:vertical}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--rose)}
+.field textarea{min-height:64px}
+.photorow{display:flex;gap:10px}
+.photobtn{flex:1;border:1.5px dashed var(--rose-soft);border-radius:14px;padding:16px 8px;text-align:center;font-size:12.5px;color:var(--rose-mid);background:var(--white);cursor:pointer;display:block}
+.photobtn.done{border-style:solid;border-color:#3EB073;color:#2F9E63;background:#F0FaF4}
+.photobtn .pe{font-size:22px;display:block;margin-bottom:4px}
+.togrow{display:flex;gap:9px}
+.togrow button{flex:1;border:1.5px solid var(--line);background:var(--white);border-radius:12px;padding:11px;font-family:'Poppins';font-size:13.5px;font-weight:500;color:var(--ink);cursor:pointer}
+.togrow button.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));color:#fff;border-color:var(--rose)}
+.formnote{background:#FFF6E9;border:1px solid #F0D9A8;border-radius:14px;padding:12px 14px;font-size:12.5px;color:#8a6a30;line-height:1.5;margin:6px 0 16px}
+
+/* ---------- CUIDADOS POST (home) ---------- */
+.postcard{background:linear-gradient(120deg,#EAF6EF,#F1FAF4);border:1px solid #D6EEDF;border-radius:20px;padding:16px 17px;margin-top:16px;box-shadow:var(--shadow-sm)}
+.postcard .pt{font-family:'Playfair Display',serif;font-size:15px;color:#2F7D52;font-weight:600;display:flex;align-items:center;gap:8px}
+.postcard p{font-size:12.8px;color:#3a5a48;line-height:1.55;margin-top:6px}
+.postcard .pa{margin-top:10px;background:#fff;border:1px solid #D6EEDF;color:#2F7D52;font-family:'Poppins';font-size:12.5px;font-weight:500;padding:9px 15px;border-radius:24px;cursor:pointer}
+
+/* ---------- MI EVOLUCIÓN ---------- */
+.resmeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted);margin:1px 0 11px}
+.resmeta .nof{background:#EAF6EF;border:1px solid #D6EEDF;color:#2F7D52;border-radius:20px;padding:2px 9px;font-weight:600}
+.resnote{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+
+/* ---------- GIFT CARDS ---------- */
+.gcpreview{border-radius:22px;padding:22px 20px;color:#fff;box-shadow:var(--shadow);margin:4px 0 16px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--rose),var(--rose-mid) 55%,#D9AE6B)}
+.gcpreview::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.12)}
+.gcpreview .gtag{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;opacity:.9}
+.gcpreview .gtitle{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin:2px 0}
+.gcpreview .gamt{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;margin-top:8px}
+.gcpreview .gto{font-size:12.5px;margin-top:10px;opacity:.95}
+.gcpreview .gded{font-size:12.5px;font-style:italic;margin-top:3px;opacity:.95}
+.occhips,.amtchips{display:flex;gap:8px;flex-wrap:wrap}
+.occhips button,.amtchips button{border:1.5px solid var(--line);background:var(--white);border-radius:20px;padding:9px 13px;font-family:'Poppins';font-size:12.5px;font-weight:500;color:var(--ink);cursor:pointer}
+.occhips button.sel,.amtchips button.sel{background:linear-gradient(125deg,var(--rose),var(--rose-mid));color:#fff;border-color:var(--rose)}
+
+/* ---------- PUNTOS EXPLICADOS ---------- */
+.ptshow{background:var(--white);border-radius:18px;padding:16px 17px;margin-top:14px;box-shadow:var(--shadow-sm)}
+.ptshow b.h{font-family:'Playfair Display',serif;font-size:15px;color:var(--rose-deep);display:block;margin-bottom:4px}
+.ptsprog{height:9px;background:var(--line);border-radius:9px;overflow:hidden;margin:12px 0 6px}
+.ptsprog i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-lite),var(--rose))}
+.ptsnote{font-size:12px;color:var(--muted)}
+.ptli{display:flex;gap:9px;font-size:13px;color:var(--ink);line-height:1.45;margin:8px 0}
+.ptli i{color:var(--gold);font-style:normal;font-weight:700}
+
+/* ---------- FAQ ---------- */
+.faqitem{background:var(--white);border-radius:16px;margin-bottom:10px;box-shadow:var(--shadow-sm);overflow:hidden}
+.faqq{padding:14px 16px;font-size:13.8px;font-weight:500;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.faqq .fq-i{color:var(--rose);font-size:22px;transition:transform .2s;flex:0 0 auto}
+.faqa{max-height:0;overflow:hidden;transition:max-height .25s ease;font-size:13px;color:var(--muted);line-height:1.55}
+.faqitem.open .faqa{max-height:280px;padding:0 16px 14px}
+.faqitem.open .fq-i{transform:rotate(45deg)}
+
+/* ---------- RESEÑAS ---------- */
+.review{background:var(--white);border-radius:16px;padding:14px 16px;margin-bottom:11px;box-shadow:var(--shadow-sm)}
+.review .rvh{display:flex;align-items:center;gap:10px}
+.review .rva{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F7D3D6,#D98A93);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px}
+.review .rvn{flex:1}
+.review .rvn b{font-size:13.5px;color:var(--ink);display:block}
+.review .rvn small{font-size:11px;color:var(--muted)}
+.review .rvver{font-size:10.5px;color:#2F7D52;background:#EAF6EF;border:1px solid #D6EEDF;border-radius:16px;padding:2px 8px;font-weight:600}
+.review .stars{color:var(--gold);font-size:13px;margin-top:8px}
+.review p{font-size:13px;color:var(--ink);line-height:1.5;margin-top:5px}
+
+/* ---------- FAVORITOS heart en ficha ---------- */
+.favbtn{position:absolute;top:12px;right:16px;background:rgba(255,255,255,.7);border:none;width:38px;height:38px;border-radius:50%;font-size:19px;cursor:pointer;z-index:3;line-height:1;box-shadow:var(--shadow-sm)}
+.privtext{font-size:13px;color:var(--ink);line-height:1.6}
+.privtext h5{font-family:'Playfair Display',serif;font-size:15px;color:var(--rose-deep);margin:16px 0 6px}
+
+/* ===== PÁGINA WEB (30-oct) — generada desde la app por _build_web.py =====
+   Menú arriba, cada pantalla de la app es una página con su ruta (#/agenda, #/tratamientos…),
+   fichas en ventana central. Mismos datos y funciones que la app. */
+@media all{
+  body{display:block;min-height:100vh;background-attachment:fixed}
+  .web{display:block;position:sticky;top:0;z-index:70;background:rgba(240,219,215,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(240,217,216,.95)}
+  .phone{position:relative;max-width:none!important;width:100%;height:auto!important;background:transparent;border-radius:0!important;box-shadow:none!important;overflow:visible}
+  .notch,.status,.nav,.grab{display:none!important}
+  .screen{position:static!important;inset:auto;opacity:1!important;height:auto!important}
+  .screen.on{display:block!important}
+  .scroll{flex:none!important;height:auto!important}
+  .screen.on{display:block}
+  #splash,#home{display:none!important}
+  .head{max-width:1120px;margin:0 auto;padding:40px 40px 6px;text-align:left}
+  .head .back{position:static!important;font-size:14px;font-family:'Poppins',sans-serif;color:var(--muted);margin-bottom:10px;display:block}
+  .head .back::after{content:' Volver'}
+  .head h3{font-size:34px;letter-spacing:0;text-transform:none;font-weight:500}
+  .scroll{overflow:visible;max-width:1120px;margin:0 auto;padding:14px 40px 72px!important}
+  #agenda .scroll,#evalprev .scroll,#privacidad .scroll,#faq .scroll,#test .scroll,#giftcards .scroll,#perfil .scroll,#mejorar .scroll{max-width:820px}
+  #agenda .head,#evalprev .head,#privacidad .head,#faq .head,#test .head,#giftcards .head,#perfil .head,#mejorar .head{max-width:820px}
+  #catList,#favList,#histList{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  #catList>*,#favList>*,#histList>*{margin:0!important}
+  .sheet-bg{position:fixed}
+  .sheet{position:fixed;left:50%;top:50%;right:auto;bottom:auto;width:min(760px,92vw);max-height:88vh;border-radius:26px;
+    transform:translate(-50%,-47%);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;padding:22px 36px 32px}
+  .sheet.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+  .toast{position:fixed;left:auto;right:32px;bottom:32px;width:400px}
+  .wafab{position:fixed;right:28px;bottom:28px}
+  .w-home{display:none}
+  body[data-r="home"] .w-home{display:block}
+  .w-foot{display:flex}
+  .subhello{text-align:left!important}
+}
+@media(max-width:999px){
+  .w-in,.head{padding-left:20px!important;padding-right:20px!important}
+  .scroll{padding-left:20px!important;padding-right:20px!important}
+  .w-top{flex-wrap:wrap!important;gap:10px!important}
+  .w-nav{order:3;width:100%;margin-left:0!important;overflow-x:auto;gap:18px!important;padding-bottom:4px;scrollbar-width:none}
+  .w-nav::-webkit-scrollbar{display:none}
+  .w-top .w-btn{margin-left:auto}
+  .w-hero{grid-template-columns:1fr!important;padding:28px 0 20px!important;gap:28px!important}
+  .w-hero h1{font-size:44px!important}
+  .w-band{flex-direction:column!important;align-items:flex-start!important;padding:28px 24px!important}
+  .head h3{font-size:28px}
+  .sheet{width:94vw;padding:18px 20px 26px}
+  .toast{right:16px;left:16px;width:auto;bottom:16px}
+}
+.w-in{max-width:1120px;margin:0 auto;padding:0 40px}
+.w-top{display:flex;align-items:center;gap:18px;padding-top:14px;padding-bottom:14px}
+.w-logo{display:flex;align-items:center;gap:12px;cursor:pointer}
+.w-logo img{width:40px}
+.w-logo b{font-family:'Playfair Display',serif;font-weight:500;letter-spacing:.18em;color:#A88452;font-size:15px;white-space:nowrap}
+.w-nav{display:flex;gap:16px;margin-left:auto}
+.w-nav a{color:var(--ink);text-decoration:none;font-size:13.5px;opacity:.78;white-space:nowrap;padding:6px 2px;border-bottom:2px solid transparent}
+.w-nav a:hover{opacity:1;color:var(--rose-deep)}
+.w-nav a.sel{opacity:1;color:var(--rose-deep);border-bottom-color:var(--rose)}
+.w-btn{border:0;border-radius:30px;padding:12px 22px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;
+  background:linear-gradient(135deg,var(--rose-mid),var(--rose-deep));color:#fff;box-shadow:var(--shadow-sm)}
+.w-btn:hover{filter:brightness(1.05)}
+.w-btn.alt{background:var(--white);color:var(--rose-deep);border:1px solid var(--line);box-shadow:none}
+.w-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding:64px 0 40px}
+.w-eyebrow{font-size:12px;letter-spacing:.22em;color:#A88452;margin-bottom:18px}
+.w-hero h1{font-family:'Playfair Display',serif;font-weight:500;color:var(--rose-deep);font-size:clamp(46px,4.8vw,68px);line-height:1.05}
+.w-hero h1 em{font-style:italic}
+.w-hero p{font-size:17px;color:var(--muted);max-width:520px;margin:20px 0 30px;line-height:1.6}
+.w-hero .ph{border-radius:28px;overflow:hidden;box-shadow:var(--shadow)}
+.w-hero .ph img{width:100%;display:block}
+.w-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.w-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.w-chips span{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:30px;padding:8px 14px;font-size:13px;color:#8E6A70}
+.w-sec{padding:48px 0 8px}
+.w-sec h2{font-family:'Playfair Display',serif;font-weight:500;color:var(--rose-deep);font-size:34px;margin-bottom:8px}
+.w-sec .w-lead{color:var(--muted);font-size:15px;margin-bottom:24px;max-width:640px;line-height:1.6}
+.w-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.w-card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 4px 14px rgba(165,76,92,.06);transition:transform .2s,box-shadow .2s}
+.w-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.w-card .e{font-size:26px;width:50px;height:50px;border-radius:50%;background:var(--rose-ghost);display:flex;align-items:center;justify-content:center}
+.w-card h3{font-family:'Playfair Display',serif;font-weight:500;font-size:19px;color:var(--ink)}
+.w-card small{color:var(--muted);font-size:12.5px}
+.w-card p{font-size:13.5px;color:#7A5A60;line-height:1.55;flex:1}
+.w-card .acts{display:flex;gap:8px;margin-top:6px}
+.w-card .acts button{flex:1;padding:9px 10px;font-size:13px}
+.w-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.w-fotos img{width:100%;border-radius:14px;cursor:zoom-in;box-shadow:0 4px 14px rgba(181,114,111,.18);transition:transform .2s}
+.w-fotos img:hover{transform:scale(1.02)}
+.w-band{margin:56px 0 8px;background:linear-gradient(120deg,#F6DBD9,#F3C9CD);border-radius:26px;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.w-band h3{font-family:'Playfair Display',serif;font-weight:500;color:var(--rose-deep);font-size:26px}
+.w-band p{color:#8E6A70;font-size:14.5px;margin-top:6px}
+.w-foot{max-width:1120px;margin:0 auto;padding:28px 40px 40px;border-top:1px solid var(--line);justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.w-foot a{color:var(--rose-deep);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="web" id="web"></div>
+<div class="phone">
+  <div class="notch"></div>
+  <div class="status"><span>9:41</span><span class="r">▪▪▪ &nbsp;⌃ &nbsp;▮</span></div>
+
+  <!-- ============ SPLASH ============ -->
+  <section class="screen on" id="splash">
+    <div class="sp-curves" aria-hidden="true">
+      <svg viewBox="0 0 412 890" preserveAspectRatio="none">
+        <path d="M-40,120 C120,220 60,430 -30,560" stroke="#fff" stroke-opacity=".55" stroke-width="26" fill="none"/>
+        <path d="M470,600 C330,690 300,810 340,930" stroke="#fff" stroke-opacity=".45" stroke-width="30" fill="none"/>
+      </svg>
+    </div>
+
+    <div class="sp-brand">
+      <img class="mtn" src="logo-montana.png" alt="Patagonia Glow">
+      <div class="pg logo-name">PATAGONIA GLOW</div>
+      <div class="logo-sub">ESTÉTICA · SALUD · BIENESTAR</div>
+    </div>
+
+    <div class="sp-copy">
+      <h1 class="serif sp-h1">Tu piel,<br>tu bienestar,<br><em>tu glow.</em></h1>
+      <p class="sp-sub">Descubre el cuidado ideal para ti.</p>
+      <button class="cta sp-cta" onclick="go('home')">Descubrir mi cuidado ideal <span class="sp-ar">→</span></button>
+      <button class="sp-login" onclick="go('perfil')">Iniciar sesión</button>
+    </div>
+
+    <div class="sp-sedes">Santiago · Punta Arenas</div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen" id="home">
+    <div class="scroll">
+      <!-- el logo vuelve a la portada; el enlace de abajo lleva a "Sobre" -->
+      <div class="top-brand fade-up" onclick="go('splash')" role="button" tabindex="0"
+           title="Volver a la portada" style="cursor:pointer">
+        <img class="mtn tiny" src="logo-montana.png" alt="">
+        <div class="pg logo-name">PATAGONIA GLOW</div>
+        <div class="logo-sub">ESTÉTICA · SALUD · BIENESTAR</div>
+      </div>
+      <div class="hello fade-up serif">¡Hola! Bienvenida a Patagonia Glow <span class="hh">♥</span></div>
+      <div class="homephrase fade-up">Tu mejor versión, cuidada con intención.</div>
+      <div class="homephrase2 fade-up">Tratamientos personalizados para realzar tu belleza de forma natural.</div>
+      <button class="ab-link fade-up" onclick="go('sobre')">Conoce Patagonia Glow <span>›</span></button>
+
+      <div class="appt fade-up">
+        <div class="lbl">Tu próxima cita</div>
+        <div class="svc serif">Limpieza Facial Profunda</div>
+        <div class="when">🗓️ Vie 14 de junio · 16:30 hrs</div>
+        <button class="det" onclick="toast('Detalles de tu cita 💆‍♀️')">Ver detalles</button>
+      </div>
+
+      <div id="postHome"></div>
+
+      <div class="bigbook fade-up" style="margin-top:16px" onclick="go('agenda')">
+        <div class="bi">${cal}</div>
+        <div class="bt"><b>Agendar tu hora</b><small>Reserva en simple, cuando quieras</small></div>
+        <span style="font-size:22px">›</span>
+      </div>
+
+      <div class="sec-title">¿Qué quieres mejorar?</div>
+      <div class="needgrid" id="needsHome"></div>
+
+      <div class="ia" style="margin-top:22px" onclick="openTest()">
+        <div class="bot">🤖</div>
+        <div class="tt"><b>Descubre qué necesita tu piel</b><p>Test rápido · recomendación personalizada ✨</p></div>
+        <span style="color:var(--rose);font-size:20px">›</span>
+      </div>
+
+      <div class="sec-title">Tratamientos recomendados <a onclick="go('catalogo')">Ver todos</a></div>
+      <div id="svcHome"></div>
+
+      <div class="provlink fade-up" onclick="go('sobre')">
+        <div class="pl-av">JB</div>
+        <div class="pl-t"><b>Quién te atenderá</b><small>Jodie Berríos · Enfermera</small></div>
+        <span style="color:var(--rose);font-size:20px">›</span>
+      </div>
+
+      <div class="grid" style="margin-top:20px">
+        <div class="tile" onclick="go('catalogo')"><div class="ic">${grid}</div><span>Catálogo</span></div>
+        <div class="tile" onclick="go('resultados')"><div class="ic">${chart}</div><span>Mi evolución</span></div>
+        <div class="tile" onclick="go('cuidados')"><div class="ic">${clip}</div><span>Cuidados de piel</span></div>
+        <div class="tile" onclick="go('giftcards')"><div class="ic">${gift}</div><span>Gift Cards</span></div>
+        <div class="tile" onclick="go('sobre')"><div class="ic">${heart}</div><span>Sobre nosotras</span></div>
+        <div class="tile" onclick="waGeneral()"><div class="ic">${cal}</div><span>WhatsApp</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AGENDA ============ -->
+  <section class="screen" id="agenda">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Agenda tu hora</h3></div>
+    <div class="scroll" style="padding-top:14px">
+      <div class="pick">Elige la sede</div>
+      <div class="chipwrap" id="sedes"></div>
+
+      <div class="pick">Profesional</div>
+      <div class="prochip"><div class="pa">JB</div><div class="pt"><b>Jodie Berríos</b><small>Enfermera</small></div></div>
+
+      <div class="pick" style="margin-top:22px">Selecciona el servicio</div>
+      <div id="svcAgenda"></div>
+
+      <div class="pick" style="margin-top:22px">Elige el día</div>
+      <div class="chipwrap" id="days"></div>
+
+      <div class="pick">Horarios disponibles</div>
+      <div class="times" id="times"></div>
+
+      <div id="resumen"></div>
+
+      <button class="cta" style="margin-top:20px" onclick="confirmBooking()">Confirmar reserva</button>
+    </div>
+  </section>
+
+  <!-- ============ MI EVOLUCIÓN ============ -->
+  <section class="screen" id="resultados">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Mi evolución</h3></div>
+    <div class="scroll" style="padding-top:16px">
+      <div class="tabs">
+        <button class="sel" id="tabMis" onclick="showRes('mis')">Mis resultados</button>
+        <button id="tabPub" onclick="showRes('pub')">Resultados reales</button>
+      </div>
+      <div id="resBody"></div>
+      <div class="resnote">Los resultados pueden variar entre pacientes</div>
+    </div>
+  </section>
+
+  <!-- ============ PERFIL ============ -->
+  <section class="screen" id="perfil">
+    <div class="head"><h3>Mi Perfil</h3></div>
+    <div class="scroll" style="padding-top:18px">
+      <div class="pavatar">V</div>
+      <div class="pname">Valentina Rojas</div>
+      <div class="pmail">valentina@correo.cl</div>
+
+      <div class="points">
+        <div><small>Puntos de fidelidad</small><div class="big">1.240</div></div>
+        <div style="font-size:34px">🌟</div>
+      </div>
+      <div class="ptshow" id="ptsExplain"></div>
+
+      <div class="mlist">
+        <div class="mrow" onclick="go('favoritos')"><div class="mi">${heart}</div><span>Mis favoritos</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('historial')"><div class="mi">${cal}</div><span>Historial de sesiones</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('giftcards')"><div class="mi">${gift}</div><span>Mis Gift Cards</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('cuidados')"><div class="mi">${clip}</div><span>Cuidados de piel</span><span class="chev">›</span></div>
+      </div>
+
+      <div class="sec-title" style="font-size:16px;margin-bottom:8px">Ayuda e información</div>
+      <div class="mlist">
+        <div class="mrow" onclick="go('faq')"><div class="mi">${clip}</div><span>Preguntas frecuentes</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('resenas')"><div class="mi">${heart}</div><span>Opiniones</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('sobre')"><div class="mi">${user}</div><span>Sobre Patagonia Glow</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="toast('Consentimientos y documentos 📄 (pronto)')"><div class="mi">${clip}</div><span>Consentimientos y documentos</span><span class="chev">›</span></div>
+        <div class="mrow" onclick="go('privacidad')"><div class="mi">${clip}</div><span>Política de privacidad</span><span class="chev">›</span></div>
+      </div>
+
+      <!-- vuelve a la portada (la pantalla con "Iniciar sesión") -->
+      <div class="mlist">
+        <div class="mrow salir" onclick="go('splash')">
+          <div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M6.6 6.6a8 8 0 1 0 10.8 0"/></svg></div>
+          <span>Cerrar sesión</span><span class="chev">›</span>
+        </div>
+      </div>
+
+      <div class="sec-title" style="font-size:16px">Nuestras sucursales</div>
+      <div class="branch">
+        <div><b>Santiago</b><small>Consulta dirección</small></div>
+        <div><b>Punta Arenas</b><small>Consulta dirección</small></div>
+      </div>
+      <div style="text-align:center;margin-top:24px;font-family:'Playfair Display',serif;font-style:italic;color:var(--rose-mid);font-size:15px">Tu bienestar, nuestra pasión ♥</div>
+    </div>
+  </section>
+
+  <!-- ============ TEST DE PIEL ============ -->
+  <section class="screen" id="test">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Descubre tu piel</h3></div>
+    <div class="scroll" style="padding-top:16px"><div id="quizWrap"></div></div>
+  </section>
+
+  <!-- ============ CATÁLOGO ============ -->
+  <section class="screen" id="catalogo">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Tratamientos</h3></div>
+    <div class="scroll" style="padding-top:16px">
+      <div class="subhello" style="text-align:center;margin:0 0 16px">Todo lo que <b>Patagonia Glow</b> tiene para ti 🌸</div>
+      <div id="catList"></div>
+      <div class="rdisc" style="text-align:center;padding:4px 8px 6px">Cada tratamiento se define en una evaluación profesional personalizada con Jodie Berríos (enfermera).</div>
+    </div>
+  </section>
+
+  <!-- ============ CUIDADOS ============ -->
+  <section class="screen" id="cuidados">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Cuidados de piel</h3></div>
+    <div class="scroll" style="padding-top:16px">
+      <div class="subhello" style="text-align:center;margin:0 0 12px">Recomendaciones de enfermería <b>según tu piel</b> 💗</div>
+      <div class="skinpick" id="skinPick"></div>
+      <div id="careBody"></div>
+      <div class="rdisc" style="text-align:center;padding:12px 8px 6px">Consejos generales de cuidado y bienestar. No reemplazan una evaluación profesional.</div>
+    </div>
+  </section>
+
+  <!-- ============ SOBRE / QUIÉN TE ATENDERÁ ============ -->
+  <section class="screen" id="sobre">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Sobre Patagonia Glow</h3></div>
+    <div class="scroll" style="padding-top:14px">
+      <div class="ab-hero fade-up">
+        <img class="mtn sm" src="logo-montana.png" alt="">
+        <div class="ab-name">PATAGONIA GLOW</div>
+        <div class="ab-sub">ESTÉTICA · SALUD · BIENESTAR</div>
+      </div>
+
+      <div class="ab-card fade-up">
+        <div class="ab-ico">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <g fill="none" stroke="#C9A063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M24 38c-7 0-12-5-12-11 0 0 5 1 8 5 0-7 4-13 4-13s4 6 4 13c3-4 8-5 8-5 0 6-5 11-12 11Z"/>
+              <path d="M24 38c-9 0-15-4-15-4s3-3 8-3M24 38c9 0 15-4 15-4s-3-3-8-3"/>
+              <path d="M35 13l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9Z" stroke-opacity=".8"/>
+            </g>
+          </svg>
+        </div>
+        <div class="ab-txt">
+          <div class="ab-t serif">Nuestra esencia</div>
+          <p>Creamos experiencias de cuidado personalizadas, pensadas para acompañarte en cada etapa y ayudarte a elegir lo más adecuado para ti.</p>
+        </div>
+      </div>
+
+      <div class="ab-h serif">Tu experiencia Patagonia Glow</div>
+
+      <div class="ab-step fade-up">
+        <span class="ab-n">1</span>
+        <span class="ab-si"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke="#C9A063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a3 3 0 0 1 3-3h11a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-7l-4 3v-3H8a3 3 0 0 1-3-3Z"/><path d="M25 12a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3h-1v3l-4-3h-4"/></g></svg></span>
+        <span class="ab-sl"></span>
+        <span class="ab-stx">Cuéntanos qué necesitas</span>
+      </div>
+
+      <div class="ab-step fade-up">
+        <span class="ab-n">2</span>
+        <span class="ab-si"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke="#C9A063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6H9a2 2 0 0 0-2 2v18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><rect x="11" y="4" width="10" height="4" rx="1.4"/><path d="M12 15l2 2 4-4M12 22l2 2 4-4"/></g></svg></span>
+        <span class="ab-sl"></span>
+        <span class="ab-stx">Recibe una recomendación personalizada</span>
+      </div>
+
+      <div class="ab-step fade-up">
+        <span class="ab-n">3</span>
+        <span class="ab-si"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke="#C9A063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="22" height="20" rx="2.6"/><path d="M5 13h22M11 4v5M21 4v5"/><circle cx="11.5" cy="18" r="1.1" fill="#C9A063" stroke="none"/><circle cx="16" cy="18" r="1.1" fill="#C9A063" stroke="none"/><circle cx="20.5" cy="18" r="1.1" fill="#C9A063" stroke="none"/><circle cx="11.5" cy="22.5" r="1.1" fill="#C9A063" stroke="none"/><circle cx="16" cy="22.5" r="1.1" fill="#C9A063" stroke="none"/></g></svg></span>
+        <span class="ab-sl"></span>
+        <span class="ab-stx">Agenda y sigue tu evolución</span>
+      </div>
+
+      <div class="ab-h serif">Nuestras sedes</div>
+      <div class="ab-sedes">
+        <div class="ab-sede fade-up">
+          <svg viewBox="0 0 120 74" aria-hidden="true">
+            <circle cx="42" cy="34" r="21" fill="#FBEDE4"/>
+            <g fill="none" stroke="#C9A063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 62h92"/>
+              <path d="M34 62V34l12-11 12 11v28"/>
+              <path d="M46 23v-7M42 18h8"/>
+              <rect x="42" y="44" width="8" height="18" rx="4"/>
+              <path d="M78 62V44M78 40c-6-6-13-4-13-4s4 7 13 4Zm0 0c6-6 13-4 13-4s-4 7-13 4Zm0 0c0-8 5-12 5-12s3 8-5 12Z"/>
+            </g>
+          </svg>
+          <div class="ab-sn">Santiago</div>
+        </div>
+        <div class="ab-sede fade-up">
+          <svg viewBox="0 0 120 74" aria-hidden="true">
+            <g fill="none" stroke="#C9A063" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 62h92"/>
+              <path d="M8 46 L30 26 L44 40 L54 32 L70 46" stroke-opacity=".45"/>
+              <path d="M44 62V40h32v22"/>
+              <path d="M60 40c0-8-7-9-7-14 0-4 3-7 7-7s7 3 7 7c0 5-7 6-7 14Z"/>
+              <path d="M54 62V50a6 6 0 0 1 12 0v12"/>
+              <path d="M92 34c4 2 7 6 7 6s-5 2-9-1-3-8-3-8 3 1 5 3Z" stroke-opacity=".8"/>
+            </g>
+          </svg>
+          <div class="ab-sn">Punta Arenas</div>
+        </div>
+      </div>
+
+      <button class="cta ab-cta" onclick="go('agenda')">Agendar una evaluación</button>
+      <button class="ab-wa" onclick="waGeneral()">Resolver dudas por WhatsApp</button>
+      <div class="rdisc" style="text-align:center">Los tratamientos comienzan con una evaluación profesional personalizada. Los resultados pueden variar entre personas.</div>
+    </div>
+  </section>
+
+  <!-- ============ ¿QUÉ QUIERES MEJORAR? ============ -->
+  <section class="screen" id="mejorar">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Lo que buscas</h3></div>
+    <div class="scroll" style="padding-top:16px"><div id="mejorarBody"></div></div>
+  </section>
+
+  <!-- ============ EVALUACIÓN PREVIA ============ -->
+  <section class="screen" id="evalprev">
+    <div class="head"><button class="back" onclick="go('agenda')">‹</button><h3>Evaluación previa</h3></div>
+    <div class="scroll" style="padding-top:16px">
+      <div class="formnote">Esta evaluación es <b>preliminar</b> y ayuda a Jodie a prepararse. <b>No reemplaza la evaluación presencial.</b></div>
+
+      <div class="field"><label>Fotos de tu rostro</label>
+        <div class="photorow">
+          <label class="photobtn" id="pb-frente"><span class="pe">📷</span>Frente<input type="file" accept="image/*" hidden onchange="markPhoto('pb-frente')"></label>
+          <label class="photobtn" id="pb-perfil"><span class="pe">📷</span>Perfil<input type="file" accept="image/*" hidden onchange="markPhoto('pb-perfil')"></label>
+        </div>
+      </div>
+
+      <div class="field"><label>Motivo de consulta</label><textarea placeholder="¿Qué te gustaría mejorar o resolver?"></textarea></div>
+      <div class="field"><label>Tratamientos anteriores</label><input type="text" placeholder="Ej: limpieza facial, ninguno…"></div>
+      <div class="field"><label>Alergias</label><input type="text" placeholder="Ej: ninguna conocida"></div>
+      <div class="field"><label>Medicamentos que tomas</label><input type="text" placeholder="Ej: ninguno"></div>
+      <div class="field"><label>Enfermedades importantes</label><input type="text" placeholder="Ej: ninguna"></div>
+
+      <div class="field"><label>¿Estás embarazada o amamantando?</label>
+        <div class="togrow"><button onclick="tog(this)">Sí</button><button class="sel" onclick="tog(this)">No</button></div>
+      </div>
+
+      <div class="field"><label>Resultado que deseas conseguir</label><textarea placeholder="Cuéntanos qué esperas del tratamiento"></textarea></div>
+
+      <button class="cta" onclick="submitEval()">Enviar evaluación</button>
+      <div class="rdisc" style="text-align:center">Con esta información Jodie confirmará contigo si el procedimiento es adecuado y su plan.</div>
+    </div>
+  </section>
+
+  <!-- ============ GIFT CARDS ============ -->
+  <section class="screen" id="giftcards">
+    <div class="head"><button class="back" onclick="go('home')">‹</button><h3>Gift Cards</h3></div>
+    <div class="scroll" style="padding-top:16px">
+      <div id="gcPreview"></div>
+      <div class="pick">Ocasión</div>
+      <div class="occhips" id="gcOcc"></div>
+      <div class="pick" style="margin-top:16px">Monto</div>
+      <div class="amtchips" id="gcAmt"></div>
+      <div class="field" style="margin-top:16px"><label>Tratamiento (opcional)</label><input type="text" id="gcTrat" placeholder="Ej: BB Glow · o déjalo como monto libre" oninput="renderGC()"></div>
+      <div class="field"><label>Para quién es</label><input type="text" id="gcTo" placeholder="Nombre de quien recibe" oninput="renderGC()"></div>
+      <div class="field"><label>Dedicatoria</label><textarea id="gcDed" placeholder="Escribe un mensaje bonito" oninput="renderGC()"></textarea></div>
+      <div class="field"><label>Fecha de envío</label><input type="text" id="gcDate" placeholder="Ej: 20 de agosto" oninput="renderGC()"></div>
+      <button class="cta" onclick="toast('Gift Card lista para descargar 🎁')">Descargar tarjeta</button>
+      <button class="cta wa" onclick="waGeneral()">Compartir por WhatsApp</button>
+      <div class="rdisc" style="text-align:center">Vigencia 6 meses desde la compra · Válida en todas las sedes · Consulta condiciones.</div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="screen" id="faq">
+    <div class="head"><button class="back" onclick="go('perfil')">‹</button><h3>Preguntas frecuentes</h3></div>
+    <div class="scroll" style="padding-top:16px"><div id="faqList"></div></div>
+  </section>
+
+  <!-- ============ RESEÑAS ============ -->
+  <section class="screen" id="resenas">
+    <div class="head"><button class="back" onclick="go('perfil')">‹</button><h3>Reseñas</h3></div>
+    <div class="scroll" style="padding-top:16px"><div id="revList"></div>
+      <div class="rdisc" style="text-align:center">Opiniones reales de nuestras pacientes, con su autorización (próximamente).</div></div>
+  </section>
+
+  <!-- ============ FAVORITOS ============ -->
+  <section class="screen" id="favoritos">
+    <div class="head"><button class="back" onclick="go('perfil')">‹</button><h3>Mis favoritos</h3></div>
+    <div class="scroll" style="padding-top:16px"><div id="favList"></div></div>
+  </section>
+
+  <!-- ============ HISTORIAL ============ -->
+  <section class="screen" id="historial">
+    <div class="head"><button class="back" onclick="go('perfil')">‹</button><h3>Historial de sesiones</h3></div>
+    <div class="scroll" style="padding-top:16px"><div id="histList"></div></div>
+  </section>
+
+  <!-- ============ PRIVACIDAD ============ -->
+  <section class="screen" id="privacidad">
+    <div class="head"><button class="back" onclick="go('perfil')">‹</button><h3>Privacidad</h3></div>
+    <div class="scroll" style="padding-top:16px">
+      <div class="privtext">
+        En Patagonia Glow cuidamos tus datos con el mismo respeto con que cuidamos tu piel.
+        <h5>Qué guardamos</h5>Tus datos de contacto, tu ficha de evaluación y las fotos que subas para tu seguimiento.
+        <h5>Para qué los usamos</h5>Solo para atenderte: preparar tu evaluación, agendar tus citas y hacer seguimiento de tus resultados.
+        <h5>Tus fotos</h5>Tus fotografías son privadas. No las publicamos sin tu autorización expresa por escrito.
+        <h5>Tus derechos</h5>Puedes pedir ver, corregir o eliminar tus datos cuando quieras, escribiéndonos por WhatsApp.
+      </div>
+      <button class="cta wa" style="margin-top:18px" onclick="waGeneral()">Escribir por WhatsApp</button>
+    </div>
+  </section>
+
+  <!-- ============ NAV ============ -->
+  <nav class="nav" id="nav" style="display:none">
+    <button data-s="home" class="sel" onclick="go('home')"><span class="nic">${home}</span>Inicio</button>
+    <button data-s="agenda" onclick="go('agenda')"><span class="nic">${cal}</span>Agenda</button>
+    <button data-s="resultados" onclick="go('resultados')"><span class="nic">${chart}</span>Evolución</button>
+    <button data-s="perfil" onclick="go('perfil')"><span class="nic">${user}</span>Perfil</button>
+  </nav>
+
+  <div class="sheet-bg" id="sheetBg" onclick="closeDetail()"></div>
+  <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
+  <button class="wafab" id="wafab" style="display:none" onclick="waGeneral()" aria-label="Consultar por WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.6.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.6-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5-.1-.2-.6-1.5-.9-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.7.7-1 1.6-1 2.6 0 .9.4 1.8.6 2.1.2.3 2.4 3.9 5.9 5.3 2.1.9 2.9.9 4 .8.6-.1 1.7-.7 2-1.4.2-.6.2-1.2.2-1.4-.1-.1-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.4 1.3 4.9L2 22l5.3-1.4c1.4.8 3 1.2 4.7 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.5 0-3-.4-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.4 14.9 4 13.5 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8z"/></svg>
+  </button>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ---- inline icon set (defined before HTML uses ${...} via template replace below) ---- */
+</script>
+<script>
+const I = {
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',
+ heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.3-9.2-8.4C1.2 8.7 2.7 5.5 6 5.5c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.3 0 4.8 3.2 3.2 6.1C19 15.7 12 20 12 20z"/></svg>',
+ chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>',
+ clip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2.5"/><path d="M9 4a3 3 0 0 1 6 0M9 11h6M9 15h4"/></svg>',
+ grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>',
+ gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="12" rx="2.5"/><path d="M3.5 12h17M12 8v12M12 8s-1.5-4-4-4-2.5 4 4 4zM12 8s1.5-4 4-4 2.5 4-4 4z"/></svg>',
+ home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6.5L20 11M6 10v9h12v-9"/></svg>',
+ user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-5 8-5s6.5 1 8 5"/></svg>',
+ // service icons
+ hair:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C9 8 6 10 6 14a6 6 0 0 0 12 0c0-4-3-6-6-11z"/><path d="M10 15a2 2 0 0 0 2 2"/></svg>',
+ face:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M9 11h.01M15 11h.01M9 15c1.5 1.2 4.5 1.2 6 0"/><path d="M7 6c1.5 1 8.5 1 10 0"/></svg>',
+ profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c5 0 9 3.5 9 9 0 3-1.5 4-1.5 6.5 0 1.5 1 2.5 1 2.5M8 3C5 5 5 9 7 12c1.5 2 1 3.5-.5 4.5"/><path d="M12 11h.01"/></svg>',
+ syringe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6M17 5l2 2M13 7l4 4-7 7H6v-4z"/><path d="M9 12l2 2"/></svg>',
+ body:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M8 9h8M9 21c0-4 1-7 3-7s3 3 3 7"/></svg>',
+ iv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="12" rx="2"/><path d="M8 8h8M12 15v4a2 2 0 0 0 2 2h2"/></svg>'
+};
+// inject icons into markup placeholders
+const cal=I.cal,heart=I.heart,chart=I.chart,clip=I.clip,grid=I.grid,gift=I.gift,home=I.home,user=I.user;
+document.querySelectorAll('.tile .ic, .mrow .mi, .nav .nic').forEach(()=>{});
+document.body.innerHTML = document.body.innerHTML
+  .replace(/\$\{cal\}/g,I.cal).replace(/\$\{heart\}/g,I.heart).replace(/\$\{chart\}/g,I.chart)
+  .replace(/\$\{clip\}/g,I.clip).replace(/\$\{grid\}/g,I.grid).replace(/\$\{gift\}/g,I.gift)
+  .replace(/\$\{home\}/g,I.home).replace(/\$\{user\}/g,I.user);
+
+/* ---- services data ----
+   Ficha completa por tratamiento (correo Jodie, 25-jul). Lenguaje seguro:
+   "ayuda a mejorar / favorece / atenúa la apariencia", nunca "elimina" ni "garantizado".
+   precio:'' → se muestra "A confirmar en tu evaluación" (Jodie define los valores reales).
+   Campos clínicos (sesiones, recuperación, contraindicaciones): Jodie debe revisarlos. */
+const TREATMENTS=[
+ {e:'🌸',n:'Pink Glow',cat:['luminosidad','hidratacion'],dur:'45 min',precio:'',eval:false,
+  d:'Tratamiento de hidratación y luminosidad: deja la piel suave, fresca y con efecto glow.',
+  b:['Hidratación','Luminosidad','Suavidad'],
+  quees:'Un tratamiento facial de hidratación intensiva y luminosidad, pensado para dar un efecto de piel descansada y radiante.',
+  sirve:'Favorece una piel más hidratada, luminosa y de textura suave, ideal antes de un evento o como cuidado de mantención.',
+  mejora:['Falta de luminosidad','Sensación de piel apagada o seca','Textura poco uniforme'],
+  paraquien:'Para quienes buscan un glow inmediato y una piel más fresca, en la mayoría de los tipos de piel.',
+  incluye:'Limpieza, aplicación de activos hidratantes, mascarilla y finalización con protección.',
+  sesiones:'Puede realizarse de forma puntual o en plan de mantención (se define en evaluación).',
+  recup:'Sin tiempo de recuperación; puedes retomar tu día con normalidad.',
+  previos:['Llega con la piel limpia, sin maquillaje si es posible.'],
+  posteriores:['Hidrata y usa protector solar durante el día.'],
+  contra:['Lesiones, irritación o infección activa en la piel.','Alergia a alguno de los activos (se revisa en evaluación).']},
+ /* BB Glow — ficha rediseñada con el correo de Jodie del 29-ago.
+    Usa la PLANTILLA DERMAPEN (DERMAPEN_PASOS + VIALES, más abajo).
+    'quitar' desactiva pasos o partes de un paso para este tratamiento,
+    ej: quitar:['dermo','altafrec']. Sin 'recup': el enrojecimiento va,
+    tranquilo, dentro de los cuidados posteriores (pedido de Jodie). */
+ {e:'💫',n:'BB Glow',cat:['luminosidad','manchas','marcas'],dur:'60 a 90 minutos',precio:'',eval:true,
+  plantilla:'dermapen', quitar:[],
+  d:'Dermapen, activos elegidos para tu piel y un pigmento personalizado para una piel más luminosa y de tono más uniforme.',
+  b:['Luminosidad','Tono más uniforme','Apariencia de manchas'],
+  resumen:'Tratamiento facial con Dermapen, un vial de activos elegido para tu piel y un pigmento personalizado según tu tono. Ayuda a mejorar visualmente la luminosidad y la uniformidad de la piel, con resultados progresivos.',
+  quees:'BB Glow es un tratamiento facial realizado con Dermapen, activos cosméticos seleccionados según las necesidades de la piel y un pigmento personalizado que ayuda a mejorar visualmente la luminosidad, la uniformidad del tono y la apariencia de manchas e imperfecciones superficiales.',
+  mejora:['Tono apagado o visualmente poco uniforme.','Apariencia de manchas superficiales.','Marcas postacné superficiales.','Textura y luminosidad de la piel.','Apariencia general de una piel cansada.'],
+  notaResultados:'Los resultados son progresivos y pueden variar según el tipo de piel, el número de sesiones y los cuidados posteriores.',
+  pigmento:'Luego de aplicar el vial seleccionado con Dermapen, se utiliza un pigmento cosmético personalizado según el tono de la piel. Su objetivo es ayudar a disimular visualmente manchas e imperfecciones superficiales y conseguir una apariencia más uniforme.',
+  sesiones:'Suele trabajarse en plan de varias sesiones; la cantidad se define en tu evaluación.',
+  previos:['Evita exfoliar o exponerte al sol los días previos.','Llega sin maquillaje.'],
+  /* Los 5 primeros son los que se ven en la vista principal. */
+  posteriores:[
+   'Es esperable que la piel se observe ligeramente rosada, sensible o con sensación de calor después del procedimiento. Generalmente disminuye progresivamente y puede durar hasta 48 horas.',
+   'Aplicar Cicaplast Baume B5+ en una capa fina, con la frecuencia indicada, siempre que la piel lo tolere. Aplicar sobre piel limpia y seca, evitando heridas abiertas y el contorno de ojos.',
+   'Utilizar protector solar de amplio espectro FPS 50+ y reaplicarlo durante el día.',
+   'Evitar maquillaje durante las primeras 24 horas o hasta que la piel se encuentre recuperada.',
+   'No tocar, rascar, frotar ni retirar pequeñas costras.',
+   'No utilizar ácidos, retinoides, exfoliantes, peróxido de benzoilo ni productos irritantes durante aproximadamente 5 a 7 días o hasta recuperar completamente la piel.',
+   'Evitar sol directo, calor intenso, ejercicio vigoroso, sudor excesivo, sauna y vapor durante 24 a 48 horas.',
+   'Evitar piscinas, mar y jacuzzi durante 48 horas.',
+   'No realizar depilación, peeling, láser, radiofrecuencia ni otros procedimientos faciales hasta que la piel esté recuperada.',
+   'Utilizar limpiador suave, sin alcohol, perfume ni partículas exfoliantes.',
+   'Cambiar la funda de la almohada y utilizar una toalla limpia para el rostro.',
+   'Seguir siempre las indicaciones específicas entregadas después de la sesión.'],
+  contra:['Embarazo o lactancia.','Acné activo, heridas, herpes, irritación o infección en la piel.','Alergia a los activos.'],
+  alerta:'Comunícate con Patagonia Glow si presentas dolor intenso o creciente, inflamación progresiva, secreción, ampollas, cambios importantes en la coloración o enrojecimiento que empeora después de 48 horas. Si presentas dificultad para respirar o inflamación de labios, lengua o rostro, busca atención de urgencia.'},
+ {e:'🌿',n:'Limpieza Facial Profunda',cat:['hidratacion'],dur:'60 min',precio:'',eval:false,
+  d:'Limpieza, extracción y descongestión de la piel. La base de cualquier rutina sana.',
+  b:['Poros limpios','Piel fresca'],
+  quees:'Un protocolo de higiene facial profunda que limpia, descongestiona y prepara la piel.',
+  sirve:'Ayuda a mantener los poros limpios, favorece una piel más fresca y potencia el resultado de otros tratamientos.',
+  mejora:['Poros congestionados','Piel opaca o con impurezas','Textura irregular'],
+  paraquien:'Para casi todos los tipos de piel; excelente como primer paso o cuidado de rutina.',
+  incluye:'Limpieza, exfoliación suave, extracción, mascarilla según tu piel y finalización con protección.',
+  sesiones:'Se recomienda de forma periódica como mantención (se define en evaluación).',
+  recup:'Sin tiempo de recuperación; puede quedar una leve rojez que baja en horas.',
+  previos:['Llega sin maquillaje si es posible.'],
+  posteriores:['Evita maquillaje y sol directo por unas horas.','Hidrata y usa protector solar.'],
+  contra:['Lesiones o infección activa en la piel.','Rosácea o irritación marcada (se valora antes).']},
+ {e:'🧬',n:'ADN de salmón con Dermapen',cat:['rejuvenecimiento','lineas','hidratacion'],dur:'45 min',precio:'',eval:true,
+  d:'Apoya la hidratación, la elasticidad y la calidad de la piel. Resultados graduales.',
+  b:['Elasticidad','Calidad de piel'],
+  quees:'Tratamiento con polinucleótidos (PDRN) que favorece la calidad, hidratación y elasticidad de la piel.',
+  sirve:'Ayuda a mejorar la firmeza, la hidratación profunda y la apariencia general de la piel de forma gradual.',
+  mejora:['Piel deshidratada o fatigada','Pérdida de elasticidad','Líneas finas'],
+  paraquien:'Para quienes buscan mejorar la calidad de la piel de forma progresiva; requiere evaluación.',
+  incluye:'Preparación y limpieza de la piel, aplicación de PDRN mediante Dermapen y finalización con productos calmantes y protección solar.',
+  sesiones:'Se trabaja en plan de varias sesiones; la cantidad se define en evaluación.',
+  recup:'Puede quedar un leve enrojecimiento; los resultados aparecen de forma gradual.',
+  previos:['Llega sin maquillaje.','Evita exponerte al sol los días previos.'],
+  posteriores:['Evita maquillaje y calor intenso por unas horas.','Usa protector solar.'],
+  contra:['Embarazo o lactancia.','Alergia al pescado/derivados (se revisa en evaluación).','Lesiones o infección en la piel.']},
+ {e:'💉',n:'ADN de salmón inyectable',cat:['rejuvenecimiento','lineas','hidratacion','firmeza'],dur:'45–60 minutos',precio:'',eval:true,
+  d:'Microinyecciones de PDRN en puntos estratégicos para mejorar progresivamente la calidad de la piel.',
+  b:['Bioestimulación','Calidad de piel'],
+  quees:'Tratamiento de bioestimulación en el que se aplican pequeñas dosis de polinucleótidos (PDRN) directamente en puntos estratégicos de la piel mediante microinyecciones.',
+  sirve:'Ayuda a mejorar progresivamente la hidratación, firmeza, elasticidad, luminosidad y calidad general de la piel, favoreciendo una apariencia más revitalizada.',
+  mejora:['Piel deshidratada, opaca o fatigada.','Pérdida de firmeza y elasticidad.','Líneas finas.','Textura irregular.','Signos visibles del envejecimiento.'],
+  paraquien:'Para personas que buscan mejorar la calidad de su piel mediante un tratamiento inyectable de bioestimulación. La indicación y el plan se determinan durante la evaluación profesional.',
+  incluye:'Evaluación, preparación y limpieza de la piel, aplicación del producto mediante microinyecciones y recomendaciones de cuidados posteriores.',
+  sesiones:'La cantidad y frecuencia de las sesiones se determina de manera personalizada según las características de la piel, el producto utilizado y los objetivos de cada paciente.',
+  recup:'Pueden aparecer pequeñas elevaciones o “pápulas” en los puntos de aplicación, además de enrojecimiento, sensibilidad, inflamación leve o pequeños hematomas. Generalmente disminuyen progresivamente durante las siguientes horas o días.',
+  previos:['Llegar sin maquillaje.','Informar medicamentos, enfermedades, alergias y procedimientos recientes.','Evitar alcohol durante las 24 horas previas.','No suspender medicamentos indicados por un médico sin su autorización.'],
+  posteriores:['No tocar, presionar ni masajear la zona, salvo indicación profesional.','Evitar maquillaje durante las primeras 12–24 horas.','Evitar ejercicio intenso, sauna, piscina, calor y alcohol por 24–48 horas.','Evitar exposición solar directa y utilizar protector solar.','Seguir las indicaciones entregadas por la profesional.'],
+  contra:['Embarazo o lactancia.','Infección, heridas o inflamación activa en la zona.','Antecedentes de alergia o hipersensibilidad a los componentes del producto.','Enfermedades autoinmunes, alteraciones de coagulación o enfermedades descompensadas, según evaluación.','Uso de anticoagulantes o medicamentos relevantes, que deben informarse previamente.']},
+ {e:'🩸',n:'PRP Facial',cat:['rejuvenecimiento','marcas','lineas'],dur:'60 min',precio:'',eval:true,
+  d:'Plasma rico en plaquetas para favorecer la renovación de la piel y mejorar la textura.',
+  b:['Renovación','Textura'],
+  quees:'Tratamiento que utiliza tu propio plasma rico en plaquetas para estimular la renovación natural de la piel.',
+  sirve:'Favorece la mejora de la textura, la luminosidad y la calidad general de la piel.',
+  mejora:['Textura irregular','Marcas superficiales de acné','Piel apagada o cansada'],
+  paraquien:'Para quienes buscan una renovación con tus propios factores; requiere evaluación y análisis previo.',
+  incluye:'Extracción de una pequeña muestra de sangre, procesamiento del plasma y aplicación en la piel.',
+  sesiones:'Suele realizarse en plan de sesiones; se define en evaluación.',
+  recup:'Puede quedar enrojecimiento temporal; los resultados son graduales.',
+  previos:['Hidrátate bien el día previo.','Evita antiinflamatorios si no son indispensables.'],
+  posteriores:['Evita maquillaje, calor intenso y ejercicio vigoroso por unas horas.','Usa protector solar.'],
+  contra:['Embarazo o lactancia.','Alteraciones de la coagulación o ciertos tratamientos médicos.','Infección o lesiones en la zona.']},
+ {e:'📡',n:'Radiofrecuencia',cat:['rejuvenecimiento','firmeza'],dur:'45 min',precio:'',eval:false,
+  d:'Trabaja firmeza, elasticidad y flacidez leve. Resultados graduales y variables.',
+  b:['Firmeza','Reafirma'],
+  quees:'Tratamiento que aplica calor controlado para favorecer la firmeza y la elasticidad de la piel.',
+  sirve:'Ayuda a mejorar la apariencia de firmeza y a atenuar la flacidez leve de forma gradual.',
+  mejora:['Flacidez leve','Pérdida de firmeza','Contorno poco definido'],
+  paraquien:'Para quienes buscan reafirmar sin procedimientos invasivos.',
+  incluye:'Preparación de la piel, aplicación de radiofrecuencia y finalización.',
+  sesiones:'Se trabaja en plan de sesiones; los resultados son graduales y variables.',
+  recup:'Sin tiempo de recuperación; puede quedar una leve sensación de calor.',
+  previos:['Retira joyas de la zona.','Llega sin maquillaje si es posible.'],
+  posteriores:['Hidrata la piel y usa protector solar.'],
+  contra:['Embarazo.','Marcapasos u otros dispositivos electrónicos.','Implantes metálicos en la zona (se revisa en evaluación).']},
+ {e:'💧',n:'Ácido Hialurónico',cat:['armonizacion','hidratacion','lineas'],dur:'45 min',precio:'',eval:true,
+  d:'Armonización e hidratación profunda del rostro, cuidando la naturalidad.',
+  b:['Hidratación','Armonía'],
+  quees:'Procedimiento de armonización con ácido hialurónico para hidratar en profundidad o realzar rasgos de forma natural.',
+  sirve:'Favorece la hidratación profunda y ayuda a armonizar el rostro cuidando siempre la naturalidad.',
+  mejora:['Deshidratación profunda','Pérdida de volumen leve','Contornos poco definidos'],
+  paraquien:'Requiere evaluación profesional previa para definir si es adecuado para ti.',
+  incluye:'Evaluación del rostro, aplicación del producto y recomendaciones de cuidado.',
+  sesiones:'Se define en evaluación según el objetivo; efecto temporal.',
+  recup:'Puede quedar leve inflamación o pequeños hematomas temporales.',
+  previos:['Evita alcohol y antiinflamatorios el día previo si no son indispensables.'],
+  posteriores:['Evita calor intenso, ejercicio y masajear la zona por 24–48 h.','Sigue las indicaciones entregadas.'],
+  contra:['Embarazo o lactancia.','Infección activa en la zona.','Alergias o alteraciones de coagulación.'],
+  galeria:{t:'Aumento y perfilado de labios',n:10}},
+ {e:'✨',n:'Toxina Botulínica',cat:['lineas','rejuvenecimiento'],dur:'30 min',precio:'',eval:true,
+  d:'Ayuda a suavizar las líneas de expresión de forma natural.',
+  b:['Líneas suaves'],
+  quees:'Procedimiento médico-estético que atenúa la apariencia de las líneas de expresión de forma temporal y natural.',
+  sirve:'Favorece un rostro más descansado, suavizando la apariencia de las líneas dinámicas.',
+  mejora:['Líneas de expresión de la frente y el entrecejo','Líneas alrededor de los ojos'],
+  paraquien:'Requiere evaluación profesional previa; no apto para todas las personas.',
+  incluye:'Evaluación de la expresión facial, aplicación y recomendaciones posteriores.',
+  sesiones:'Efecto temporal; la mantención se define en evaluación.',
+  recup:'Sin tiempo de recuperación; el efecto aparece de forma progresiva en días.',
+  previos:['Evita alcohol y antiinflamatorios el día previo si no son indispensables.'],
+  posteriores:['No masajees la zona ni te recuestes por 4 horas.','Evita calor intenso y ejercicio el mismo día.'],
+  contra:['Embarazo o lactancia.','Ciertas enfermedades neuromusculares.','Infección en la zona (se revisa en evaluación).']},
+ {e:'🔥',n:'Lipólisis Enzimática',cat:['modelacion'],dur:'60 min',precio:'',eval:true,
+  d:'Apoya la modelación corporal y la reducción de la apariencia de grasa localizada.',
+  b:['Modela','Apoya reducción'],
+  quees:'Tratamiento corporal que aplica activos para favorecer la modelación de zonas con grasa localizada.',
+  sirve:'Ayuda a mejorar el contorno corporal y a atenuar la apariencia de grasa localizada, como apoyo a hábitos saludables.',
+  mejora:['Grasa localizada','Contorno poco definido en zonas puntuales'],
+  paraquien:'Requiere evaluación previa; es un apoyo, no reemplaza alimentación y actividad física.',
+  incluye:'Evaluación de la zona, aplicación del tratamiento y recomendaciones.',
+  sesiones:'Se trabaja en plan de varias sesiones; los resultados son graduales y variables.',
+  recup:'Puede quedar sensibilidad o leve hinchazón temporal en la zona.',
+  previos:['Hidrátate bien y evita comidas muy pesadas antes de la sesión.'],
+  posteriores:['Bebe agua, camina y evita calor intenso las primeras horas.'],
+  contra:['Embarazo o lactancia.','Alergias a los activos.','Ciertas condiciones médicas (se revisa en evaluación).']},
+ {e:'💆‍♀️',n:'Recuperación Capilar (PRP)',cat:['capilar'],dur:'60 min',precio:'',eval:true,
+  d:'Plasma rico en plaquetas para favorecer la fortaleza y el estímulo del cabello.',
+  b:['Fortalece','Cabello'],
+  quees:'Aplicación de plasma rico en plaquetas en el cuero cabelludo para estimular el folículo de forma natural.',
+  sirve:'Favorece la fortaleza del cabello y ayuda a mejorar la apariencia de densidad de forma gradual.',
+  mejora:['Debilidad capilar','Apariencia de menor densidad','Cuero cabelludo poco vital'],
+  paraquien:'Requiere evaluación previa del cuero cabelludo.',
+  incluye:'Extracción de una pequeña muestra de sangre, procesamiento del plasma y aplicación en el cuero cabelludo.',
+  sesiones:'Se trabaja en plan de sesiones; los resultados son graduales.',
+  recup:'Puede quedar sensibilidad temporal en el cuero cabelludo.',
+  previos:['Llega con el cabello limpio y seco.','Evita antiinflamatorios si no son indispensables.'],
+  posteriores:['Evita lavarte el cabello por unas horas y el sol directo.'],
+  contra:['Embarazo o lactancia.','Alteraciones de coagulación.','Infección en el cuero cabelludo.']},
+ {e:'💊',n:'Sueroterapia',cat:['hidratacion'],dur:'40 min',precio:'',eval:true,
+  d:'Aporte de vitaminas y activos para apoyar tu bienestar y energía.',
+  b:['Bienestar','Energía'],
+  quees:'Aporte de vitaminas y activos (como Vitamina C, Complejo B o L-Carnitina) para apoyar el bienestar general.',
+  sirve:'Favorece una sensación de energía y bienestar, como complemento de hábitos saludables.',
+  mejora:['Sensación de cansancio','Necesidad de un aporte de vitaminas puntual'],
+  paraquien:'Requiere evaluación previa de salud para confirmar si es adecuado para ti.',
+  incluye:'Evaluación breve, preparación y aplicación del suero indicado.',
+  sesiones:'Puntual o en plan; se define en evaluación.',
+  recup:'Sin tiempo de recuperación.',
+  previos:['Hidrátate y evita ir en ayunas prolongado.'],
+  posteriores:['Bebe agua e hidrátate durante el día.'],
+  contra:['Embarazo o lactancia.','Enfermedades renales o cardíacas (se revisa en evaluación).','Alergias a los componentes.']},
+ /* Sueroterapias independientes (correos de Jodie del 14-sep). Usan 'secciones'
+    para respetar exactamente sus títulos y su orden. */
+ {e:'🍊',n:'Sueroterapia con vitamina C',cat:['sueroterapia'],dur:'40 min',precio:'',eval:true,
+  d:'Administración intravenosa de vitamina C, nutriente esencial con función antioxidante y participación en la formación normal de colágeno.',
+  b:['Antioxidante','Colágeno'],
+  secciones:[
+   {t:'Qué es', x:'Administración intravenosa de vitamina C bajo evaluación e indicación profesional. La vitamina C es un nutriente esencial que el organismo no produce por sí solo y que participa en diferentes procesos fisiológicos.'},
+   {t:'Para qué sirve', x:'Contribuye a la síntesis normal de colágeno, el funcionamiento del sistema inmunitario, la absorción del hierro y la protección antioxidante de las células. La vitamina C ayuda a neutralizar radicales libres involucrados en el estrés oxidativo.'},
+   {t:'Beneficios fisiológicos', l:['Es indispensable para la formación normal de colágeno.','Participa en la cicatrización y mantenimiento de los tejidos.','Actúa como antioxidante fisiológico.','Contribuye al funcionamiento normal del sistema inmunitario.','Favorece la absorción del hierro no hemínico.','Participa en la síntesis de carnitina y determinados neurotransmisores.']},
+   {t:'Para quién está recomendado', x:'Para personas que, luego de una evaluación profesional, presenten indicación de suplementación o necesiten corregir un aporte insuficiente de vitamina C. No reemplaza una alimentación equilibrada ni el tratamiento indicado por un médico.'},
+   {t:'Qué incluye la sesión', x:'Evaluación previa, control de signos vitales, instalación de vía venosa periférica, administración supervisada de la solución y control posterior.'},
+   {t:'Duración', x:'Aproximadamente 40 minutos. Puede variar según la dosis, formulación utilizada y tolerancia de cada paciente.'},
+   {t:'Sesiones recomendadas', x:'La cantidad y frecuencia no son iguales para todas las personas. Se determinan de manera individual según la evaluación, los antecedentes de salud y la indicación profesional.'},
+   {t:'Posibles molestias o reacciones', x:'Puede producir dolor o hematoma en el sitio de punción, irritación de la vena, sensación de frío, náuseas, mareos o malestar. Aunque es poco frecuente, existe riesgo de reacción alérgica u otras complicaciones asociadas a una administración intravenosa.'},
+   {t:'Cuidados previos', l:['Informar enfermedades, alergias y medicamentos de uso habitual.','Informar antecedentes renales, cálculos renales o sobrecarga de hierro.','No acudir en ayunas, salvo indicación contraria.','Mantener una hidratación adecuada.','No suspender medicamentos sin autorización médica.']},
+   {t:'Cuidados posteriores', l:['Mantener una hidratación adecuada.','Evitar esfuerzos intensos inmediatamente después de la sesión si existe mareo o malestar.','Consultar ante dolor intenso, inflamación persistente o reacción inesperada.','Seguir las indicaciones entregadas por la profesional.']},
+   {t:'Contraindicaciones y precauciones principales', cls:'contra', l:['Enfermedad renal o antecedentes de cálculos renales.','Deficiencia de glucosa-6-fosfato deshidrogenasa, especialmente ante dosis elevadas.','Hemocromatosis u otros trastornos por sobrecarga de hierro.','Embarazo o lactancia, salvo indicación médica.','Alergia o hipersensibilidad a algún componente.','Enfermedad aguda o crónica descompensada.','Tratamiento oncológico activo sin autorización del oncólogo tratante.','Uso de medicamentos con posibles interacciones, según evaluación.']}
+  ]},
+ {e:'⚡',n:'Sueroterapia con complejo B (B1, B3, B6, B7 y B12)',cat:['sueroterapia'],dur:'40 min',precio:'',eval:true,
+  d:'Vitaminas esenciales que participan en el metabolismo energético, el sistema nervioso, la formación de células sanguíneas y la síntesis de neurotransmisores.',
+  b:['Metabolismo energético','Sistema nervioso'],
+  secciones:[
+   {t:'Qué es', x:'Administración intravenosa de vitaminas B1, B3, B6, B7 y B12, sujeta a evaluación e indicación profesional. Estas vitaminas hidrosolubles participan en el aprovechamiento de los nutrientes y en el funcionamiento normal del sistema nervioso, la sangre y numerosos procesos celulares.'},
+   {t:'Para qué sirve', x:'Contribuye a mantener niveles adecuados de vitaminas del complejo B y apoya procesos relacionados con el metabolismo energético, la función neurológica, la producción de glóbulos rojos y la síntesis de determinados neurotransmisores. Su beneficio puede ser especialmente relevante cuando existe déficit o un requerimiento aumentado.'},
+   {t:'¿Qué hace cada vitamina?', l:['<b>Vitamina B1 (tiamina):</b> ayuda a transformar los carbohidratos en energía y participa en el funcionamiento normal de los nervios, músculos y corazón.','<b>Vitamina B3 (niacina o nicotinamida):</b> forma parte de las coenzimas NAD y NADP, fundamentales para el metabolismo energético, la reparación celular y el funcionamiento de la piel y el sistema nervioso.','<b>Vitamina B6 (piridoxina):</b> interviene en el metabolismo de proteínas, la formación de hemoglobina y la síntesis de neurotransmisores como serotonina, dopamina y GABA.','<b>Vitamina B7 (biotina):</b> participa en el metabolismo de grasas, carbohidratos y aminoácidos. Ayuda a mantener funciones normales relacionadas con la piel y el cabello, especialmente cuando existe deficiencia.','<b>Vitamina B12 (cobalamina):</b> es necesaria para la formación normal de glóbulos rojos, la síntesis de ADN y el mantenimiento del sistema nervioso.']},
+   {t:'Apoyo fisiológico', l:['Metabolismo y aprovechamiento energético de los nutrientes.','Funcionamiento normal del sistema nervioso.','Síntesis de neurotransmisores.','Formación normal de glóbulos rojos y hemoglobina.','Mantenimiento de la piel y otros tejidos.','Corrección o prevención de déficits, cuando existe indicación profesional.']},
+   {t:'Para quién está recomendado', x:'Para personas que, después de una evaluación profesional, presenten déficit, riesgo de aporte insuficiente, necesidades aumentadas o una indicación específica de suplementación. No sustituye una alimentación equilibrada ni el diagnóstico y tratamiento de las causas de cansancio.'},
+   {t:'Qué incluye la sesión', x:'Evaluación previa, revisión de antecedentes y medicamentos, control de signos vitales, instalación de vía venosa periférica, administración supervisada y control posterior.'},
+   {t:'Duración', x:'Aproximadamente 40 minutos. El tiempo puede variar según la formulación, la velocidad de administración y la tolerancia de cada paciente.'},
+   {t:'Sesiones recomendadas', x:'La frecuencia y cantidad de sesiones se determinan individualmente según los antecedentes clínicos, alimentación, síntomas, exámenes cuando correspondan y formulación utilizada.'},
+   {t:'Lo que muestra la ciencia', x:'Las vitaminas B participan en funciones neurológicas y metabólicas esenciales. Algunos ensayos con suplementos orales de complejo B han observado reducción del estrés percibido en ciertos grupos después de varias semanas.'},
+   {t:'Importante sobre la serotonina', x:'La vitamina B6 funciona como cofactor en reacciones necesarias para sintetizar serotonina y otros neurotransmisores. Esto significa que participa en el proceso fisiológico, pero no que la sueroterapia aumente directamente la serotonina ni que trate por sí sola depresión, ansiedad o trastornos del ánimo. <i>(Fuente: NIH – Vitamina B6)</i>'},
+   {t:'Posibles molestias o reacciones', l:['Dolor, irritación o hematoma en el lugar de punción.','Sensación de calor, rubor, picazón, náuseas o mareos.','Cambios transitorios en el color u olor de la orina.','Reacción alérgica; en casos excepcionales puede ser grave.','Algunas formas o dosis de vitamina B3 pueden producir rubor, calor o descenso de la presión arterial.']},
+   {t:'Cuidados previos', l:['Informar enfermedades, alergias y medicamentos de uso habitual.','Informar antecedentes renales, hepáticos, neurológicos o de sensibilidad al cobalto.','Comunicar si se realizarán exámenes de sangre próximamente.','No acudir en ayunas, salvo indicación diferente.','Mantener una hidratación adecuada.','No suspender medicamentos sin autorización médica.']},
+   {t:'Cuidados posteriores', l:['Mantener una hidratación adecuada.','Evitar ejercicio intenso inmediatamente después si existe mareo o malestar.','No manipular excesivamente la zona de punción.','Consultar ante dolor intenso, inflamación persistente, dificultad respiratoria o cualquier reacción inesperada.','Informar al laboratorio o al médico que se recibió biotina antes de realizarse exámenes.']},
+   {t:'Contraindicaciones y precauciones principales', cls:'contra', l:['Embarazo o lactancia, salvo indicación médica.','Alergia a alguna vitamina o componente de la solución.','Sensibilidad al cobalto o antecedentes de reacción a vitamina B12.','Enfermedad renal, hepática o neurológica relevante.','Enfermedad aguda o crónica descompensada.','Uso de medicamentos con posibles interacciones.','Administración repetida de dosis altas de B6, por riesgo de neuropatía.','Exámenes de laboratorio próximos, debido a que la biotina puede alterar ciertos resultados.']},
+   {t:'Advertencia sobre la biotina', alerta:true, x:'La vitamina B7 o biotina puede interferir con algunos exámenes y generar resultados falsos, incluidos análisis tiroideos, hormonales y ciertas pruebas de troponina utilizadas ante sospecha de infarto. La paciente debe informar siempre su uso antes de realizarse exámenes. <i>(Fuente: advertencia de la FDA)</i>'},
+   {t:'Aviso importante', alerta:true, x:'Este servicio no está destinado a diagnosticar ni tratar depresión, ansiedad, anemia sin diagnóstico, fatiga crónica, enfermedades neurológicas u otras patologías. Si existe cansancio persistente, se recomienda evaluación médica para investigar su causa.'}
+  ]}
+];
+function trow(t,i,mode){ return '<div class="srow" onclick="'+(mode==='sel'?'selService('+i+')':'openDetail('+i+')')+'"><div class="circ" style="font-size:24px">'+t.e+'</div><div class="nm"><b>'+t.n+'</b><small>'+t.dur+'</small></div>'+(mode==='sel'?'<span class="badge">✓ Elegido</span><span class="info">ⓘ</span>':'<span class="chev">›</span>')+'</div>'; }
+function renderTreatments(){
+  var h=document.getElementById('svcHome'); if(h) h.innerHTML=TREATMENTS.slice(0,6).map(function(t,i){return trow(t,i,'view');}).join('');
+  var a=document.getElementById('svcAgenda'); if(a) a.innerHTML='<div id="selSum"></div>'+TREATMENTS.map(function(t,i){return trow(t,i,'sel');}).join('');
+  var c=document.getElementById('catList'); if(c) c.innerHTML=TREATMENTS.map(function(t,i){return '<div class="tcard" onclick="openDetail('+i+')"><h5>'+t.e+' '+t.n+'</h5><p>'+t.d+'</p></div>';}).join('');
+}
+renderTreatments();
+
+/* ---- ¿Qué quieres mejorar? (categorías del correo → recomienda tratamientos) ---- */
+const NEEDS=[
+ {k:'luminosidad',e:'🌟',label:'Luminosidad',cats:['luminosidad']},
+ {k:'manchas',e:'🟤',label:'Manchas y tono desigual',cats:['manchas']},
+ {k:'hidratacion',e:'💧',label:'Hidratación',cats:['hidratacion']},
+ {k:'marcas',e:'🌾',label:'Marcas de acné',cats:['marcas']},
+ {k:'lineas',e:'〰️',label:'Líneas de expresión',cats:['lineas']},
+ {k:'rejuvenecimiento',e:'✨',label:'Rejuvenecimiento facial',cats:['rejuvenecimiento','firmeza']},
+ {k:'capilar',e:'💆‍♀️',label:'Caída del cabello',cats:['capilar']},
+ {k:'armonizacion',e:'💠',label:'Armonización facial',cats:['armonizacion']},
+ {k:'modelacion',e:'🔥',label:'Modelación corporal',cats:['modelacion']},
+ {k:'evento',e:'💃',label:'Preparación para un evento',cats:['luminosidad','hidratacion']}
+];
+function renderNeedsHome(){ var el=document.getElementById('needsHome'); if(!el)return;
+  el.innerHTML=NEEDS.map(function(n){ return '<div class="needcard" onclick="openMejorar(\''+n.k+'\')"><span class="ne">'+n.e+'</span><b>'+n.label+'</b></div>'; }).join('');
+}
+renderNeedsHome();
+function openMejorar(k){
+  var n=NEEDS.find(function(x){return x.k===k;}); if(!n)return;
+  var idxs=[]; TREATMENTS.forEach(function(t,i){ if(t.cat&&t.cat.some(function(c){return n.cats.indexOf(c)>=0;})) idxs.push(i); });
+  var html='<div class="needhero"><div class="nh-e">'+n.e+'</div><div class="nh-t">'+n.label+'</div><p>Estos tratamientos pueden ayudarte. El plan final se define en tu evaluación profesional personalizada.</p></div>';
+  html+= idxs.length ? idxs.map(function(i){return trow(TREATMENTS[i],i,'view');}).join('')
+        : '<div class="carecard"><b>Conversemos en tu evaluación</b><div class="li"><i>✿</i><span>Te orientamos según lo que buscas.</span></div></div>';
+  html+='<button class="cta" style="margin-top:18px" onclick="go(\'agenda\')">Agendar evaluación 🗓️</button>';
+  html+='<button class="cta wa" onclick="waGeneral()">Consultar por WhatsApp</button>';
+  html+='<div class="rdisc" style="text-align:center">Esta orientación no reemplaza una evaluación profesional. Los resultados pueden variar entre personas.</div>';
+  document.getElementById('mejorarBody').innerHTML=html;
+  go('mejorar');
+}
+window.openMejorar=openMejorar;
+
+function fsec(lbl,txt){ return txt?('<div class="lbl2">'+lbl+'</div><div class="dtext">'+txt+'</div>'):''; }
+/* Fichas con secciones propias (sueroterapias, correo de Jodie del 14-sep):
+   {t:'Título', x:'texto'} · {t, l:[lista], cls:'contra'} · {t, x, alerta:true} */
+function fseccion(s){ if(s.l) return flist(s.t, s.l, s.cls); if(s.alerta) return '<div class="lbl2">'+s.t+'</div><div class="dp-alerta">'+s.x+'</div>'; return fsec(s.t, s.x); }
+function flist(lbl,arr,cls){ if(!arr||!arr.length)return ''; return '<div class="lbl2">'+lbl+'</div><div class="flist '+(cls||'')+'">'+arr.map(function(x){return '<div class="fli"><i>•</i><span>'+x+'</span></div>';}).join('')+'</div>'; }
+/* ===== PLANTILLA DERMAPEN (punto 7 del correo de Jodie, 29-ago) =====
+   Editable: cambiar textos aqui cambia TODAS las fichas con plantilla:'dermapen'.
+   Cada paso y cada item tiene un id; un tratamiento puede apagarlos con
+   quitar:['id',...] porque no todos se hacen en todas las pieles.
+   Sin marcas, fabricantes ni proveedores (pedido de Jodie). */
+const DERMAPEN_PASOS=[
+ {id:'prep', t:'Preparación y limpieza', corto:'Evaluamos tu piel y la preparamos.', items:[
+   {id:'evaluacion', x:'Evaluación del estado actual de la piel.'},
+   {id:'higiene',    x:'Higienización con una fórmula de agua volcánica, zinc, cobre y ácido salicílico, cuando sea adecuada para el tipo de piel.'},
+   {id:'vapor',      x:'Vapor de ozono para preparar la piel.'},
+   {id:'altafrec',   x:'Alta frecuencia de ozono según evaluación.'},
+   {id:'extraccion', x:'Extracción de comedones con espátula ultrasónica.'},
+   {id:'dermo',      x:'Dermoabrasión solamente cuando esté indicada y sea compatible con la condición de la piel y el resto de la sesión.'}]},
+ {id:'vial', t:'Vial personalizado con Dermapen', corto:'Aplicamos el vial elegido para tu piel.',
+   texto:'Después de preparar la piel, se selecciona un vial según sus necesidades y se aplica mediante Dermapen.'},
+ {id:'pigmento', t:'Pigmento personalizado', corto:'Un pigmento según el tono de tu piel.', soloSi:'pigmento'},
+ {id:'final', t:'Finalización', corto:'Hidratamos, calmamos y protegemos.', items:[
+   {id:'mascarilla', x:'Mascarilla hidratante con ácido hialurónico.'},
+   {id:'led',        x:'Fototerapia LED con el color seleccionado según las necesidades de la piel.'},
+   {id:'calmantes',  x:'Aplicación de productos calmantes y de protección final.'}]},
+ {id:'casa', t:'Cuidados en casa', corto:'Cicaplast Baume B5+ según indicación y protector solar FPS 50+.'}
+];
+const VIALES=[
+ {n:'ADN de salmón', para:'Revitalizar', d:'Orientado a revitalizar y mejorar visualmente la calidad general de la piel.'},
+ {n:'Pink Glow', para:'Piel apagada o deshidratada', d:'Para piel apagada, deshidratada o que busca mayor luminosidad.'},
+ {n:'Ácido hialurónico con células madre', para:'Deshidratada y opaca', d:'Ideal para piel deshidratada y opaca.'},
+ {n:'Centella asiática con péptidos de oro', para:'Sensible o con marcas', d:'Ideal para piel sensible, con marcas o que necesita reparación cosmética.'},
+ {n:'Células madre con niacinamida, péptidos y adenosina', para:'Manchas o tono desigual', d:'Ideal para piel opaca, con manchas superficiales o tono desigual.'},
+ {n:'ADN de salmón con péptidos de oro', para:'Madura o sin elasticidad', d:'Ideal para piel madura, apagada o con pérdida de elasticidad.'},
+ {n:'Factor de crecimiento epidérmico, péptidos y oro puro', para:'Líneas finas y firmeza', d:'Ideal para líneas finas, textura irregular y pérdida de firmeza.'}
+];
+const VIAL_NOTA='El vial se selecciona durante la evaluación según las características y necesidades actuales de la piel.';
+
+function dpPasos(t){ var q=t.quitar||[];
+  return DERMAPEN_PASOS.filter(function(p){ return q.indexOf(p.id)<0 && (!p.soloSi || t[p.soloSi]); })
+    .map(function(p){ var c=Object.assign({},p); if(p.items) c.items=p.items.filter(function(it){ return q.indexOf(it.id)<0; }); return c; });
+}
+function dpLista(arr,cls){ return '<div class="flist '+(cls||'')+'">'+(arr||[]).map(function(x){ return '<div class="fli"><i>•</i><span>'+x+'</span></div>'; }).join('')+'</div>'; }
+function dpAcc(id,titulo,html,cls){ return '<details id="'+id+'"'+(cls?' class="'+cls+'"':'')+'><summary>'+titulo+'</summary><div class="dp-in">'+html+'</div></details>'; }
+function dpVerCuidados(){
+  var d=document.getElementById('dpPost'); if(!d) return; d.open=true;
+  var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  d.scrollIntoView({behavior: quieto?'auto':'smooth', block:'start'});
+}
+window.dpVerCuidados=dpVerCuidados;
+function openDermapen(i){
+  var t=TREATMENTS[i], b=document.getElementById('sheetBody'), pasos=dpPasos(t);
+  var precio = t.precio ? ('Desde '+t.precio) : 'A confirmar en tu evaluación';
+  var nombreWa = t.n.replace(/'/g,'');
+  var html='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
+   +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
+   +'<div class="fmeta"><div class="fmi"><small>Duración</small><b>'+t.dur+'</b></div><div class="fmi"><small>Precio desde</small><b>'+precio+'</b></div></div>'
+   +(t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '')
+   /* --- vista principal --- */
+   +'<div class="dp-res"><p>'+t.resumen+'</p><div class="benefs">'+t.b.map(function(x){ return '<span>'+x+'</span>'; }).join('')+'</div></div>'
+   +'<div class="dp-h">Tu sesión en '+pasos.length+' pasos</div><div class="dp-pasos">'
+   +pasos.map(function(p,k){ return '<div class="dp-paso"><div class="dp-num">'+(k+1)+'</div><div><b>'+p.t+'</b><span>'+p.corto+'</span></div></div>'; }).join('')+'</div>'
+   +'<div class="dp-h">Viales según tu piel</div><div class="dp-viales">'+VIALES.map(function(v){ return '<span>'+v.para+'</span>'; }).join('')+'</div>'
+   +'<div class="dp-nota">'+VIAL_NOTA+'</div>'
+   +'<div class="dp-h">Cuidados después de tu sesión</div>'+dpLista(t.posteriores.slice(0,5))
+   +'<button class="dp-mas" onclick="dpVerCuidados()">Ver todos los cuidados</button>'
+   +'<div class="fbtns"><button class="cta" onclick="agendarDe('+i+')">Agendar una evaluación</button></div>'
+   +'<button class="dp-link" onclick="waTratamiento(\''+nombreWa+'\')">Resolver dudas por WhatsApp</button>'
+   /* --- todo el detalle, en desplegables --- */
+   +'<div class="dp-acc">'
+   +dpAcc('dpQue','¿Qué es?','<div class="dtext">'+t.quees+'</div>')
+   +dpAcc('dpBen','Beneficios','<div class="dp-sub">Ayuda a mejorar</div>'+dpLista(t.mejora)+'<div class="dp-nota">'+t.notaResultados+'</div>')
+   +dpAcc('dpSes','Tu sesión, paso a paso', pasos.map(function(p,k){
+       var cuerpo = p.items ? dpLista(p.items.map(function(x){ return x.x; }))
+                 : '<div class="dtext">'+(p.id==='pigmento' ? t.pigmento : (p.texto||p.corto))+'</div>';
+       return '<div class="dp-sub">Paso '+(k+1)+': '+p.t+'</div>'+cuerpo;
+     }).join('') + (t.sesiones ? '<div class="dp-sub">Sesiones recomendadas</div><div class="dtext">'+t.sesiones+'</div>' : ''))
+   +dpAcc('dpVial','Vial según tu piel', VIALES.map(function(v){ return '<div class="dp-vial"><b>'+v.n+'</b><span>'+v.d+'</span></div>'; }).join('')+'<div class="dp-nota">'+VIAL_NOTA+'</div>')
+   +(t.pigmento ? dpAcc('dpPig','Pigmento personalizado','<div class="dtext">'+t.pigmento+'</div>') : '')
+   +dpAcc('dpPre','Cuidados previos', dpLista(t.previos))
+   +dpAcc('dpPost','Cuidados posteriores', dpLista(t.posteriores))
+   +dpAcc('dpContra','Contraindicaciones', dpLista(t.contra,'contra'))
+   +(t.alerta ? dpAcc('dpAlerta','Signos de alerta','<div class="dp-alerta">'+t.alerta+'</div>','alerta') : '')
+   +'</div>'
+   /* sin nombres de personas en esta ficha (pedido de Jodie) */
+   +'<div class="rdisc" style="text-align:center">Los resultados pueden variar entre personas. El plan final se define en tu <b>evaluación profesional personalizada</b>.</div>';
+  b.innerHTML=html;
+  document.getElementById('sheet').classList.add('on'); document.getElementById('sheetBg').classList.add('on');
+  var sh=document.getElementById('sheet'); if(sh) sh.scrollTop=0;
+}
+
+function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'){ openDermapen(i); return; }
+  var t=TREATMENTS[i], b=document.getElementById('sheetBody');
+  var precio = t.precio ? ('Desde '+t.precio) : 'A confirmar en tu evaluación';
+  var meta='<div class="fmeta">'
+     +'<div class="fmi"><small>Duración</small><b>'+t.dur+'</b></div>'
+     +'<div class="fmi"><small>Precio desde</small><b>'+precio+'</b></div></div>';
+  var evalBadge = t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '';
+  b.innerHTML='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
+   +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
+   +meta+evalBadge+fgaleria(t)
+   +(t.secciones ? t.secciones.map(fseccion).join('') : (
+    fsec('Qué es', t.quees)
+   +fsec('Para qué sirve', t.sirve)
+   +flist('Ayuda a mejorar', t.mejora)
+   +fsec('Para quién está recomendado', t.paraquien)
+   +fsec('Qué incluye la sesión', t.incluye)
+   +fsec('Sesiones recomendadas', t.sesiones)
+   +fsec('Tiempo de recuperación', t.recup)
+   +flist('Cuidados previos', t.previos)
+   +flist('Cuidados posteriores', t.posteriores)
+   +flist('Contraindicaciones principales', t.contra, 'contra')))
+   +'<div class="fbtns"><button class="cta" onclick="agendarDe('+i+')">Agendar 🗓️</button>'
+   +'<button class="cta wa" onclick="waTratamiento(\''+t.n.replace(/'/g,'')+'\')">Consultar por WhatsApp</button></div>'
+   +'<div class="rdisc" style="text-align:center">Los resultados pueden variar entre personas. El plan final se define en tu <b>evaluación profesional personalizada</b> con Jodie Berríos (enfermera).</div>';
+  document.getElementById('sheet').classList.add('on'); document.getElementById('sheetBg').classList.add('on');
+  var sh=document.getElementById('sheet'); if(sh) sh.scrollTop=0;
+}
+/* Fotos reales antes/después enviadas por Jodie (30-oct): img/labios/labios-01..10.jpg */
+function galFotos(g){ var h=''; for(var k=1;k<=g.n;k++){ var u='img/labios/labios-'+(k<10?'0':'')+k+'.jpg'; h+='<img src="'+u+'" loading="lazy" alt="'+g.t+', antes y después" onclick="verFoto(this.src)">'; } return h; }
+function fgaleria(t){ if(!t.galeria) return ''; return '<div class="dp-h">Resultados reales · '+t.galeria.t+'</div><div class="galeria">'+galFotos(t.galeria)+'</div><div class="rdisc" style="margin-top:4px">Pacientes reales de Patagonia Glow, publicadas con su autorización. Toca una foto para verla grande.</div>'; }
+function verFoto(u){ var v=document.getElementById('fotoGrande'); if(!v){ v=document.createElement('div'); v.id='fotoGrande'; v.onclick=function(){ v.classList.remove('on'); }; document.body.appendChild(v); } v.innerHTML='<img src="'+u+'" alt=""><span>✕</span>'; v.classList.add('on'); }
+window.verFoto=verFoto;
+function closeDetail(){ document.getElementById('sheet').classList.remove('on'); document.getElementById('sheetBg').classList.remove('on'); }
+function agendarDe(i){ closeDetail(); go('agenda'); selService(i); }
+
+/* ---- booking state (Fase 3) ---- */
+let svcSel=null, selDay=null, selTime=null, selSede='Santiago';
+const dayNames=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+const SEDES=['Santiago','Punta Arenas'];
+const PROFESIONAL='Jodie Berríos';
+const POL_CANCEL='Puedes cancelar o reprogramar hasta 24 horas antes sin costo.';
+const POL_ATRASO='Hay una tolerancia de 10 minutos. Pasado ese tiempo, la sesión puede acortarse o reprogramarse.';
+
+document.getElementById('sedes').innerHTML=SEDES.map(function(s){ return '<div class="sedechip '+(s===selSede?'sel':'')+'" onclick="pickSede(this,\''+s+'\')">'+s+'</div>'; }).join('');
+window.pickSede=function(el,s){ selSede=s; document.querySelectorAll('#sedes .sedechip').forEach(function(c){c.classList.remove('sel');}); el.classList.add('sel'); renderResumen(); };
+
+(function buildDays(){
+  let html='';const base=new Date();
+  for(let k=1;k<=7;k++){const d=new Date(base);d.setDate(base.getDate()+k);
+    html+=`<div class="daychip ${k===1?'sel':''}" onclick="pickDay(this)"><small>${dayNames[d.getDay()]}</small><b>${d.getDate()}</b></div>`;}
+  document.getElementById('days').innerHTML=html;
+  selDay=(new Date(base.getTime()+86400000)).getDate();
+})();
+const TIMES=['09:00','10:30','11:30','12:30','15:00','16:30','17:30','18:30','19:30'];
+const OFF=['11:30','17:30'];
+document.getElementById('times').innerHTML=TIMES.map(function(t){ return OFF.includes(t)
+  ? `<div class="tchip off" onclick="waitlist('${t}')">${t}</div>`
+  : `<div class="tchip" onclick="pickTime(this,'${t}')">${t}</div>`; }).join('');
+window.waitlist=function(t){ toast('Te avisaremos si se libera las '+t+' 🔔'); };
+
+window.selService=function(i){ svcSel=i;
+  document.querySelectorAll('#svcAgenda .srow').forEach(function(r,k){ r.classList.toggle('sel',k===i); });
+  var t=TREATMENTS[i], sum=document.getElementById('selSum');
+  if(sum) sum.innerHTML='<div class="selsum"><b>'+t.e+' '+t.n+' · '+t.dur+'</b>'+t.d+'</div>';
+  renderResumen();
+};
+window.pickDay=function(el){document.querySelectorAll('.daychip').forEach(function(d){d.classList.remove('sel');});el.classList.add('sel');selDay=el.querySelector('b').textContent;renderResumen();};
+window.pickTime=function(el,t){document.querySelectorAll('.tchip').forEach(function(d){d.classList.remove('sel');});el.classList.add('sel');selTime=t;renderResumen();};
+
+function rrow(k,v){ return '<div class="rr"><span>'+k+'</span><b>'+v+'</b></div>'; }
+function renderResumen(){
+  var el=document.getElementById('resumen'); if(!el)return;
+  if(svcSel===null){ el.innerHTML=''; return; }
+  var t=TREATMENTS[svcSel];
+  var precio = t.precio ? ('Desde '+t.precio) : 'A confirmar al agendar';
+  el.innerHTML='<div class="resumen"><div class="rh">Resumen de tu reserva</div>'
+   +rrow('Tratamiento', t.e+' '+t.n)
+   +rrow('Sede', selSede)
+   +rrow('Profesional', PROFESIONAL)
+   +rrow('Día', selDay?('Día '+selDay):'Por elegir')
+   +rrow('Hora', selTime||'Por elegir')
+   +rrow('Duración', t.dur)
+   +rrow('Valor total', precio)
+   +rrow('Abono para reservar', t.precio?'50% al confirmar':'Se confirma al agendar')
+   +rrow('Saldo pendiente', t.precio?'El resto el día de tu sesión':'—')
+   +'<div class="polbox"><b>Política de cancelación</b><p>'+POL_CANCEL+'</p><b>Atrasos</b><p>'+POL_ATRASO+'</p></div>'
+   +(t.eval?'<button class="cta gold" style="margin-top:12px" onclick="go(\'evalprev\')">🩺 Completar evaluación previa</button>':'')
+   +'</div>';
+}
+
+window.confirmBooking=function(){
+  if(svcSel===null){toast('Elige un servicio primero 💗');return;}
+  if(!selTime){toast('Elige un horario disponible ⏰');return;}
+  var t=TREATMENTS[svcSel], b=document.getElementById('sheetBody');
+  b.innerHTML='<div class="demoji">✅</div><h4>¡Reserva confirmada!</h4>'
+    +'<div class="dur">'+t.n+' · '+selSede+' · Día '+selDay+' · '+selTime+'</div>'
+    +'<div class="confbtns">'
+    +'<button class="btn2" onclick="toast(\'Te enviaremos un recordatorio 🔔\')">🔔 Activar recordatorio</button>'
+    +'<button class="btn2" onclick="addToCalendar()">🗓️ Agregar al calendario</button>'
+    +'<button class="btn2" onclick="closeDetail()">↻ Reprogramar</button>'
+    +'</div>'
+    +(t.eval?'<div class="fbadge" style="margin-top:14px">🩺 Requiere evaluación previa. <a onclick="closeDetail();go(\'evalprev\')" style="color:var(--rose-deep);font-weight:600;text-decoration:underline;cursor:pointer">Completar ahora</a></div>':'')
+    +flist('Indicaciones previas', t.previos)
+    +'<button class="cta" style="margin-top:16px" onclick="closeDetail();go(\'home\')">Listo</button>';
+  document.getElementById('sheet').classList.add('on'); document.getElementById('sheetBg').classList.add('on');
+  var sh=document.getElementById('sheet'); if(sh) sh.scrollTop=0;
+};
+function addToCalendar(){ toast('Evento agregado a tu calendario 🗓️'); }
+window.addToCalendar=addToCalendar;
+
+/* ---- cuidados post automáticos (home, punto 10) ---- */
+function renderPostHome(){
+  var el=document.getElementById('postHome'); if(!el)return;
+  var bi=TI('BB Glow'); var t=TREATMENTS[bi]; // última sesión realizada = BB Glow
+  /* 14-sep: BB Glow ahora trae 12 cuidados; unirlos todos llenaba la tarjeta
+     del inicio. Se muestran los 2 primeros y el boton abre la lista completa. */
+  var cuidado=(t.posteriores&&t.posteriores.length)?t.posteriores.slice(0,2).join(' '):'';
+  var abrir = t.plantilla==='dermapen' ? 'openDetail('+bi+');dpVerCuidados()' : 'openDetail('+bi+')';
+  el.innerHTML='<div class="postcard fade-up"><div class="pt">🌿 Después de tu sesión</div>'
+    +'<p>Hoy te realizaste <b>'+t.n+'</b>. '+cuidado+'</p>'
+    +'<button class="pa" onclick="'+abrir+'">Ver cuidados completos</button></div>';
+}
+renderPostHome();
+
+/* ---- formulario evaluación previa (punto 6) ---- */
+function markPhoto(id){ var el=document.getElementById(id); if(el){ el.classList.add('done'); el.querySelector('.pe').textContent='✅'; } }
+function tog(btn){ var row=btn.parentElement; row.querySelectorAll('button').forEach(function(b){b.classList.remove('sel');}); btn.classList.add('sel'); }
+function submitEval(){ toast('¡Evaluación enviada! Jodie la revisará 💗'); setTimeout(function(){go('agenda');},1400); }
+window.markPhoto=markPhoto; window.tog=tog; window.submitEval=submitEval;
+
+/* ---- navigation ---- */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById(id);el.classList.add('on');
+  const sc=el.querySelector('.scroll');if(sc)sc.scrollTop=0;
+  const nav=document.getElementById('nav');
+  nav.style.display = id==='splash' ? 'none':'flex';
+  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.dataset.s===id));
+  const fab=document.getElementById('wafab'); if(fab) fab.style.display = ['splash','giftcards','sobre','mejorar','evalprev','privacidad'].includes(id) ? 'none':'flex';
+  if(id==='favoritos' && typeof renderFavs==='function') renderFavs();
+}
+let tt;
+function toast(msg){const t=document.getElementById('toast');t.innerHTML='✨ '+msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}
+window.go=go;window.toast=toast;
+
+/* ---- WhatsApp (Jodie: pon el número real con código país en WA_NUM) ---- */
+const WA_NUM='56974365285'; // Jodie Berríos (+56 9 7436 5285)
+function waLink(msg){ return (WA_NUM?('https://wa.me/'+WA_NUM):'https://wa.me/')+'?text='+encodeURIComponent(msg); }
+function waTratamiento(n){ window.open(waLink('¡Hola Patagonia Glow! Quiero consultar por el tratamiento: '+n),'_blank'); }
+function waGeneral(){ window.open(waLink('¡Hola Patagonia Glow! Quiero hacer una consulta 💗'),'_blank'); }
+window.waTratamiento=waTratamiento; window.waGeneral=waGeneral;
+
+/* ===================== TEST DE PIEL ===================== */
+const QUIZ=[
+ {k:'tipo', q:'¿Cómo sientes tu piel?', opts:[['seca','💧','Seca / tirante'],['grasa','✨','Grasa'],['mixta','🌗','Mixta'],['normal','🌸','Normal'],['sensible','🌡️','Sensible / reactiva']]},
+ {k:'meta', q:'¿Qué te gustaría mejorar?', opts:[['hidratacion','💧','Hidratación'],['luminosidad','🌟','Luminosidad / glow'],['manchas','🟤','Manchas / tono disparejo'],['poros','🔬','Poros y grasa'],['textura','🌾','Textura / marcas de acné'],['lineas','〰️','Líneas finas'],['firmeza','⬆️','Firmeza']]},
+ {k:'alerta', q:'¿Tienes acné activo, heridas, herpes, irritación o alguna infección en la piel?', opts:[['si','⚠️','Sí'],['no','✅','No']]},
+ {k:'reactiva', q:'¿Tu piel se enrojece o reacciona con facilidad?', opts:[['si','🌡️','Sí, con facilidad'],['no','🙂','No']]},
+ {k:'spf', q:'¿Usas protector solar a diario?', opts:[['si','☀️','Sí, todos los días'],['no','🌥️','No / a veces']]},
+ {k:'medica', q:'¿Estás embarazada, amamantando o con alguna enfermedad o tratamiento médico?', opts:[['si','🤍','Sí'],['no','🙂','No']]},
+ {k:'ritmo', q:'¿Qué prefieres?', opts:[['inmediato','✨','Un glow más inmediato'],['progresivo','🌱','Un cambio progresivo']]},
+ {k:'aguja', q:'¿Cómo prefieres los tratamientos?', opts:[['sin','🌸','Sin agujas, algo suave'],['micro','💫','Acepto microagujas'],['iny','💉','Acepto inyectables']]}
+];
+let qi=-1, qans={};
+function openTest(){ qi=-1; qans={}; renderQuiz(); go('test'); }
+function startQuiz(){ qi=0; qans={}; renderQuiz(); }
+function answer(v){ qans[QUIZ[qi].k]=v; qi++; renderQuiz(); }
+function renderQuiz(){
+  var wrap=document.getElementById('quizWrap'); if(!wrap)return;
+  if(qi<0){ wrap.innerHTML='<div class="qintro"><div class="bb">🤖💗</div><div class="tt">Descubre qué necesita tu piel</div><p>Responde unas preguntas rápidas y te oriento sobre el tratamiento que podría ir mejor contigo.</p><button class="cta" style="margin-top:20px" onclick="startQuiz()">Comenzar test ✨</button></div>'; return; }
+  if(qi>=QUIZ.length){ renderResult(); return; }
+  var Q=QUIZ[qi], pct=Math.round(qi/QUIZ.length*100);
+  wrap.innerHTML='<div class="qprog"><i style="width:'+pct+'%"></i></div><div class="qnum">Pregunta '+(qi+1)+' de '+QUIZ.length+'</div><div class="qq">'+Q.q+'</div>'+
+    Q.opts.map(function(o){ return '<div class="qopt" onclick="answer(\''+o[0]+'\')"><span class="em">'+o[1]+'</span><span>'+o[2]+'</span></div>'; }).join('');
+  var sc=document.querySelector('#test .scroll'); if(sc)sc.scrollTop=0;
+}
+/* Por NOMBRE, no por posición: al agregar tratamientos la lista se corre (29-sep). */
+function TI(nombre){ var i=TREATMENTS.findIndex(function(t){return t.n===nombre;}); return i<0?0:i; }
+function renderResult(){
+  var a=qans;
+  var MAP={
+   hidratacion:{ti:TI('Pink Glow'),d:'Hidratación profunda, luminosidad y piel más suave.',needle:false,alt:'También puede sumar ADN de salmón, según tu evaluación.'},
+   luminosidad:{ti:TI('Pink Glow'),d:'Aporta luz y frescura al rostro. Para más uniformidad de tono se evalúa BB Glow.',needle:false,alt:'BB Glow ayuda a emparejar el tono, con microagujas.'},
+   manchas:{ti:TI('BB Glow'),d:'Ayuda a mejorar la uniformidad del tono, siempre con evaluación previa de tus manchas.',needle:true,alt:'Para aportar luz mientras tanto: Pink Glow, sin agujas.'},
+   poros:{ti:TI('Limpieza Facial Profunda'),d:'Trabaja poros y grasa con una limpieza profunda de la piel.',needle:false,alt:'Según tu evaluación, se puede complementar con otros tratamientos.'},
+   textura:{ti:TI('PRP Facial'),d:'Ayuda a mejorar la textura y las marcas superficiales de acné.',needle:true,alt:'También: ADN de salmón, según evaluación.'},
+   lineas:{ti:TI('ADN de salmón con Dermapen'),d:'Apoya la hidratación, la elasticidad y las líneas finas de forma gradual.',needle:true,alt:'Complemento: radiofrecuencia para firmeza.'},
+   firmeza:{ti:TI('Radiofrecuencia'),d:'Trabaja firmeza y flacidez leve; resultados graduales y variables.',needle:false,alt:'También: ADN de salmón o PRP, según evaluación.'}
+  };
+  var NEEDLEFREE={luminosidad:TI('Pink Glow'),hidratacion:TI('Pink Glow'),manchas:TI('Pink Glow'),poros:TI('Limpieza Facial Profunda'),textura:TI('Radiofrecuencia'),lineas:TI('Radiofrecuencia'),firmeza:TI('Radiofrecuencia')};
+  var base=MAP[a.meta]||MAP.hidratacion, safe='';
+  if(a.alerta==='si'){ safe='Como indicaste acné activo, heridas, herpes, irritación o infección, <b>lo primero es una evaluación presencial</b>. Por tu seguridad no aplicamos microagujas ni alta frecuencia sobre piel con lesiones o infección.'; }
+  else if(a.medica==='si'){ safe='Por embarazo, lactancia o un tratamiento médico, <b>necesitamos una evaluación previa</b> antes de recomendarte un procedimiento.'; }
+  var recIdx=base.ti, switched=false;
+  if(!safe && a.aguja==='sin' && base.needle){ recIdx=(NEEDLEFREE[a.meta]!=null?NEEDLEFREE[a.meta]:0); switched=true; }
+  var recName=TREATMENTS[recIdx].n;
+  var recDesc = switched ? 'Una opción más suave y sin agujas para lo que buscas; en tu evaluación vemos el plan completo.' : base.d;
+  var notes=[];
+  if(a.tipo==='sensible'||a.reactiva==='si'){ notes.push('Tu piel es reactiva → priorizamos <b>cuidados suaves</b> y una valoración antes de procedimientos intensivos.'); }
+  if(a.meta==='manchas'){ notes.push('Si tus manchas son <b>nuevas, irregulares o cambiaron</b>, primero una evaluación profesional.'); }
+  if(a.spf==='no'){ notes.push('Usa <b>protector solar a diario</b>: es la base de cualquier resultado.'); }
+  var wrap=document.getElementById('quizWrap'), html='<div class="rcard"><div class="tag">Tu orientación</div>';
+  if(safe){ html+='<div class="tname">Empecemos por una evaluación 🤍</div><div class="tdesc">Queremos cuidarte bien.</div><div class="rsafe">⚠️ '+safe+'</div>'; }
+  else { html+='<div class="tname">'+recName+'</div><div class="tdesc">'+recDesc+'</div>'; if(base.alt) html+='<div class="rextra">'+base.alt+'</div>'; }
+  notes.forEach(function(n){ html+='<div class="rtip">💡 '+n+'</div>'; });
+  html+='<div class="rdisc">Esta recomendación es <b>orientativa y debe confirmarse mediante una evaluación profesional</b> con Jodie Berríos (enfermera).</div>';
+  if(!safe){ html+='<button class="cta" style="margin-top:16px" onclick="openDetail('+recIdx+')">Ver tratamiento recomendado</button>'; }
+  html+='<button class="cta gold" onclick="go(\'agenda\')">Agendar evaluación 🗓️</button>';
+  html+='<button class="btn2" onclick="startQuiz()">Repetir test ↺</button></div>';
+  wrap.innerHTML=html; var sc=document.querySelector('#test .scroll'); if(sc)sc.scrollTop=0;
+}
+
+/* Catálogo: lo renderiza renderTreatments() (lista unificada con fichas al tocar). */
+
+/* ===================== CUIDADOS DE ENFERMERÍA ===================== */
+const CUIDADOS={
+ seca:{t:'Piel seca / deshidratada',li:['Limpia con productos suaves, sin jabones fuertes.','Hidrata mañana y noche; busca ácido hialurónico y ceramidas.','Bebe agua y suma omega-3 (pescado, chía) a tu dieta.','Protector solar diario, incluso en invierno.']},
+ grasa:{t:'Piel grasa',li:['Limpieza suave 2 veces al día (resecar empeora el rebote de grasa).','Hidratante ligero "oil-free": no saltes la hidratación.','Evita tocarte la cara y exfoliar en exceso.','Protector solar en gel o ligero, a diario.']},
+ mixta:{t:'Piel mixta',li:['Cuida la zona T (frente y nariz) sin resecar las mejillas.','Hidratación equilibrada con productos ligeros.','Limpieza suave mañana y noche.','Protector solar diario.']},
+ normal:{t:'Piel normal',li:['Rutina simple: limpiar, hidratar y proteger.','Hidratación diaria y una alimentación variada.','Protector solar todos los días.','Descanso y manejo del estrés (la piel lo refleja).']},
+ sensible:{t:'Piel sensible / reactiva',li:['Menos es más: pocos productos y suaves, sin alcohol ni perfume.','Prueba los productos nuevos de a uno.','Evita el agua muy caliente y la fricción fuerte.','Protector solar para piel sensible, a diario.','Ante rojez persistente, consulta antes de tratamientos intensivos.']}
+};
+let careSel='seca';
+(function(){
+ var pick=document.getElementById('skinPick'); if(!pick)return;
+ var names={seca:'Seca',grasa:'Grasa',mixta:'Mixta',normal:'Normal',sensible:'Sensible'};
+ pick.innerHTML=Object.keys(CUIDADOS).map(function(k){ return '<button class="'+(k===careSel?'sel':'')+'" onclick="setCare(\''+k+'\')">'+names[k]+'</button>'; }).join('');
+ renderCare();
+})();
+function setCare(k){ careSel=k; document.querySelectorAll('#skinPick button').forEach(function(b){ b.classList.toggle('sel', b.textContent.toLowerCase().startsWith(k.slice(0,4))); }); renderCare(); }
+function renderCare(){ var c=CUIDADOS[careSel], el=document.getElementById('careBody'); if(!el)return; el.innerHTML='<div class="carecard"><b>'+c.t+'</b>'+c.li.map(function(x){ return '<div class="li"><i>✿</i><span>'+x+'</span></div>'; }).join('')+'</div>'; }
+
+/* ===================== FASE 4 ===================== */
+/* --- Mi evolución --- */
+const MISRESULT=[
+ {t:'Recuperación Capilar (PRP)',fecha:'12 mar 2026',ses:'Sesión 3 de 6',prog:50},
+ {t:'PRP Facial',fecha:'2 abr 2026',ses:'Sesión 4 de 6',prog:67},
+ {t:'Lipólisis Enzimática',fecha:'20 abr 2026',ses:'Sesión 2 de 6',prog:33}
+];
+const PUBRESULT=[]; // resultados reales: se cargan cuando haya fotos de pacientes CON su autorización
+function resCard(r){
+  return '<div class="rescard fade-up"><h4>'+r.t+'</h4>'
+   +'<div class="resmeta"><span>📅 '+r.fecha+'</span><span>· '+r.ses+'</span></div>'
+   +'<div style="background:#F7E7E2;border-radius:14px;padding:22px 14px;text-align:center;color:#B5726F;font-size:13px;margin:4px 0 10px">📷 Aquí irán tus fotos de seguimiento reales</div>'
+   +'<div class="track"><div class="bar"><i style="width:'+r.prog+'%"></i></div><div class="lbls"><span>Inicio</span><span>Ahora</span></div></div></div>';
+}
+function showRes(which){
+  var data=which==='pub'?PUBRESULT:MISRESULT;
+  var body=document.getElementById('resBody');
+  var conGal=TREATMENTS.filter(function(t){ return t.galeria; });
+  if(which==='pub' && conGal.length){ body.innerHTML=conGal.map(function(t){ return '<div class="rescard fade-up"><h4>'+t.galeria.t+'</h4><div class="resmeta"><span>'+t.n+'</span></div><div class="galeria grid">'+galFotos(t.galeria)+'</div></div>'; }).join('')+'<div class="rdisc" style="text-align:center">Pacientes reales de Patagonia Glow, publicadas con su autorización. Los resultados pueden variar entre personas.</div>'; }
+  else if(which==='pub' && !data.length){ body.innerHTML='<div class="carecard"><b>Resultados reales, pronto</b><div class="li"><i>✿</i><span>Aquí publicaremos resultados de pacientes reales, siempre con su autorización.</span></div></div>'; }
+  else { body.innerHTML=data.map(resCard).join(''); }
+  document.getElementById('tabMis').classList.toggle('sel',which==='mis');
+  document.getElementById('tabPub').classList.toggle('sel',which==='pub');
+}
+showRes('mis'); window.showRes=showRes;
+
+/* --- Puntos explicados --- */
+(function renderPts(){
+  var el=document.getElementById('ptsExplain'); if(!el)return;
+  el.innerHTML='<b class="h">Tu próximo beneficio</b>'
+   +'<div class="ptsprog"><i style="width:82%"></i></div>'
+   +'<div class="ptsnote">Tienes <b>1.240 puntos</b>. Te faltan <b>260</b> para desbloquear tu próximo beneficio 🎁</div>'
+   +'<b class="h" style="margin-top:14px">Cómo ganar puntos</b>'
+   +['Puntos por cada tratamiento que realizas','Puntos por recomendar a una amiga','Beneficio especial en tu cumpleaños','Premio al completar un plan de sesiones','Puntos por dejar una reseña tras asistir']
+     .map(function(x){return '<div class="ptli"><i>✦</i><span>'+x+'</span></div>';}).join('');
+})();
+
+/* --- Gift Cards --- */
+const GC_OCC=[{k:'cumple',e:'🎂',l:'Glow de cumpleaños'},{k:'auto',e:'🕯️',l:'Día de autocuidado'},{k:'mama',e:'👩‍👧',l:'Regalo mamá e hija'},{k:'evento',e:'💃',l:'Para un evento'}];
+const GC_AMT=['$20.000','$30.000','$50.000','$80.000'];
+let gcOcc='cumple', gcAmt='$30.000';
+function renderGCchips(){
+  var o=document.getElementById('gcOcc'); if(o) o.innerHTML=GC_OCC.map(function(x){return '<button class="'+(x.k===gcOcc?'sel':'')+'" onclick="pickOcc(\''+x.k+'\')">'+x.e+' '+x.l+'</button>';}).join('');
+  var a=document.getElementById('gcAmt'); if(a) a.innerHTML=GC_AMT.map(function(x){return '<button class="'+(x===gcAmt?'sel':'')+'" onclick="pickAmt(\''+x+'\')">'+x+'</button>';}).join('');
+}
+function pickOcc(k){ gcOcc=k; renderGCchips(); renderGC(); }
+function pickAmt(v){ gcAmt=v; renderGCchips(); renderGC(); }
+function renderGC(){
+  var occ=GC_OCC.find(function(x){return x.k===gcOcc;})||GC_OCC[0];
+  var to=(document.getElementById('gcTo')||{}).value||'…';
+  var ded=(document.getElementById('gcDed')||{}).value||'Con cariño para ti';
+  var trat=(document.getElementById('gcTrat')||{}).value;
+  var el=document.getElementById('gcPreview'); if(!el)return;
+  el.innerHTML='<div class="gcpreview"><div class="gtag">Patagonia Glow · Gift Card</div>'
+   +'<div class="gtitle">'+occ.e+' '+occ.l+'</div>'
+   +'<div class="gamt">'+gcAmt+(trat?' · '+trat:'')+'</div>'
+   +'<div class="gto">Para: '+to+'</div>'
+   +'<div class="gded">"'+ded+'"</div></div>';
+}
+renderGCchips(); renderGC();
+window.pickOcc=pickOcc; window.pickAmt=pickAmt; window.renderGC=renderGC;
+
+/* --- FAQ --- */
+const FAQS=[
+ ['¿Necesito una evaluación antes de mi tratamiento?','Algunos procedimientos requieren una evaluación previa para tu seguridad. En cada tratamiento te indicamos si es necesaria; también puedes completar la evaluación preliminar desde la app.'],
+ ['¿Puedo reprogramar o cancelar mi hora?','Sí. Puedes reprogramar o cancelar hasta 24 horas antes sin costo, desde la app o por WhatsApp.'],
+ ['¿Los tratamientos duelen?','La mayoría son muy tolerables. En procedimientos con microagujas se toman medidas para tu comodidad. Jodie te explica todo antes de comenzar.'],
+ ['¿Cuándo veo resultados?','Depende del tratamiento y de tu piel. Muchos son progresivos y se aprecian mejor tras varias sesiones. Los resultados pueden variar entre personas.'],
+ ['¿En qué ciudades atienden?','En Santiago y Punta Arenas. Eliges tu sede al agendar.'],
+ ['¿Cómo se cuidan mis fotos y datos?','Tus fotos y datos son privados y solo se usan para tu atención. No los publicamos sin tu autorización. Revisa la Política de privacidad.']
+];
+(function renderFaq(){
+  var el=document.getElementById('faqList'); if(!el)return;
+  el.innerHTML=FAQS.map(function(f,i){return '<div class="faqitem" id="faq'+i+'"><div class="faqq" onclick="toggleFaq('+i+')">'+f[0]+'<span class="fq-i">+</span></div><div class="faqa">'+f[1]+'</div></div>';}).join('');
+})();
+function toggleFaq(i){ document.getElementById('faq'+i).classList.toggle('open'); }
+window.toggleFaq=toggleFaq;
+
+/* --- Reseñas verificadas --- */
+const REVIEWS=[]; // reseñas reales: se cargan con la autorización de cada paciente
+(function renderReviews(){
+  var el=document.getElementById('revList'); if(!el)return;
+  if(!REVIEWS.length){ el.innerHTML='<div class="carecard"><b>Pronto, opiniones de nuestras pacientes</b><div class="li"><i>✿</i><span>Publicaremos opiniones reales, con la autorización de cada paciente.</span></div></div>'; return; }
+  el.innerHTML=REVIEWS.map(function(r){return '<div class="review"><div class="rvh"><div class="rva">'+r[0][0]+'</div><div class="rvn"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="rvver">✓ Verificada</span></div><div class="stars">★★★★★</div><p>'+r[2]+'</p></div>';}).join('');
+})();
+
+/* --- Favoritos --- */
+const FAVS=new Set();
+function toggleFav(i,btn){ if(FAVS.has(i)){FAVS.delete(i);if(btn)btn.textContent='🤍';toast('Quitado de favoritos');} else {FAVS.add(i);if(btn)btn.textContent='❤️';toast('Agregado a favoritos ❤️');} }
+function renderFavs(){
+  var el=document.getElementById('favList'); if(!el)return;
+  if(!FAVS.size){ el.innerHTML='<div class="carecard"><b>Aún no tienes favoritos</b><div class="li"><i>✿</i><span>Toca el corazón en un tratamiento para guardarlo aquí.</span></div></div><button class="cta" style="margin-top:14px" onclick="go(\'catalogo\')">Ver tratamientos</button>'; return; }
+  el.innerHTML=Array.from(FAVS).map(function(i){return trow(TREATMENTS[i],i,'view');}).join('');
+}
+window.toggleFav=toggleFav; window.renderFavs=renderFavs;
+
+/* --- Historial de sesiones --- */
+const HIST=[
+ {t:'Limpieza Facial Profunda',fecha:'2 abr 2026',sede:'Santiago'},
+ {t:'BB Glow',fecha:'18 mar 2026',sede:'Santiago'},
+ {t:'ADN de salmón con Dermapen',fecha:'28 feb 2026',sede:'Santiago'}
+];
+(function renderHist(){
+  var el=document.getElementById('histList'); if(!el)return;
+  el.innerHTML=HIST.map(function(h){return '<div class="srow" style="cursor:default"><div class="circ" style="font-size:20px">✓</div><div class="nm"><b>'+h.t+'</b><small>'+h.fecha+' · '+h.sede+'</small></div></div>';}).join('')
+   +'<div class="rdisc" style="text-align:center">Tus sesiones anteriores en Patagonia Glow.</div>';
+})();
+
+/* ===== PÁGINA WEB: rutas + menú + portada (mismos datos y funciones de la app) ===== */
+function esWeb(){ return true; }
+const RUTAS={home:'inicio',catalogo:'tratamientos',agenda:'agenda',resultados:'resultados',cuidados:'cuidados',giftcards:'gift-cards',
+  sobre:'nosotras',faq:'preguntas',perfil:'mi-perfil',favoritos:'favoritos',historial:'historial',resenas:'resenas',
+  mejorar:'lo-que-buscas',evalprev:'evaluacion-previa',privacidad:'privacidad',test:'test'};
+const MENU=[['home','Inicio'],['catalogo','Tratamientos'],['resultados','Resultados'],['cuidados','Cuidados'],['giftcards','Gift Cards'],['sobre','Nosotras'],['faq','Preguntas'],['perfil','Mi perfil']];
+function slug(t){ return t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+var _go=go, _open=openDetail, _close=closeDetail, rutaActual='home';
+go=function(id){
+  _go(id); rutaActual=id; document.body.dataset.r=id;
+  if(id!=='splash' && RUTAS[id]){ var h='#/'+RUTAS[id]; if(location.hash!==h) history.pushState(null,'',h); }
+  document.querySelectorAll('.w-nav a').forEach(function(a){ a.classList.toggle('sel',a.dataset.s===id); });
+  if(esWeb()) window.scrollTo(0,0);
+};
+openDetail=function(i){ _open(i); var h='#/tratamiento/'+slug(TREATMENTS[i].n); if(location.hash!==h) history.pushState(null,'',h); };
+closeDetail=function(){ _close(); var h='#/'+(RUTAS[rutaActual]||'inicio'); if(location.hash!==h) history.replaceState(null,'',h); };
+window.go=go; window.openDetail=openDetail; window.closeDetail=closeDetail;
+function aplicarRuta(){
+  var r=location.hash.replace(/^#\/?/,'');
+  if(r.indexOf('tratamiento/')===0){
+    var i=TREATMENTS.findIndex(function(t){ return slug(t.n)===r.slice(12); });
+    if(i>=0){ if(rutaActual!=='catalogo'){ go('catalogo'); } _open(i); history.replaceState(null,'','#/'+r); return; }
+  }
+  _close();
+  var id=Object.keys(RUTAS).find(function(k){ return RUTAS[k]===r; });
+  if(id) go(id); else if(esWeb()) go('home');
+}
+window.addEventListener('popstate',aplicarRuta);
+(function renderWeb(){
+  var w=document.getElementById('web'); if(!w) return;
+  w.innerHTML='<div class="w-in w-top"><div class="w-logo" onclick="go(\'home\')"><img src="logo-montana.png" alt=""><b>PATAGONIA GLOW</b></div>'
+   +'<nav class="w-nav">'+MENU.map(function(m){ return '<a href="#/'+RUTAS[m[0]]+'" data-s="'+m[0]+'" onclick="go(\''+m[0]+'\');return false">'+m[1]+'</a>'; }).join('')+'</nav>'
+   +'<button class="w-btn" style="padding:10px 18px" onclick="go(\'agenda\')">Agendar</button></div>';
+  var gal=TREATMENTS.filter(function(t){ return t.galeria; });
+  var home=document.createElement('div'); home.className='w-home w-in';
+  home.innerHTML='<section class="w-hero"><div><div class="w-eyebrow">ESTÉTICA · SALUD · BIENESTAR</div>'
+   +'<h1>Tu piel,<br>tu bienestar,<br><em>tu glow.</em></h1>'
+   +'<p>Tratamientos faciales y de bienestar con evaluación profesional personalizada, en Santiago y Punta Arenas.</p>'
+   +'<div class="w-ctas"><button class="w-btn" onclick="go(\'agenda\')">Agendar una evaluación</button>'
+   +'<button class="w-btn alt" onclick="openTest()">Descubrir mi cuidado ideal</button></div>'
+   +'<div class="w-chips"><span>Jodie Berríos · Enfermera</span><span>Santiago · Punta Arenas</span><span>Evaluación personalizada</span></div></div>'
+   +(gal.length?'<div class="ph"><img src="img/labios/labios-01.jpg" alt="Resultado real de aumento de labios"></div>':'')+'</section>'
+   +'<section class="w-sec"><h2>Tratamientos</h2><div class="w-lead">Cada tratamiento se define en una evaluación profesional personalizada. Abre su ficha para ver en qué consiste, sus cuidados y contraindicaciones.</div><div class="w-grid">'
+   +TREATMENTS.map(function(t,i){
+      return '<div class="w-card"><div class="e">'+t.e+'</div><h3>'+t.n+'</h3><small>⏱ '+t.dur+(t.eval?' · requiere evaluación':'')+'</small>'
+       +'<p>'+(t.d||t.resumen||'')+'</p><div class="acts"><button class="w-btn alt" onclick="openDetail('+i+')">Ver ficha</button><button class="w-btn" onclick="agendarDe('+i+')">Agendar</button></div></div>';
+    }).join('')+'</div></section>'
+   +gal.map(function(t){ return '<section class="w-sec"><h2>Resultados reales</h2><div class="w-lead">'+t.galeria.t+' con '+t.n.toLowerCase()+'. Pacientes reales de Patagonia Glow, publicadas con su autorización. Los resultados pueden variar entre personas.</div><div class="w-fotos">'+galFotos(t.galeria)+'</div></section>'; }).join('')
+   +'<div class="w-band"><div><h3>¿No sabes qué tratamiento elegir?</h3><p>Responde unas preguntas y te orientamos. Siempre se confirma en tu evaluación.</p></div><button class="w-btn" onclick="openTest()">Hacer el test</button></div>';
+  w.after(home);
+  var f=document.createElement('footer'); f.className='w-foot';
+  f.innerHTML='<span>© Patagonia Glow · Estética, salud y bienestar · Santiago · Punta Arenas</span>'
+   +'<span><a onclick="go(\'privacidad\')">Privacidad</a> · <a onclick="go(\'faq\')">Preguntas</a> · <a onclick="waGeneral()">WhatsApp</a></span>';
+  document.body.appendChild(f);
+  if(location.hash) aplicarRuta(); else if(esWeb()) go('home');
+})();
+</script>
+</body>
+</html>
