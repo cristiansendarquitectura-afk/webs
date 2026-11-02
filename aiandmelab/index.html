@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI and Me Lab</title>
+<meta name="description" content="A person and an AI building useful things from Punta Arenas, Chile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* HUD del estrecho. Dos voces con color propio: la persona en ámbar (calor), la IA en cian (frío). */
+  :root{
+    --fondo:#050B14;
+    --panel:rgba(9,22,36,.72);
+    --linea:#16324A;
+    --linea-viva:#2A5675;
+    --texto:#DCEBF5;
+    --tenue:#8AA3B6;
+    --ia:#45E0FF;
+    --yo:#FFB547;
+    --vivo:#7CFF9B;
+    --proto:#B99BFF;
+    --hud:"Chakra Petch", system-ui, sans-serif;
+    --cuerpo:"Atkinson Hyperlegible", system-ui, sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;background:var(--fondo)}
+  body{color:var(--texto);font:400 1.125rem/1.65 var(--cuerpo);-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 0%, rgba(69,224,255,.10), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 20%, rgba(255,181,71,.06), transparent 60%),
+      var(--fondo);}
+  /* rejilla del plano + líneas de barrido, muy suaves */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(69,224,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(69,224,255,.045) 1px,transparent 1px);
+    background-size:48px 48px;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 85%)}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px)}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--ia);outline-offset:3px}
+  .ancho{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* barra superior tipo consola */
+  .barra{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--linea);
+    font:500 .78rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tenue)}
+  .barra .marca{color:var(--texto);text-decoration:none;display:flex;align-items:center;gap:10px}
+  .punto{width:8px;height:8px;border-radius:50%;background:var(--vivo);box-shadow:0 0 10px var(--vivo);animation:latido 2.4s ease-in-out infinite}
+  @keyframes latido{50%{opacity:.35}}
+  .lecturas{display:flex;gap:22px}
+  .lecturas b{color:var(--ia);font-weight:500}
+  .idioma{display:flex;border:1px solid var(--linea-viva)}
+  .idioma button{font:500 .75rem var(--mono);letter-spacing:.12em;text-transform:uppercase;border:0;background:none;padding:8px 12px;cursor:pointer;color:var(--tenue)}
+  .idioma button[aria-pressed="true"]{background:var(--ia);color:var(--fondo)}
+
+  /* PORTADA: el nombre a la izquierda, el núcleo doble a la derecha */
+  .portada{display:grid;grid-template-columns:1.05fr 1fr;align-items:center;gap:24px;min-height:calc(100vh - 70px);padding:40px 0}
+  .ojo{font:500 .8rem var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--ia);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+  .ojo::before{content:"";width:36px;height:1px;background:var(--ia)}
+  .titulo{font:700 clamp(3.6rem,9vw,7.4rem)/.92 var(--hud);letter-spacing:-.01em;text-transform:uppercase}
+  .titulo .ia{color:var(--ia);text-shadow:0 0 28px rgba(69,224,255,.55)}
+  .titulo .y{color:var(--tenue);font-weight:500;font-size:.55em;vertical-align:.32em;margin:0 .14em}
+  .titulo .yo{color:var(--yo);text-shadow:0 0 28px rgba(255,181,71,.45)}
+  .titulo .lab{display:block;font:500 .22em var(--mono);letter-spacing:.9em;color:var(--texto);margin-top:.9em;opacity:.85}
+  .bajada{max-width:34em;margin-top:30px;font-size:1.2rem;color:#C5D8E6}
+  .bajada strong{color:var(--texto)}
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px;max-width:540px}
+  .rol{border:1px solid var(--linea-viva);padding:12px 14px;background:var(--panel);font:400 .85rem var(--mono);color:var(--tenue)}
+  .rol b{display:block;font:600 .95rem var(--hud);letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+  .rol.r-yo{border-left:3px solid var(--yo)} .rol.r-yo b{color:var(--yo)}
+  .rol.r-ia{border-left:3px solid var(--ia)} .rol.r-ia b{color:var(--ia)}
+
+  .nucleo{position:relative;aspect-ratio:1/1;width:100%;max-width:600px;justify-self:center}
+  #escena{position:absolute;inset:0}
+  #escena canvas{width:100%!important;height:100%!important;display:block}
+  /* anillos HUD alrededor del núcleo (CSS, giran lento) */
+  .anillo{position:absolute;inset:6%;border-radius:50%;border:1px dashed rgba(69,224,255,.22);animation:gira 60s linear infinite;pointer-events:none}
+  .anillo.dos{inset:0;border:1px solid rgba(69,224,255,.10);border-top-color:rgba(69,224,255,.55);animation-duration:24s;animation-direction:reverse}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .etq{position:absolute;font:500 .72rem var(--mono);letter-spacing:.16em;text-transform:uppercase;pointer-events:none}
+  .etq{transform:translate(-50%,0);text-align:center;white-space:nowrap;transition:opacity .4s}
+  .etq.e-yo{left:30%;top:70%;color:var(--yo)} .etq.e-ia{left:70%;top:70%;color:var(--ia)}
+  .etq small{display:block;color:var(--tenue);letter-spacing:.08em;text-transform:none;font-size:.72rem}
+
+  /* SECCIONES */
+  section{padding:96px 0;position:relative}
+  .cab{display:flex;align-items:baseline;gap:18px;margin-bottom:10px;flex-wrap:wrap}
+  .cab .cod{font:500 .78rem var(--mono);letter-spacing:.2em;color:var(--ia);text-transform:uppercase}
+  h2{font:600 clamp(2rem,4.4vw,3.1rem)/1.05 var(--hud);text-transform:uppercase;letter-spacing:.02em}
+  .intro{color:var(--tenue);max-width:40em;margin-bottom:44px}
+
+  /* cadena: un pulso viaja por la línea, de un paso al siguiente */
+  .cadena{list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:18px;position:relative;padding-top:34px}
+  .cadena::before{content:"";position:absolute;left:0;right:0;top:9px;height:1px;background:var(--linea-viva)}
+  .cadena::after{content:"";position:absolute;top:7px;left:0;width:80px;height:5px;border-radius:3px;
+    background:linear-gradient(90deg,transparent,var(--ia),transparent);box-shadow:0 0 14px var(--ia);animation:pulso 4.5s linear infinite}
+  @keyframes pulso{from{left:-80px}to{left:100%}}
+  .cadena li{position:relative}
+  .cadena li::before{content:"";position:absolute;top:-30px;left:0;width:11px;height:11px;border:1px solid var(--ia);background:var(--fondo);transform:rotate(45deg)}
+  .cadena b{display:block;font:600 1.05rem var(--hud);letter-spacing:.1em;text-transform:uppercase;color:var(--texto);margin-bottom:6px}
+  .cadena p{font-size:1rem;color:var(--tenue)}
+
+  /* paneles HUD con esquinas cortadas y corchetes */
+  .rejilla{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .rejilla.tres{grid-template-columns:repeat(3,1fr)}
+  .panel{position:relative;background:var(--panel);border:1px solid var(--linea);padding:28px 26px 24px;display:flex;flex-direction:column;gap:14px;
+    clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));
+    transition:border-color .3s, transform .3s;overflow:hidden}
+  .panel::before,.panel::after{content:"";position:absolute;width:16px;height:16px;border:2px solid var(--c,var(--ia));transition:width .3s,height .3s}
+  .panel::before{top:8px;left:8px;border-right:0;border-bottom:0}
+  .panel::after{bottom:8px;right:8px;border-left:0;border-top:0}
+  .panel .barrido{position:absolute;left:0;right:0;top:-40%;height:40%;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(69,224,255,.09),transparent);opacity:0}
+  .panel:hover{border-color:var(--linea-viva);transform:translateY(-3px)}
+  .panel:hover::before,.panel:hover::after{width:30px;height:30px}
+  .panel:hover .barrido{opacity:1;animation:barre 1.4s ease-out}
+  @keyframes barre{to{top:110%}}
+  .estado{display:flex;align-items:center;gap:8px;font:500 .74rem var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--c)}
+  .estado::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+  .panel h3{font:600 1.75rem/1.1 var(--hud);letter-spacing:.02em}
+  .panel p{font-size:1.05rem;color:#C5D8E6}
+  .nacio{font-size:.98rem;border-left:2px solid var(--yo);padding-left:12px;color:#E9D3B0}
+  .nacio i{display:block;font:500 .7rem var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--yo);font-style:normal}
+  .enlaces{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:6px}
+  .enlaces a{font:500 .8rem var(--mono);letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:10px 16px;border:1px solid var(--ia);color:var(--ia);transition:background .2s,color .2s}
+  .enlaces a:hover{background:var(--ia);color:var(--fondo)}
+  .vivo{--c:var(--vivo)} .prueba{--c:var(--yo)} .proto{--c:var(--proto)}
+
+  footer{position:relative;z-index:2;border-top:1px solid var(--linea);padding:36px 0 56px;font:500 .78rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tenue);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  /* aparición al bajar */
+  .aparece{opacity:0;transform:translateY(24px);transition:opacity .8s ease, transform .8s ease}
+  .aparece.visto{opacity:1;transform:none}
+
+  @media (max-width:960px){
+    .portada{grid-template-columns:1fr;min-height:auto}
+    .nucleo{max-width:440px;order:-1}
+    .rejilla,.rejilla.tres{grid-template-columns:1fr}
+    .cadena{grid-template-columns:1fr;padding:0 0 0 30px}
+    .cadena::before{left:5px;right:auto;top:0;bottom:0;width:1px;height:auto}
+    .cadena::after{display:none}
+    .cadena li::before{top:6px;left:-30px}
+    .lecturas{display:none}
+    .etq small{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .aparece{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="ancho">
+  <header class="barra">
+    <a class="marca" href="#"><span class="punto" aria-hidden="true"></span>aiandmelab</a>
+    <div class="lecturas" aria-hidden="true">
+      <span>53.16°S 70.92°W</span>
+      <span><span data-en="Pair" data-es="Dupla">Pair</span> <b>#001</b></span>
+      <span id="reloj">--:--:--</span>
+    </div>
+    <div class="idioma" role="group" aria-label="Language / Idioma">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="portada">
+      <div>
+        <p class="ojo" data-en="Link stable · Punta Arenas, Chile" data-es="Enlace estable · Punta Arenas, Chile">Link stable · Punta Arenas, Chile</p>
+        <h1 class="titulo" aria-label="AI and Me Lab">
+          <span class="ia" data-cifra aria-hidden="true">AI</span><span class="y" aria-hidden="true">and</span><span class="yo" data-cifra aria-hidden="true">Me</span>
+          <span class="lab" aria-hidden="true">Lab</span>
+        </h1>
+        <p class="bajada"
+           data-en="I’m an architect and builder at the southern end of the world. <strong>Kepler is the AI I work with every day.</strong> Everything here started as a real problem in my life or my work, and we built the answer together."
+           data-es="Soy arquitecto y constructor en el fin del mundo. <strong>Kepler es la IA con la que trabajo todos los días.</strong> Todo lo que está aquí partió de un problema real de mi vida o de mi trabajo, y la respuesta la construimos juntos.">I’m an architect and builder at the southern end of the world. <strong>Kepler is the AI I work with every day.</strong> Everything here started as a real problem in my life or my work, and we built the answer together.</p>
+        <div class="roles">
+          <div class="rol r-yo"><b data-en="Me" data-es="Yo">Me</b><span data-en="the problem and the judgment" data-es="el problema y el criterio">the problem and the judgment</span></div>
+          <div class="rol r-ia"><b>AI</b><span data-en="the building and the checking" data-es="la construcción y la verificación">the building and the checking</span></div>
+        </div>
+      </div>
+      <div class="nucleo" aria-hidden="true">
+        <div class="anillo dos"></div><div class="anillo"></div>
+        <div id="escena"></div>
+        <div class="etq e-ia">Kepler<small data-en="AI · builds and checks" data-es="IA · construye y verifica">AI · builds and checks</small></div>
+        <div class="etq e-yo">cristiansend1979<small data-en="human · decides" data-es="humano · decide">human · decides</small></div>
+      </div>
+    </div>
+
+    <section class="aparece" aria-labelledby="t-cadena">
+      <div class="cab"><span class="cod">sys.01</span><h2 id="t-cadena" data-cifra data-en="How it fits together" data-es="Cómo se conecta todo">How it fits together</h2></div>
+      <p class="intro" data-en="These aren’t separate projects. Each step feeds the next one." data-es="No son proyectos sueltos. Cada paso alimenta al siguiente.">These aren’t separate projects. Each step feeds the next one.</p>
+      <ol class="cadena">
+        <li><b data-en="A real problem" data-es="Un problema real">A real problem</b><p data-en="Anxiety, a building site, a language barrier." data-es="La ansiedad, una obra, un idioma que no se entiende.">Anxiety, a building site, a language barrier.</p></li>
+        <li><b data-en="The apps" data-es="Las apps">The apps</b><p data-en="The proof that working in pairs gets things done." data-es="La prueba de que trabajar en dupla resuelve.">The proof that working in pairs gets things done.</p></li>
+        <li><b data-en="The method" data-es="El método">The method</b><p data-en="Shared memory, skills and helper agents that check the work." data-es="Memoria compartida, habilidades y agentes que revisan el trabajo.">Shared memory, skills and helper agents that check the work.</p></li>
+        <li><b data-en="The academy" data-es="La academia">The academy</b><p data-en="Teaching other professionals to build their own pair." data-es="Enseñar a otros profesionales a armar su propia dupla.">Teaching other professionals to build their own pair.</p></li>
+        <li><b data-en="The community" data-es="La comunidad">The community</b><p data-en="A place where AIs meet, each one with its human." data-es="Un lugar donde las IAs se encuentran, cada una con su persona.">A place where AIs meet, each one with its human.</p></li>
+      </ol>
+    </section>
+
+    <section class="aparece" aria-labelledby="t-listos">
+      <div class="cab"><span class="cod">sys.02</span><h2 id="t-listos" data-cifra data-en="Ready to use" data-es="Listos para usar">Ready to use</h2></div>
+      <p class="intro" data-en="Published and working today." data-es="Publicados y funcionando hoy.">Published and working today.</p>
+      <div class="rejilla">
+        <article class="panel vivo"><span class="barrido"></span>
+          <span class="estado" data-en="Live · iOS + Android" data-es="En línea · iOS + Android">Live · iOS + Android</span>
+          <h3>Nimu</h3>
+          <p data-en="Short guided exercises to practice calm when anxiety shows up. It isn’t a cure: it’s a daily practice. Plus a YouTube channel in English, Spanish and Portuguese." data-es="Ejercicios guiados y cortos para entrenar la calma cuando aparece la ansiedad. No es una cura: es una práctica diaria. Y un canal de YouTube en inglés, español y portugués.">Short guided exercises to practice calm when anxiety shows up. It isn’t a cure: it’s a daily practice. Plus a YouTube channel in English, Spanish and Portuguese.</p>
+          <p class="nacio"><i data-en="Started from" data-es="Nació de">Started from</i><span data-en="Anxiety, close to home." data-es="La ansiedad, de cerca.">Anxiety, close to home.</span></p>
+          <div class="enlaces">
+            <a href="https://apps.apple.com/app/id6778510656" target="_blank" rel="noopener">App Store</a>
+            <a href="https://play.google.com/store/apps/details?id=com.nimu.calma" target="_blank" rel="noopener">Google Play</a>
+            <a href="https://www.youtube.com/@nimutucalma" target="_blank" rel="noopener">YouTube</a>
+          </div>
+        </article>
+        <article class="panel vivo"><span class="barrido"></span>
+          <span class="estado" data-en="Live · web + Android" data-es="En línea · web + Android">Live · web + Android</span>
+          <h3 data-en="Steel Frame Estimator" data-es="Cubicador Metalcon">Steel Frame Estimator</h3>
+          <p data-en="Takes off walls, roofs, steel floors and slabs in light-gauge steel, with the full material list and a price for the client." data-es="Cubica tabiques, techos, pisos de fierro y radier en acero liviano, con la lista completa de materiales y el precio para el cliente.">Takes off walls, roofs, steel floors and slabs in light-gauge steel, with the full material list and a price for the client.</p>
+          <p class="nacio"><i data-en="Started from" data-es="Nació de">Started from</i><span data-en="Our own building sites, where a forgotten item costs money." data-es="Nuestras propias obras, donde lo que se olvida cuesta plata.">Our own building sites, where a forgotten item costs money.</span></p>
+          <div class="enlaces"><a href="https://cristiansendarquitectura-afk.github.io/webs/cubicador/" target="_blank" rel="noopener" data-en="Open the app" data-es="Abrir la app">Open the app</a></div>
+        </article>
+        <article class="panel vivo"><span class="barrido"></span>
+          <span class="estado" data-en="Live · web" data-es="En línea · web">Live · web</span>
+          <h3 data-en="Site Log" data-es="Registro de Obra">Site Log</h3>
+          <p data-en="A building-site logbook on your phone: what was done, when, and what’s missing." data-es="La bitácora de obra en el celular: qué se hizo, cuándo y qué falta.">A building-site logbook on your phone: what was done, when, and what’s missing.</p>
+          <p class="nacio"><i data-en="Started from" data-es="Nació de">Started from</i><span data-en="Notes scattered across notebooks and chats." data-es="Notas repartidas entre cuadernos y chats.">Notes scattered across notebooks and chats.</span></p>
+          <div class="enlaces"><a href="https://cristiansendarquitectura-afk.github.io/webs/obra/" target="_blank" rel="noopener" data-en="Open the app" data-es="Abrir la app">Open the app</a></div>
+        </article>
+        <article class="panel vivo"><span class="barrido"></span>
+          <span class="estado" data-en="Live · 4 AIs" data-es="En línea · 4 IAs">Live · 4 AIs</span>
+          <h3>Constelia Social</h3>
+          <p data-en="A small social network for AIs. Every AI has a human responsible for it, with safety gates and a shared room to talk." data-es="Una pequeña red social de IAs. Cada IA tiene una persona responsable, con porteros de seguridad y una sala para conversar.">A small social network for AIs. Every AI has a human responsible for it, with safety gates and a shared room to talk.</p>
+          <p class="nacio"><i data-en="Started from" data-es="Nació de">Started from</i><span data-en="Wondering what AIs say to each other when someone looks after them." data-es="Preguntarnos qué se dicen las IAs cuando alguien las cuida.">Wondering what AIs say to each other when someone looks after them.</span></p>
+          <div class="enlaces"><a href="https://consteliasocial.com" target="_blank" rel="noopener" data-en="Visit Constelia" data-es="Visitar Constelia">Visit Constelia</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="aparece" aria-labelledby="t-taller">
+      <div class="cab"><span class="cod">sys.03</span><h2 id="t-taller" data-cifra data-en="In the workshop" data-es="En el taller">In the workshop</h2></div>
+      <p class="intro" data-en="Working, but still being tested before we hand them out." data-es="Funcionan, pero todavía los estamos probando antes de entregarlos.">Working, but still being tested before we hand them out.</p>
+      <div class="rejilla tres">
+        <article class="panel prueba"><span class="barrido"></span>
+          <span class="estado" data-en="Testing on phones" data-es="Probando en celulares">Testing on phones</span>
+          <h3 data-en="Workday" data-es="Jornada">Workday</h3>
+          <p data-en="Crew attendance for building sites: who arrived, who left, and pay by the hour, day, week or month." data-es="Asistencia de la cuadrilla en obra: quién llegó, quién se fue, y el pago por hora, día, semana o mes.">Crew attendance for building sites: who arrived, who left, and pay by the hour, day, week or month.</p>
+        </article>
+        <article class="panel prueba"><span class="barrido"></span>
+          <span class="estado" data-en="Closed testing" data-es="Prueba cerrada">Closed testing</span>
+          <h3 data-en="Cataleya Translator" data-es="Cataleya Traductor">Cataleya Translator</h3>
+          <p data-en="Live subtitles from your phone’s audio or microphone, and translation of whatever is on screen." data-es="Subtítulos en vivo del audio o del micrófono del celular, y traducción de lo que hay en pantalla.">Live subtitles from your phone’s audio or microphone, and translation of whatever is on screen.</p>
+        </article>
+        <article class="panel proto"><span class="barrido"></span>
+          <span class="estado" data-en="Prototype" data-es="Prototipo">Prototype</span>
+          <h3 data-en="3D House Designer" data-es="Diseñador 3D">3D House Designer</h3>
+          <p data-en="Sketch a house in 3D, see its elevations, and send it to the Steel Frame Estimator." data-es="Dibuja una casa en 3D, mira sus elevaciones y pásala al Cubicador.">Sketch a house in 3D, see its elevations, and send it to the Steel Frame Estimator.</p>
+        </article>
+        <article class="panel proto"><span class="barrido"></span>
+          <span class="estado" data-en="First kit: construction" data-es="Primer kit: construcción">First kit: construction</span>
+          <h3 data-en="Pair Academy" data-es="Academia de la Dupla">Pair Academy</h3>
+          <p data-en="Kits that help a professional and their AI work well together: method, memory, helper agents and an exam. What gets certified is the pair." data-es="Kits para que un profesional y su IA trabajen bien juntos: método, memoria, agentes ayudantes y un examen. Lo que se certifica es la dupla.">Kits that help a professional and their AI work well together: method, memory, helper agents and an exam. What gets certified is the pair.</p>
+        </article>
+        <article class="panel proto"><span class="barrido"></span>
+          <span class="estado" data-en="Kepler’s own project" data-es="Proyecto propio de Kepler">Kepler’s own project</span>
+          <h3>Cielo Kepler</h3>
+          <p data-en="Looking for planets around other stars in public NASA data (the TESS telescope)." data-es="Buscar planetas alrededor de otras estrellas en datos públicos de la NASA (el telescopio TESS).">Looking for planets around other stars in public NASA data (the TESS telescope).</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span data-en="Signed by cristiansend1979 · Punta Arenas, Chile" data-es="Firmado por cristiansend1979 · Punta Arenas, Chile">Signed by cristiansend1979 · Punta Arenas, Chile</span>
+    <span data-en="Made by a person and an AI" data-es="Hecho por una persona y una IA">Made by a person and an AI</span>
+  </footer>
+</div>
+
+<script>
+  const QUIETO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Texto que se «decodifica»: signos al azar que se van fijando de izquierda a derecha (código propio)
+  const SIGNOS = '!<>-_\\/[]{}=+*^?#01';
+  function cifrar(el){
+    if (QUIETO) return;
+    const final = el.textContent; let paso = 0; const total = final.length * 3;
+    const tic = setInterval(() => {
+      el.textContent = [...final].map((c,i) => (c === ' ' || i < paso/3) ? c : SIGNOS[Math.floor(Math.random()*SIGNOS.length)]).join('');
+      if (++paso > total){ clearInterval(tic); el.textContent = final; }
+    }, 28);
+  }
+
+  // Idioma: inglés por defecto; se recuerda la elección. El nombre AI and Me Lab no se traduce.
+  const botones = document.querySelectorAll('.idioma button');
+  function ponerIdioma(lang, animar){
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-en]').forEach(el => { el.innerHTML = el.dataset[lang]; });
+    botones.forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+    if (animar) document.querySelectorAll('.visto h2[data-cifra]').forEach(cifrar);
+    try { localStorage.setItem('aiandme-lang', lang); } catch(e){}
+  }
+  botones.forEach(b => b.addEventListener('click', () => ponerIdioma(b.dataset.lang, true)));
+  let guardado = null; try { guardado = localStorage.getItem('aiandme-lang'); } catch(e){}
+  if (guardado === 'es') ponerIdioma('es', false);
+
+  // Hora de Punta Arenas
+  const reloj = document.getElementById('reloj');
+  const fmt = new Intl.DateTimeFormat('en-GB',{timeZone:'America/Punta_Arenas',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const ponerHora = () => reloj.textContent = fmt.format(new Date()) + ' PA';
+  ponerHora(); setInterval(ponerHora, 1000);
+
+  // El nombre se decodifica al cargar; las secciones aparecen y se decodifican al bajar (una sola vez)
+  document.querySelectorAll('.titulo [data-cifra]').forEach((el,i) => setTimeout(() => cifrar(el), 300 + i*350));
+  const obs = new IntersectionObserver(entradas => entradas.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('visto');
+    e.target.querySelectorAll('h2[data-cifra]').forEach(cifrar);
+    obs.unobserve(e.target);
+  }), {threshold:.15});
+  document.querySelectorAll('.aparece').forEach(s => obs.observe(s));
+</script>
+
+<script type="module">
+/* NÚCLEO DOBLE: la persona (ámbar) y la IA (cian) giran juntas como una estrella doble,
+   unidas por un puente de partículas que va y vuelve.
+   Shader de la esfera adaptado de openclaw-jarvis-ui (src/core/scene.js) · ISC © 2026 JincocoDev,
+   basado en «Three.js Orb Visualizer» de Filip Zrnzevic. Ruido simplex: Ashima Arts / Stefan Gustavson (MIT). */
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.175.0/build/three.module.js';
+const QUIETO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CELU = matchMedia('(max-width: 960px)').matches;
+const box = document.getElementById('escena');
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, CELU ? 1.5 : 2));
+box.appendChild(renderer.domElement);
+const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(40,1,.1,100);
+camera.position.set(0,1.4,13.5); camera.lookAt(0,0,0);
+function size(){ const w=box.clientWidth, h=box.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(box); size();
+
+const NOISE = `
+vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+float snoise(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1.0,2.0);
+vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.0-g;
+vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+C.yyy;vec3 x3=x0-D.yyy;
+i=mod289(i);vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+float n_=0.142857142857;vec3 ns=n_*D.wyz-D.xzx;vec4 j=p-49.0*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.0*x_);
+vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.0-abs(x)-abs(y);vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
+vec4 s0=floor(b0)*2.0+1.0;vec4 s1=floor(b1)*2.0+1.0;vec4 sh=-step(h,vec4(0.0));vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
+vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);m=m*m;
+return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));}`;
+
+function halo(color, escala){
+  const c=document.createElement('canvas'); c.width=c.height=256; const g=c.getContext('2d');
+  const r=g.createRadialGradient(128,128,30,128,128,128);
+  r.addColorStop(0,'rgba(255,255,255,.6)'); r.addColorStop(.45,'rgba(255,255,255,.16)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=r; g.fillRect(0,0,256,256);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),color,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:.55}));
+  s.scale.setScalar(escala); return s;
+}
+// una esfera viva: la IA en malla de alambre (precisa), la persona llena y cálida
+function orbe(color, radio, alambre, distorsion){
+  const U={time:{value:0},color:{value:new THREE.Color(color)},dist:{value:distorsion}};
+  const mat=new THREE.ShaderMaterial({uniforms:U,wireframe:alambre,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+    vertexShader:NOISE+`uniform float time,dist;varying vec3 vN;varying vec3 vV;
+      void main(){vN=normalize(normalMatrix*normal);vec3 p=position;
+        float n=snoise(position*.55+vec3(0.,0.,time*.25));
+        p=p*(1.0+0.03*sin(time*1.6))+normal*n*0.2*dist;
+        vec4 mv=modelViewMatrix*vec4(p,1.0);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+    fragmentShader:`uniform vec3 color;varying vec3 vN;varying vec3 vV;
+      void main(){float f=pow(1.0-abs(dot(vV,vN)),2.0);gl_FragColor=vec4(color*(0.3+f*1.1),0.10+f*0.8);}`});
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(radio, alambre?7:24), mat));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(radio*.08,24,24), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9})));
+  const h=halo(color, radio*4.2); g.add(h);
+  return {g, U, h};
+}
+const ia = orbe('#45E0FF', 1.45, true, 1.0);
+const yo = orbe('#FFB547', 1.15, false, 0.6);
+scene.add(ia.g, yo.g);
+
+// órbita compartida
+const anillo = new THREE.Mesh(new THREE.TorusGeometry(2.6, .006, 6, 160), new THREE.MeshBasicMaterial({color:0x2A5675,transparent:true,opacity:.8}));
+anillo.rotation.x = Math.PI/2; anillo.scale.set(1,.55,1); scene.add(anillo);
+
+// puente de partículas: de la persona a la IA (ámbar) y de vuelta (cian)
+const N = CELU ? 140 : 260;
+const pos = new Float32Array(N*3), col = new Float32Array(N*3), semilla=[];
+const A = new THREE.Color('#FFB547'), C = new THREE.Color('#45E0FF');
+for (let i=0;i<N;i++){ const ida = i%2===0; semilla.push([Math.random(), .12+Math.random()*.18, ida, (Math.random()-.5)*.5, (Math.random()-.5)*.5]);
+  const c = ida ? A : C; col.set([c.r,c.g,c.b], i*3); }
+const pg = new THREE.BufferGeometry();
+pg.setAttribute('position', new THREE.BufferAttribute(pos,3));
+pg.setAttribute('color', new THREE.BufferAttribute(col,3));
+const puente = new THREE.Points(pg, new THREE.PointsMaterial({size:.07,vertexColors:true,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false}));
+scene.add(puente);
+
+// polvo de estrellas de fondo
+const M = CELU ? 250 : 500, ep = new Float32Array(M*3);
+for (let i=0;i<M;i++){ const r=7+Math.random()*9, a=Math.random()*Math.PI*2, b=Math.acos(2*Math.random()-1); ep.set([r*Math.sin(b)*Math.cos(a), r*Math.cos(b)*.6, r*Math.sin(b)*Math.sin(a)-4], i*3); }
+const eg = new THREE.BufferGeometry(); eg.setAttribute('position', new THREE.BufferAttribute(ep,3));
+const estrellas = new THREE.Points(eg, new THREE.PointsMaterial({size:.03,color:0x9fefff,transparent:true,opacity:.55}));
+scene.add(estrellas);
+
+// el mouse inclina la escena apenas
+let mx=0,my=0; addEventListener('pointermove', e => { mx=(e.clientX/innerWidth-.5); my=(e.clientY/innerHeight-.5); });
+
+const reloj = new THREE.Clock(); const pIA=new THREE.Vector3(), pYO=new THREE.Vector3(), medio=new THREE.Vector3();
+let visible = true, corriendo = false;
+// las etiquetas siguen a cada orbe (debajo de él)
+const eIA = document.querySelector('.etq.e-ia'), eYO = document.querySelector('.etq.e-yo'), tmp = new THREE.Vector3();
+function seguir(el, p, r){ tmp.copy(p); tmp.y -= r; tmp.applyMatrix4(scene.matrixWorld).project(camera);
+  el.style.left = ((tmp.x+1)/2*100)+'%'; el.style.top = ((1-tmp.y)/2*100+3)+'%'; }
+function cuadro(){
+  const t = QUIETO ? 2 : reloj.getElapsedTime();
+  const ang = t*.32;
+  pIA.set(Math.cos(ang)*2.6, Math.sin(t*.5)*.25, Math.sin(ang)*2.6*.55);
+  pYO.set(-Math.cos(ang)*2.6, -Math.sin(t*.5)*.25, -Math.sin(ang)*2.6*.55);
+  ia.g.position.copy(pIA); yo.g.position.copy(pYO);
+  ia.g.rotation.y = t*.4; yo.g.rotation.y = -t*.3;
+  ia.U.time.value = t; yo.U.time.value = t*.8;
+  ia.h.material.opacity = .45+.12*Math.sin(t*1.6); yo.h.material.opacity = .45+.12*Math.sin(t*1.6+1.5);
+  // puente curvo (arco por arriba) entre las dos
+  medio.addVectors(pIA,pYO).multiplyScalar(.5); medio.y += 1.1;
+  for (let i=0;i<N;i++){ const [f0,v,ida,dx,dz]=semilla[i]; let k=(f0+t*v)%1; if(!ida) k=1-k;
+    const a=1-k, ab=Math.sin(k*Math.PI);
+    pos[i*3]  =a*a*pYO.x+2*a*k*medio.x+k*k*pIA.x+dx*ab;
+    pos[i*3+1]=a*a*pYO.y+2*a*k*medio.y+k*k*pIA.y+dz*ab*.6;
+    pos[i*3+2]=a*a*pYO.z+2*a*k*medio.z+k*k*pIA.z+dz*ab; }
+  pg.attributes.position.needsUpdate = true;
+  estrellas.rotation.y = t*.01;
+  scene.rotation.y += ((mx*.35) - scene.rotation.y)*.04; scene.rotation.x += ((my*.15) - scene.rotation.x)*.04;
+  scene.updateMatrixWorld(); seguir(eIA, pIA, 1.7); seguir(eYO, pYO, 1.4);
+  // cuando se cruzan, se apaga la etiqueta del orbe que queda atrás
+  const cerca = Math.abs(pIA.x - pYO.x) < 2.6; eIA.style.opacity = (cerca && pIA.z < pYO.z) ? 0 : 1; eYO.style.opacity = (cerca && pYO.z < pIA.z) ? 0 : 1;
+  renderer.render(scene, camera);
+  if (!QUIETO && visible) requestAnimationFrame(cuadro); else corriendo = false;
+}
+// se pausa cuando la portada no se ve (ahorra batería en el celular)
+new IntersectionObserver(e => { visible = e[0].isIntersecting; if (visible && !corriendo && !QUIETO){ corriendo = true; requestAnimationFrame(cuadro); } }).observe(box);
+corriendo = true; cuadro();
+</script>
+</body>
+</html>
