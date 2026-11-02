@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1C2430">
+<title>Jornada</title>
+<link href="letras/letras.css" rel="stylesheet">
+<style>
+/* JORNADA · asistencia y pagos (1-nov-2026). Metáfora: la tarjeta del reloj control; cada llegada se «timbra».
+   Letras dentro de la app (carpeta letras/): funciona igual sin internet. */
+:root{
+  --acero:#E9ECEF;      /* fondo: plancha galvanizada */
+  --tarjeta:#FBFBF8;    /* cartulina de la tarjeta */
+  --tinta:#1C2430;      /* texto */
+  --gris:#5E6875;       /* textos secundarios */
+  --linea:#CDD3DA;
+  --timbre:#5B3FA8;     /* tinta violeta del reloj control */
+  --llego:#1F7A4D;      /* entrada */
+  --aviso:#B86A00;      /* no pagado */
+  --falta:#A3342B;
+  --sombra:0 1px 0 rgba(28,36,48,.06),0 6px 18px -10px rgba(28,36,48,.35);
+  --display:'Big Shoulders Display','Arial Narrow',sans-serif;
+  --texto:'Atkinson Hyperlegible',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --arriba:var(--safe-area-inset-top,env(safe-area-inset-top,0px));     /* la app de Android lo entrega; el navegador usa env() */
+  --abajo:var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px));
+}
+/* franja fija detrás de la hora y la batería del teléfono: el contenido no pasa por debajo */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--arriba);background:var(--tinta);z-index:6}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--acero);color:var(--tinta);font-family:var(--texto);font-size:17px;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;padding-bottom:calc(84px + var(--abajo))}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--timbre);outline-offset:2px;border-radius:8px}
+
+/* cabecera: el reloj */
+header{background:var(--tinta);color:#fff;padding:calc(14px + var(--arriba)) 16px 18px}
+.marca{font-family:var(--display);font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:15px;color:#AEB7C2}
+.reloj{display:flex;align-items:baseline;gap:12px;margin-top:2px}
+.hora{font-family:var(--display);font-weight:800;font-size:64px;line-height:.95;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.fecha{font-size:16px;color:#D5DBE2;line-height:1.25}
+.resumen{margin-top:10px;font-size:15px;color:#D5DBE2}
+.resumen b{color:#fff}
+
+main{max-width:640px;margin:0 auto;padding:16px}
+h2{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:.02em;text-transform:uppercase;margin:6px 0 12px}
+.sub{color:var(--gris);font-size:15px;margin:-6px 0 14px}
+
+/* LA TARJETA (firma del diseño) */
+.tarjeta{position:relative;background:var(--tarjeta);border-radius:6px;box-shadow:var(--sombra);padding:14px 14px 14px 22px;margin-bottom:14px;overflow:hidden}
+.tarjeta::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;
+  background:repeating-linear-gradient(to bottom,var(--linea) 0 2px,transparent 2px 9px)} /* borde perforado de la cartulina */
+.t-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.nombre{font-size:21px;font-weight:700;line-height:1.15}
+.oficio{color:var(--gris);font-size:14px}
+.tarifa{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--gris);text-align:right;white-space:nowrap}
+.casillas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.casilla{border:1.5px dashed var(--linea);border-radius:4px;padding:6px 8px 8px;min-height:62px;background:none;text-align:left;width:100%}
+.casilla .et{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gris)}
+.timbre{display:inline-block;font-family:var(--mono);font-weight:600;font-size:26px;color:var(--timbre);transform:rotate(-2.5deg);margin-top:2px;opacity:.92}
+.timbre.vacio{color:#B9C0C8;font-size:20px;transform:none}
+.timbre.nuevo{animation:timbrar .38s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes timbrar{0%{transform:scale(1.6) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(-2.5deg);opacity:.92}}
+.acciones{display:flex;gap:8px}
+.btn{border:0;border-radius:10px;padding:14px 16px;font-weight:700;font-size:17px;min-height:52px}
+.btn-llego{background:var(--llego);color:#fff;flex:1}
+.btn-salio{background:var(--tinta);color:#fff;flex:1}
+.btn-suave{background:#E3E7EB;color:var(--tinta)}
+.btn-falta{background:none;border:1.5px solid var(--linea);color:var(--gris);padding:14px 12px}
+.estado{font-size:15px;color:var(--gris);margin-top:2px}
+.estado b{color:var(--tinta)}
+.despues{display:inline-block;margin-top:8px;font-size:13px;font-weight:700;color:var(--aviso);background:#FBEBD3;border-radius:6px;padding:3px 8px}
+.t-pie{display:flex;gap:8px;margin-top:10px}
+.t-pie .chip{flex:1}
+/* cambiar de día */
+.nav-dia{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin-bottom:10px}
+.nav-dia .btn{min-height:48px;padding:8px 14px}
+.nav-dia input{width:100%;border:1.5px solid var(--linea);border-radius:10px;padding:10px;background:#fff;min-height:48px;font-weight:700;text-align:center}
+.nav-dia .btn:disabled{opacity:.35}
+.pasado{background:#E6E0F5;color:#3D2A73;border-radius:8px;padding:10px 12px;font-size:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.falto{position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-10deg);font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:.08em;color:var(--falta);border:3px solid var(--falta);padding:0 10px;border-radius:6px;opacity:.75;pointer-events:none}
+
+/* semana / mes */
+.seg{display:flex;background:#DDE2E7;border-radius:12px;padding:4px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:10px;font-weight:700;min-height:44px;color:var(--gris)}
+.seg button[aria-pressed="true"]{background:var(--tarjeta);color:var(--tinta);box-shadow:var(--sombra)}
+.nav-semana{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.nav-semana .btn{min-height:44px;padding:8px 14px}
+.rango{font-weight:700;text-align:center}
+.tabla{background:var(--tarjeta);border-radius:6px;box-shadow:var(--sombra);overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:10px 6px;text-align:center;border-bottom:1px solid #E6E9ED;white-space:nowrap}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);font-weight:700}
+td:first-child,th:first-child{text-align:left;padding-left:12px;position:sticky;left:0;background:var(--tarjeta)}
+td.dia{font-family:var(--mono);font-size:13px}
+td.dia button{background:none;border:0;font:inherit;padding:4px;color:inherit}
+td.dia.f{color:var(--falta);font-weight:600}
+td.dia.n{color:#B9C0C8}
+td.total{font-weight:700;font-family:var(--mono)}
+.pagos{margin-top:16px}
+.pago{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--tarjeta);border-radius:6px;box-shadow:var(--sombra);padding:12px 14px;margin-bottom:10px}
+.pago .monto{font-family:var(--mono);font-weight:600;font-size:20px}
+.det{color:var(--gris);font-size:14px}
+.chip{border:0;border-radius:999px;padding:10px 14px;font-weight:700;font-size:15px;min-height:44px}
+.chip.no{background:#FBEBD3;color:var(--aviso)}
+.chip.si{background:#DDF0E5;color:var(--llego)}
+.chip.gris{background:#E3E7EB;color:var(--tinta)}
+.gran-total{display:flex;justify-content:space-between;align-items:baseline;padding:14px 4px;border-top:2px solid var(--tinta);margin-top:6px}
+.gran-total .monto{font-family:var(--display);font-weight:800;font-size:34px}
+.aviso{background:#FBEBD3;color:#6B3F00;border-radius:8px;padding:10px 12px;font-size:15px;margin-bottom:12px}
+
+/* equipo y formularios */
+.campo{display:block;margin-bottom:12px}
+.campo span{display:block;font-size:14px;font-weight:700;color:var(--gris);margin-bottom:4px}
+.campo input,.campo select{width:100%;border:1.5px solid var(--linea);border-radius:10px;padding:12px;background:#fff;min-height:50px}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.persona{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--tarjeta);border-radius:6px;box-shadow:var(--sombra);padding:12px 14px;margin-bottom:10px}
+.vacio-msg{background:var(--tarjeta);border-radius:6px;box-shadow:var(--sombra);padding:22px 18px;text-align:center}
+.vacio-msg p{color:var(--gris);margin:8px 0 14px}
+.bloque{background:var(--tarjeta);border-radius:6px;box-shadow:var(--sombra);padding:16px;margin-bottom:16px}
+.ayuda{font-size:14px;color:var(--gris);margin-top:4px}
+.botonera{display:flex;flex-wrap:wrap;gap:8px}
+.opcion{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #E6E9ED}
+.opcion input{width:22px;height:22px;accent-color:var(--timbre)}
+.calc{font-family:var(--mono);font-weight:600;color:var(--timbre);margin:10px 0 14px}
+
+/* barra inferior */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--tinta);display:flex;padding:8px 8px calc(8px + var(--abajo));gap:6px;z-index:5}
+nav.tabs button{flex:1;background:none;border:0;color:#AEB7C2;border-radius:10px;padding:8px 4px;min-height:56px;font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-current="page"]{background:#2C3644;color:#fff}
+body.escribiendo nav.tabs{display:none}   /* con el teclado abierto la barra subía y tapaba los campos (visto en el S25) */
+
+/* hoja para corregir */
+dialog{border:0;border-radius:14px;padding:18px;width:min(420px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(28,36,48,.55)}
+dialog h3{font-family:var(--display);font-weight:800;font-size:24px;text-transform:uppercase;margin-bottom:4px}
+.toast{position:fixed;left:50%;bottom:calc(96px + var(--abajo));transform:translateX(-50%);background:var(--tinta);color:#fff;padding:10px 16px;border-radius:10px;font-size:15px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;max-width:calc(100% - 32px)}
+.toast.ver{opacity:1}
+@media (prefers-reduced-motion:reduce){.timbre.nuevo{animation:none}.toast{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">Jornada · asistencia y pagos</div>
+  <div class="reloj"><div class="hora" id="hora">--:--</div><div class="fecha" id="fecha"></div></div>
+  <div class="resumen" id="resumen"></div>
+</header>
+<main id="vista"></main>
+
+<nav class="tabs" aria-label="Secciones">
+  <button data-tab="hoy" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Hoy</button>
+  <button data-tab="pagos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Pagos</button>
+  <button data-tab="equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3 2.5 3.5 5.2"/></svg>Equipo</button>
+</nav>
+
+<dialog id="hoja"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+// ---------- datos (solo en este teléfono) ----------
+// Cómo se paga: 'hora' | 'dia' | 'semana' (sueldo semanal) | 'mes' (sueldo mensual).
+// Cada día: e/s = entrada y salida · dur = minutos escritos a mano · modo = 'completo' | 'medio' | 'horas' · falta.
+const CLAVE = 'reloj_faena_v1';   // misma clave de la v1: no se pierde lo ya marcado
+const vacio = () => ({ trabajadores: [], registros: {}, pagos: {}, ajustes: {} });
+const AJ = { colacion: 60, desde: 6, jornada: 9, diasSemana: 5 };
+let D;
+try { D = Object.assign(vacio(), JSON.parse(localStorage.getItem(CLAVE)) || {}); } catch { D = vacio(); }
+D.ajustes = Object.assign({}, AJ, D.ajustes);
+for (const r of Object.values(D.registros).flatMap(Object.values)) if (r.medio) { r.modo = 'medio'; delete r.medio; }   // de la v1
+const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(D)); } catch { aviso('No se pudo guardar en este teléfono'); } };
+
+// ---------- utilidades ----------
+const $ = s => document.querySelector(s);
+const el = (tag, attrs = {}, ...hijos) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const h of hijos.flat()) if (h != null && h !== false) e.append(h.nodeType ? h : String(h));
+  return e;
+};
+const poner = (v, ...h) => v.replaceChildren(...h.flat().filter(x => x != null && x !== false));
+const dos = n => String(n).padStart(2, '0');
+const isoDia = d => `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
+const deIso = s => { const [a, m, d] = s.split('-').map(Number); return new Date(a, m - 1, d, 12); };
+const horaAhora = () => { const d = new Date(); return `${dos(d.getHours())}:${dos(d.getMinutes())}`; };
+const pesos = n => '$' + Math.round(n).toLocaleString('es-CL');
+const num = n => String(Math.round(n * 100) / 100).replace('.', ',');
+const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const fechaLarga = d => d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+const lunesDe = d => { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+const minutos = h => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };
+const nuevoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const hDec = h => { const hh = Math.floor(h + 1e-9), mm = Math.round((h - hh) * 60); return mm ? `${hh} h ${mm} min` : `${hh} h`; };
+const POR = { hora: 'por hora', dia: 'por día', semana: 'a la semana', mes: 'al mes' };
+const CORTO = { hora: ' / hora', dia: ' / día', semana: ' / semana', mes: ' / mes' };
+let tToast;
+function aviso(t) { const e = $('#toast'); e.textContent = t; e.classList.add('ver'); clearTimeout(tToast); tToast = setTimeout(() => e.classList.remove('ver'), 2400); }
+
+// ---------- cálculo ----------
+// horas trabajadas de un día (lo escrito a mano manda; si no, salida − entrada menos colación)
+function horasDe(r) {
+  if (!r || r.falta) return 0;
+  if (r.dur) return r.dur / 60;
+  if (!r.e || !r.s) return 0;
+  let m = minutos(r.s) - minutos(r.e);
+  if (m < 0) m += 24 * 60;                      // turno que cruza la medianoche
+  if (m >= D.ajustes.desde * 60) m -= D.ajustes.colacion;
+  return Math.max(0, m) / 60;
+}
+// qué parte de un día cuenta (1 = día completo)
+function parteDia(r) {
+  if (!r || r.falta) return 0;
+  if (r.modo === 'medio') return .5;
+  if (r.modo === 'horas') return Math.min(1, horasDe(r) / D.ajustes.jornada);
+  return (r.e || r.dur) ? 1 : 0;
+}
+const marcado = r => r && (r.falta || r.e || r.dur);
+// cuánto se le debe a una persona por una lista de días (fechas iso) — para sueldo fijo: el sueldo menos los días que faltó
+function cuenta(t, dias, periodo) {
+  let horas = 0, partes = 0, faltas = 0, hay = false;
+  for (const dia of dias) {
+    const r = (D.registros[dia] || {})[t.id]; if (!marcado(r)) continue;
+    hay = true; horas += horasDe(r); partes += parteDia(r); if (r.falta) faltas++;
+  }
+  let total = 0, detalle = '';
+  if (t.tipo === 'hora') { total = horas * t.monto; detalle = `${hDec(horas)} × ${pesos(t.monto)}`; }
+  else if (t.tipo === 'dia') { total = partes * t.monto; detalle = `${num(partes)} días × ${pesos(t.monto)}`; }
+  else if (hay) {
+    const base = t.tipo === 'semana' ? (periodo === 'semana' ? t.monto : t.monto * dias.length / 7) : (periodo === 'mes' ? t.monto : t.monto * 7 / 30);
+    const valorDia = t.tipo === 'semana' ? t.monto / D.ajustes.diasSemana : t.monto / 30;
+    const descontar = dias.filter(d => marcado((D.registros[d] || {})[t.id])).reduce((a, d) => a + (1 - parteDia(D.registros[d][t.id])), 0);
+    total = Math.max(0, base - descontar * valorDia);
+    detalle = `Sueldo ${pesos(base)}` + (descontar ? ` − ${num(descontar)} días sin trabajar` : '');
+  }
+  return { horas, partes, faltas, total, detalle, hay };
+}
+const activos = () => D.trabajadores.filter(t => t.activo !== false);
+const reg = (dia, id) => (D.registros[dia] ||= {})[id] ||= {};
+
+// ---------- cabecera ----------
+function tic() {
+  const d = new Date();
+  $('#hora').textContent = `${dos(d.getHours())}:${dos(d.getMinutes())}`;
+  const f = fechaLarga(d); $('#fecha').textContent = f[0].toUpperCase() + f.slice(1);
+}
+function resumenHoy() {
+  const hoy = D.registros[isoDia(new Date())] || {};
+  const ts = activos();
+  const llegaron = ts.filter(t => hoy[t.id]?.e || hoy[t.id]?.dur).length;
+  const trabajando = ts.filter(t => hoy[t.id]?.e && !hoy[t.id]?.s && !hoy[t.id]?.dur).length;
+  poner($('#resumen'), ts.length
+    ? el('span', {}, el('b', {}, `${llegaron} de ${ts.length}`), ' llegaron hoy', trabajando ? ` · ${trabajando} trabajando ahora` : '')
+    : 'Agrega a tu equipo para empezar a marcar');
+}
+
+// ---------- vistas ----------
+let diaVista = null;   // null = hoy; si no, la fecha iso del día que se está mirando
+let pestaña = 'hoy', periodo = 'semana', semana = lunesDe(new Date()), mes = new Date(new Date().getFullYear(), new Date().getMonth(), 1, 12), ultimoTimbre = null;
+function ir(t) {
+  pestaña = t; if (t === 'hoy') diaVista = null;
+  document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === t ? 'page' : 'false'));
+  pintar(); window.scrollTo(0, 0);
+}
+function pintar() { resumenHoy(); ({ hoy: vistaHoy, pagos: vistaPagos, equipo: vistaEquipo })[pestaña](); }
+
+function vistaHoy() {
+  const v = $('#vista'), hoy = isoDia(new Date());
+  if (diaVista && diaVista >= hoy) diaVista = null;
+  const dia = diaVista || hoy, esHoy = dia === hoy, dd = deIso(dia);
+  const ts = esHoy ? activos() : D.trabajadores.filter(t => t.activo !== false || marcado((D.registros[dia] || {})[t.id]));
+  // barra para moverse entre días: ‹ anterior · calendario · siguiente ›
+  const moverDia = k => { const d = deIso(dia); d.setDate(d.getDate() + k); diaVista = isoDia(d) >= hoy ? null : isoDia(d); pintar(); };
+  const cal = el('input', { type: 'date', value: dia, max: hoy, 'aria-label': 'Elegir el día', onchange: ev => { if (ev.target.value) { diaVista = ev.target.value >= hoy ? null : ev.target.value; pintar(); } } });
+  const navDia = el('div', { class: 'nav-dia' },
+    el('button', { class: 'btn btn-suave', 'aria-label': 'Día anterior', onclick: () => moverDia(-1) }, '‹'),
+    cal,
+    el('button', { class: 'btn btn-suave', 'aria-label': 'Día siguiente', disabled: esHoy, onclick: () => moverDia(1) }, '›'));
+  const fl = fechaLarga(dd), titulo = fl[0].toUpperCase() + fl.slice(1);
+  const cabeza = esHoy
+    ? [el('h2', {}, 'Marcar hoy'), navDia, el('p', { class: 'sub' }, 'Toca «Llegó» cuando entra y «Se fue» cuando sale. Con ‹ o el calendario vuelves a un día anterior para anotarlo o corregirlo.')]
+    : [el('h2', {}, 'Anotar otro día'), navDia,
+       el('div', { class: 'pasado' }, el('span', {}, el('b', {}, titulo), el('br'), 'Lo que anotes aquí queda marcado «anotado después».'),
+         el('button', { class: 'chip gris', onclick: () => { diaVista = null; pintar(); } }, 'Ir a hoy'))];
+  if (!activos().length && !ts.length) {
+    poner(v, el('div', { class: 'vacio-msg' },
+      el('h2', {}, 'Tu equipo está vacío'),
+      el('p', {}, 'Agrega a cada trabajador con lo que gana: por hora, por día, a la semana o al mes. Después marcas aquí su llegada y su salida.'),
+      el('button', { class: 'btn btn-llego', onclick: () => ir('equipo') }, 'Agregar trabajador')));
+    return;
+  }
+  const lista = ts.map(t => {
+    const r = (D.registros[dia] || {})[t.id] || {};
+    const casilla = (cual, etiqueta) => {
+      const valor = r[cual];
+      const nuevo = ultimoTimbre === `${t.id}:${cual}`;
+      return el('button', { class: 'casilla', 'aria-label': `${etiqueta} de ${t.nombre}: ${valor || 'sin marcar'}. Toca para corregir`, onclick: () => corregir(dia, t) },
+        el('div', { class: 'et' }, etiqueta),
+        el('span', { class: 'timbre' + (valor ? '' : ' vacio') + (nuevo ? ' nuevo' : '') }, valor || '– – : – –'));
+    };
+    let acciones;
+    if (r.falta) acciones = el('div', { class: 'acciones' }, el('button', { class: 'btn btn-suave', style: 'flex:1', onclick: () => guardarReg(dia, t.id, {}) }, 'Quitar «no vino»'));
+    else if (!r.e && !r.dur) acciones = el('div', { class: 'acciones' },
+      esHoy ? el('button', { class: 'btn btn-llego', onclick: () => timbrar(dia, t, 'e') }, 'Llegó')
+            : el('button', { class: 'btn btn-llego', onclick: () => corregir(dia, t) }, 'Anotar horas'),
+      el('button', { class: 'btn btn-falta', onclick: () => { guardarReg(dia, t.id, { falta: true }); aviso(`${t.nombre}: no vino`); } }, 'No vino'));
+    else if (!r.s && !r.dur) acciones = el('div', { class: 'acciones' }, esHoy
+      ? el('button', { class: 'btn btn-salio', onclick: () => timbrar(dia, t, 's') }, 'Se fue')
+      : el('button', { class: 'btn btn-salio', onclick: () => corregir(dia, t) }, 'Anotar la salida'));
+    else acciones = el('div', { class: 'estado' }, 'Trabajó ', el('b', {}, hDec(horasDe(r))), r.modo === 'medio' ? ' · medio día' : r.modo === 'horas' ? ' · se paga por las horas' : '',
+      (t.tipo === 'hora' || t.tipo === 'dia') ? el('span', {}, ' · gana ', el('b', {}, pesos(cuenta(t, [dia]).total))) : '');
+    return el('article', { class: 'tarjeta' },
+      el('div', { class: 't-cab' },
+        el('div', {}, el('div', { class: 'nombre' }, t.nombre), t.oficio ? el('div', { class: 'oficio' }, t.oficio) : null),
+        el('div', { class: 'tarifa' }, pesos(t.monto), CORTO[t.tipo])),
+      el('div', { class: 'casillas' }, casilla('e', 'Entrada'), casilla('s', 'Salida')),
+      acciones,
+      marcado(r) ? el('div', { class: 't-pie' },
+        el('button', { class: 'chip gris', onclick: () => corregir(dia, t) }, 'Corregir'),
+        el('button', { class: 'chip gris', onclick: () => { if (confirm(`¿Borrar lo anotado de ${t.nombre} este día?`)) { guardarReg(dia, t.id, {}); aviso('Borrado'); } } }, 'Borrar')) : null,
+      r.anotado ? el('div', { class: 'despues' }, `Anotado después (el ${cortaFecha(r.anotado)})`) : null,
+      r.falta ? el('div', { class: 'falto', 'aria-hidden': 'true' }, 'NO VINO') : null);
+  });
+  ultimoTimbre = null;
+  poner(v, cabeza, lista);
+}
+const cortaFecha = iso => { const d = deIso(iso); return `${d.getDate()}/${d.getMonth() + 1}`; };
+// guarda un día; si es un día pasado, queda la fecha en que se anotó o corrigió («anotado después»)
+function guardarReg(dia, id, r) {
+  const hoy = isoDia(new Date());
+  if (marcado(r) && dia < hoy) r.anotado = hoy; else delete r.anotado;
+  (D.registros[dia] ||= {})[id] = r; guardar(); pintar();
+}
+function timbrar(dia, t, cual) {
+  const r = reg(dia, t.id); r[cual] = horaAhora(); delete r.falta;
+  ultimoTimbre = `${t.id}:${cual}`; guardar(); pintar();
+  aviso(`${t.nombre}: ${cual === 'e' ? 'llegó' : 'se fue'} a las ${r[cual]}`);
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+// hoja para corregir un día: horas, o escribir cuánto trabajó, y cómo cuenta ese día
+function corregir(dia, t) {
+  const r = Object.assign({}, (D.registros[dia] || {})[t.id] || {});
+  const h = $('#hoja'), d = deIso(dia);
+  const e = el('input', { type: 'time', value: r.e || '' }), s = el('input', { type: 'time', value: r.s || '' });
+  const hh = el('input', { type: 'number', inputmode: 'numeric', min: '0', max: '24', placeholder: '0', value: r.dur ? Math.floor(r.dur / 60) : '' });
+  const mm = el('input', { type: 'number', inputmode: 'numeric', min: '0', max: '59', step: '5', placeholder: '0', value: r.dur ? r.dur % 60 : '' });
+  const modos = t.tipo === 'hora' ? null : ['completo', 'medio', 'horas'].map(m => {
+    const i = el('input', { type: 'radio', name: 'modo', value: m }); i.checked = (r.modo || 'completo') === m; return i;
+  });
+  const calc = el('div', { class: 'calc', 'aria-live': 'polite' });
+  const leer = () => {
+    const n = {};
+    if (e.value) n.e = e.value; if (s.value) n.s = s.value;
+    const dur = (+hh.value || 0) * 60 + (+mm.value || 0); if (dur > 0) n.dur = dur;
+    const m = modos?.find(i => i.checked)?.value; if (m && m !== 'completo') n.modo = m;
+    return n;
+  };
+  const recalcular = () => {
+    const n = leer();
+    if (!n.e && !n.dur) { calc.textContent = ''; return; }
+    const hrs = horasDe(n), parte = parteDia(n);
+    calc.textContent = `${hDec(hrs)} trabajadas` + (t.tipo === 'hora' ? ` · ${pesos(hrs * t.monto)}`
+      : t.tipo === 'dia' ? ` · ${pesos(parte * t.monto)}` : ` · cuenta como ${num(parte)} día`);
+  };
+  [e, s, hh, mm, ...(modos || [])].forEach(i => i.addEventListener('input', recalcular));
+  const etiquetas = { completo: 'Día completo', medio: 'Medio día', horas: `Solo las horas trabajadas (la jornada es de ${num(D.ajustes.jornada)} h)` };
+  h.replaceChildren(
+    el('h3', {}, t.nombre),
+    el('p', { class: 'sub', style: 'margin:0 0 12px' }, `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`),
+    el('div', { class: 'fila2' }, el('label', { class: 'campo' }, el('span', {}, 'Entrada'), e), el('label', { class: 'campo' }, el('span', {}, 'Salida'), s)),
+    el('p', { class: 'ayuda', style: 'margin:-4px 0 6px' }, 'O escribe cuánto trabajó (por ejemplo 1 h 35 min):'),
+    el('div', { class: 'fila2' }, el('label', { class: 'campo' }, el('span', {}, 'Horas'), hh), el('label', { class: 'campo' }, el('span', {}, 'Minutos'), mm)),
+    modos ? el('fieldset', { style: 'border:0;padding:0;margin:4px 0 0' }, el('legend', { class: 'campo', style: 'font-size:14px;font-weight:700;color:var(--gris);margin:0' }, 'Cómo cuenta este día'),
+      modos.map(i => el('label', { class: 'opcion' }, i, etiquetas[i.value]))) : null,
+    calc,
+    el('div', { class: 'botonera' },
+      el('button', { class: 'btn btn-llego', onclick: () => {
+        const n = leer();
+        if (n.s && !n.e && !n.dur) { aviso('Pon también la hora de entrada'); return; }
+        guardarReg(dia, t.id, n); h.close(); aviso('Día guardado');
+      } }, 'Guardar el día'),
+      el('button', { class: 'btn btn-suave', onclick: () => { guardarReg(dia, t.id, { falta: true }); h.close(); aviso(`${t.nombre}: no vino`); } }, 'No vino'),
+      el('button', { class: 'btn btn-suave', onclick: () => { guardarReg(dia, t.id, {}); h.close(); aviso('Día borrado'); } }, 'Borrar el día'),
+      el('button', { class: 'btn btn-suave', onclick: () => h.close() }, 'Cancelar')));
+  recalcular(); h.showModal(); e.focus();
+}
+
+// ---------- pagos: semana o mes ----------
+const claveMes = d => `M${d.getFullYear()}-${dos(d.getMonth() + 1)}`;
+const pagaEn = t => t.tipo === 'mes' ? 'mes' : 'semana';
+function diasDe(p) {
+  if (p === 'semana') return [...Array(7)].map((_, i) => { const d = new Date(semana); d.setDate(d.getDate() + i); return d; });
+  const n = new Date(mes.getFullYear(), mes.getMonth() + 1, 0).getDate();
+  return [...Array(n)].map((_, i) => new Date(mes.getFullYear(), mes.getMonth(), i + 1, 12));
+}
+function vistaPagos() {
+  const v = $('#vista'), fechas = diasDe(periodo), dias = fechas.map(isoDia);
+  const clave = periodo === 'semana' ? isoDia(semana) : claveMes(mes);
+  const fin = fechas[fechas.length - 1];
+  const rango = periodo === 'semana' ? `${semana.getDate()}/${semana.getMonth() + 1} al ${fin.getDate()}/${fin.getMonth() + 1}` : `${MESES[mes.getMonth()]} ${mes.getFullYear()}`;
+  const mover = k => { if (periodo === 'semana') semana.setDate(semana.getDate() + 7 * k); else mes.setMonth(mes.getMonth() + k); pintar(); };
+  const seg = el('div', { class: 'seg', role: 'group', 'aria-label': 'Ver por' },
+    ['semana', 'mes'].map(p => el('button', { 'aria-pressed': periodo === p, onclick: () => { periodo = p; pintar(); } }, p === 'semana' ? 'Semana' : 'Mes')));
+  const nav = el('div', { class: 'nav-semana' },
+    el('button', { class: 'btn btn-suave', onclick: () => mover(-1) }, '‹ Anterior'),
+    el('div', { class: 'rango' }, rango),
+    el('button', { class: 'btn btn-suave', onclick: () => mover(1) }, 'Siguiente ›'));
+  const ts = D.trabajadores.filter(t => t.activo !== false || dias.some(d => marcado((D.registros[d] || {})[t.id])));
+  if (!ts.length) { poner(v, el('h2', {}, 'Pagos'), seg, nav, el('div', { class: 'vacio-msg' }, el('p', {}, 'Todavía no hay trabajadores. Agrégalos en «Equipo».'))); return; }
+
+  const filas = ts.map(t => ({ t, c: cuenta(t, dias, periodo) }));
+  let tabla = null;
+  if (periodo === 'semana') tabla = el('div', { class: 'tabla' }, el('table', {},
+    el('thead', {}, el('tr', {}, el('th', {}, 'Nombre'), fechas.map(d => el('th', {}, `${DIAS[d.getDay()]} ${d.getDate()}`)))),
+    el('tbody', {}, filas.map(({ t }) => el('tr', {}, el('td', {}, el('b', {}, t.nombre)), fechas.map(d => {
+      const r = (D.registros[isoDia(d)] || {})[t.id];
+      if (r?.falta) return el('td', { class: 'dia f' }, el('button', { onclick: () => corregir(isoDia(d), t) }, 'faltó'));
+      if (!marcado(r)) return el('td', { class: 'dia n' }, el('button', { 'aria-label': `Marcar ${t.nombre}`, onclick: () => corregir(isoDia(d), t) }, '·'));
+      const txt = r.dur && !r.e ? hDec(r.dur / 60) : `${r.e}–${r.s || '?'}`;
+      return el('td', { class: 'dia' }, el('button', { title: r.anotado ? `Anotado después, el ${cortaFecha(r.anotado)}` : null, onclick: () => corregir(isoDia(d), t) }, txt + (r.modo === 'medio' ? ' ½' : '') + (r.anotado ? ' *' : '')));
+    }))))));
+
+  const pagos = D.pagos[clave] ||= {};
+  let suma = 0, debe = 0;
+  const lista = filas.filter(f => f.c.total > 0).map(({ t, c }) => {
+    const aqui = pagaEn(t) === periodo;            // se paga en esta vista (semana) o en la otra (mes)
+    const pagado = !!pagos[t.id];
+    suma += c.total; if (aqui && !pagado) debe += c.total;
+    return el('div', { class: 'pago' },
+      el('div', {}, el('div', { class: 'nombre', style: 'font-size:18px' }, t.nombre),
+        el('div', { class: 'det' }, c.detalle), c.faltas ? el('div', { class: 'det' }, `Faltó ${c.faltas} ${c.faltas === 1 ? 'día' : 'días'}`) : null),
+      el('div', { style: 'text-align:right' }, el('div', { class: 'monto' }, pesos(c.total)),
+        aqui ? el('button', { class: 'chip ' + (pagado ? 'si' : 'no'), 'aria-pressed': pagado, onclick: () => { pagos[t.id] = !pagado; guardar(); pintar(); aviso(pagado ? 'Marcado como sin pagar' : `${t.nombre}: pagado`); } }, pagado ? '✓ Pagado' : 'Sin pagar')
+          : el('div', { class: 'det' }, t.tipo === 'mes' ? 'se paga al mes' : 'se paga por semana')));
+  });
+  const atrasado = impagoAnterior();
+  poner(v,
+    el('h2', {}, 'Pagos'), seg, nav,
+    atrasado ? el('div', { class: 'aviso' }, `Quedan ${pesos(atrasado)} sin pagar de ${periodo === 'semana' ? 'semanas' : 'meses'} anteriores.`) : null,
+    tabla,
+    el('div', { class: 'pagos' }, el('h2', { style: 'font-size:22px;margin-top:18px' }, periodo === 'semana' ? 'Lo de esta semana' : 'Lo de este mes'),
+      lista.length ? lista : el('p', { class: 'sub' }, periodo === 'semana' ? 'Esta semana nadie tiene días marcados.' : 'Este mes nadie tiene días marcados.'),
+      lista.length ? el('div', { class: 'gran-total' }, el('span', {}, debe ? `Falta pagar ${pesos(debe)}` : 'Todo pagado'), el('span', { class: 'monto' }, pesos(suma))) : null),
+    lista.length ? el('div', { class: 'botonera', style: 'margin-top:8px' },
+      el('button', { class: 'btn btn-salio', style: 'flex:1', onclick: () => compartir(texto(filas, fechas, rango, pagos)) }, periodo === 'semana' ? 'Compartir la semana' : 'Compartir el mes'),
+      el('button', { class: 'btn btn-suave', onclick: () => bajarCSV(filas, fechas, clave, pagos) }, 'Bajar planilla')) : null);
+}
+// lo que quedó sin pagar antes del periodo que se mira (cada persona en su forma de pago)
+function impagoAnterior() {
+  let n = 0;
+  const desdeSem = isoDia(periodo === 'semana' ? semana : lunesDe(mes)), desdeMes = claveMes(periodo === 'mes' ? mes : semana);
+  const porPeriodo = {};
+  for (const dia of Object.keys(D.registros)) for (const t of D.trabajadores) {
+    if (!marcado(D.registros[dia][t.id])) continue;
+    const k = t.tipo === 'mes' ? claveMes(deIso(dia)) : isoDia(lunesDe(deIso(dia)));
+    if (t.tipo === 'mes' ? k >= desdeMes : k >= desdeSem) continue;
+    ((porPeriodo[t.id + '|' + k] ||= { t, k, dias: [] }).dias).push(dia);
+  }
+  for (const { t, k, dias } of Object.values(porPeriodo)) {
+    if ((D.pagos[k] || {})[t.id]) continue;
+    let todos = dias;
+    if (t.tipo === 'mes') { const [a, m] = k.slice(1).split('-').map(Number); const nd = new Date(a, m, 0).getDate(); todos = [...Array(nd)].map((_, i) => isoDia(new Date(a, m - 1, i + 1, 12))); }
+    else { const l = deIso(k); todos = [...Array(7)].map((_, i) => { const d = new Date(l); d.setDate(d.getDate() + i); return isoDia(d); }); }
+    n += cuenta(t, todos, t.tipo === 'mes' ? 'mes' : 'semana').total;
+  }
+  return n;
+}
+function texto(filas, fechas, rango, pagos) {
+  const l = [`*Asistencia · ${periodo === 'semana' ? 'semana ' : ''}${rango}*`, ''];
+  for (const { t, c } of filas) {
+    if (!c.hay) continue;
+    const aqui = pagaEn(t) === periodo;
+    l.push(`*${t.nombre}* — ${pesos(c.total)}` + (aqui ? (pagos[t.id] ? ' ✅ pagado' : ' ⏳ sin pagar') : ''));
+    l.push(`  ${c.detalle}`);
+    for (const d of fechas) {
+      const r = (D.registros[isoDia(d)] || {})[t.id]; if (!marcado(r)) continue;
+      l.push(`  ${DIAS[d.getDay()]} ${d.getDate()}: ` + (r.falta ? 'no vino' : (r.e ? `${r.e} a ${r.s || '?'}` : hDec(r.dur / 60))
+        + (r.modo === 'medio' ? ' (medio día)' : r.modo === 'horas' ? ` (${hDec(horasDe(r))})` : ''))
+        + (r.anotado ? ` · anotado después, el ${cortaFecha(r.anotado)}` : ''));
+    }
+  }
+  l.push('', `*Total: ${pesos(filas.reduce((a, f) => a + f.c.total, 0))}*`);
+  return l.join('\n');
+}
+const nativo = () => window.Capacitor?.isNativePlatform?.();
+async function compartir(texto) {
+  if (nativo()) { try { await Capacitor.Plugins.Share.share({ text: texto }); } catch {} return; }
+  if (navigator.share) { try { await navigator.share({ text: texto }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  location.href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+}
+async function bajar(nombre, contenido, tipo) {
+  if (nativo()) {   // en la app Android no hay descargas: se guarda el archivo y se abre «Compartir» (WhatsApp, Drive, correo)
+    try {
+      const { Filesystem, Share } = Capacitor.Plugins;
+      const r = await Filesystem.writeFile({ path: nombre, data: contenido, directory: 'CACHE', encoding: 'utf8' });
+      await Share.share({ title: nombre, url: r.uri });
+    } catch (e) { if (!/cancel/i.test(e?.message || '')) aviso('No se pudo guardar el archivo'); }
+    return;
+  }
+  const a = el('a', { href: URL.createObjectURL(new Blob([contenido], { type: tipo })), download: nombre });
+  document.body.append(a); a.click(); a.remove();
+}
+function bajarCSV(filas, fechas, clave, pagos) {
+  const c = v => `"${String(v).replace(/"/g, '""')}"`;
+  const l = [['Nombre', 'Se paga', 'Monto', ...fechas.map(d => `${DIAS[d.getDay()]} ${isoDia(d)}`), 'Horas', 'Días', 'A pagar', 'Pagado'].map(c).join(';')];
+  for (const { t, c: k } of filas) l.push([t.nombre, POR[t.tipo], t.monto, ...fechas.map(d => {
+    const r = (D.registros[isoDia(d)] || {})[t.id];
+    const nota = r?.anotado ? ` [anotado ${r.anotado}]` : '';
+    return (r?.falta ? 'no vino' : r?.e ? `${r.e}-${r.s || '?'}${r.modo === 'medio' ? ' (medio)' : ''}` : r?.dur ? hDec(r.dur / 60) : '') + (r && marcado(r) ? nota : '');
+  }), num(k.horas), num(k.partes), Math.round(k.total), pagaEn(t) === periodo ? (pagos[t.id] ? 'sí' : 'no') : ''].map(c).join(';'));
+  bajar(`asistencia_${clave}.csv`, '﻿' + l.join('\r\n'), 'text/csv');
+}
+
+// ---------- equipo ----------
+function vistaEquipo(editar) {
+  const v = $('#vista');
+  const t = editar || { nombre: '', oficio: '', tipo: 'dia', monto: '' };
+  const nombre = el('input', { value: t.nombre, autocomplete: 'off', placeholder: 'Ej.: Juan Soto' });
+  const oficio = el('input', { value: t.oficio || '', autocomplete: 'off', placeholder: 'Ej.: maestro, ayudante' });
+  const tipo = el('select', {}, Object.entries({ hora: 'Por hora', dia: 'Por día', semana: 'Sueldo semanal', mes: 'Sueldo mensual' }).map(([k, x]) => el('option', { value: k }, x))); tipo.value = t.tipo;
+  const monto = el('input', { type: 'number', inputmode: 'numeric', min: '0', step: '500', value: t.monto, placeholder: 'Ej.: 40000' });
+  const form = el('form', { class: 'bloque', onsubmit: ev => {
+    ev.preventDefault();
+    const n = nombre.value.trim(), m = Number(monto.value);
+    if (!n) { aviso('Escribe el nombre'); nombre.focus(); return; }
+    if (!(m > 0)) { aviso('Escribe cuánto gana'); monto.focus(); return; }
+    if (editar) Object.assign(editar, { nombre: n, oficio: oficio.value.trim(), tipo: tipo.value, monto: m });
+    else D.trabajadores.push({ id: nuevoId(), nombre: n, oficio: oficio.value.trim(), tipo: tipo.value, monto: m, activo: true });
+    guardar(); aviso(editar ? 'Cambios guardados' : `${n} agregado al equipo`); vistaEquipo(); resumenHoy();
+  } },
+    el('h2', { style: 'font-size:22px;margin-top:0' }, editar ? `Editar a ${t.nombre}` : 'Agregar trabajador'),
+    el('label', { class: 'campo' }, el('span', {}, 'Nombre'), nombre),
+    el('label', { class: 'campo' }, el('span', {}, 'Oficio (opcional)'), oficio),
+    el('div', { class: 'fila2' }, el('label', { class: 'campo' }, el('span', {}, 'Se le paga'), tipo), el('label', { class: 'campo' }, el('span', {}, 'Monto en pesos'), monto)),
+    el('div', { class: 'botonera' }, el('button', { class: 'btn btn-llego', type: 'submit', style: 'flex:1' }, editar ? 'Guardar cambios' : 'Agregar al equipo'),
+      editar ? el('button', { class: 'btn btn-suave', type: 'button', onclick: () => vistaEquipo() }, 'Cancelar') : null));
+
+  const lista = D.trabajadores.map(x => el('div', { class: 'persona', style: x.activo === false ? 'opacity:.55' : '' },
+    el('div', {}, el('div', { class: 'nombre', style: 'font-size:18px' }, x.nombre), el('div', { class: 'det' }, `${pesos(x.monto)} ${POR[x.tipo]}${x.oficio ? ' · ' + x.oficio : ''}${x.activo === false ? ' · ya no trabaja' : ''}`)),
+    el('div', { class: 'botonera', style: 'justify-content:flex-end' },
+      el('button', { class: 'chip gris', onclick: () => { vistaEquipo(x); window.scrollTo(0, 0); } }, 'Editar'),
+      el('button', { class: 'chip gris', onclick: () => { x.activo = x.activo === false; guardar(); vistaEquipo(); resumenHoy(); aviso(x.activo ? `${x.nombre} vuelve a la lista de hoy` : `${x.nombre} sale de la lista de hoy (su historial se guarda)`); } }, x.activo === false ? 'Reactivar' : 'Ya no viene'))));
+
+  const A = D.ajustes;
+  const campoNum = (val, step) => el('input', { type: 'number', inputmode: 'decimal', min: '0', step, value: val });
+  const jor = campoNum(A.jornada, '0.5'), dsem = campoNum(A.diasSemana, '0.5'), col = campoNum(A.colacion, '15'), des = campoNum(A.desde, '0.5');
+  const ajustes = el('div', { class: 'bloque' },
+    el('h2', { style: 'font-size:22px;margin-top:0' }, 'Jornada'),
+    el('div', { class: 'fila2' }, el('label', { class: 'campo' }, el('span', {}, 'Horas de un día completo'), jor), el('label', { class: 'campo' }, el('span', {}, 'Días que se trabajan a la semana'), dsem)),
+    el('p', { class: 'ayuda', style: 'margin:-4px 0 12px' }, 'Sirven para los días pagados por horas y para descontar las faltas del sueldo semanal. El sueldo mensual descuenta 1/30 por día.'),
+    el('div', { class: 'fila2' }, el('label', { class: 'campo' }, el('span', {}, 'Colación (minutos)'), col), el('label', { class: 'campo' }, el('span', {}, 'Se descuenta si pasa de (horas)'), des)),
+    el('p', { class: 'ayuda' }, 'La colación se descuenta de las horas cuando se marca entrada y salida. Pon 0 para no descontar.'),
+    el('button', { class: 'btn btn-suave', style: 'margin-top:10px', onclick: () => {
+      A.jornada = Math.max(1, +jor.value || 9); A.diasSemana = Math.max(1, +dsem.value || 5);
+      A.colacion = Math.max(0, +col.value || 0); A.desde = Math.max(0, +des.value || 0); guardar(); aviso('Jornada guardada');
+    } }, 'Guardar jornada'));
+
+  const archivo = el('input', { type: 'file', accept: '.json,application/json', style: 'display:none', onchange: async ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    try { const n = JSON.parse(await f.text()); if (!Array.isArray(n.trabajadores) || typeof n.registros !== 'object') throw 0;
+      if (!confirm('Esto reemplaza los datos de este teléfono por los del archivo. ¿Seguir?')) return;
+      D = Object.assign(vacio(), n); D.ajustes = Object.assign({}, AJ, D.ajustes); guardar(); aviso('Respaldo cargado'); pintar();
+    } catch { aviso('Ese archivo no es un respaldo de Jornada'); }
+  } });
+  const respaldo = el('div', { class: 'bloque' },
+    el('h2', { style: 'font-size:22px;margin-top:0' }, 'Respaldo'),
+    el('p', { class: 'ayuda', style: 'margin-bottom:10px' }, 'Los datos se guardan solo en este teléfono. Guarda un respaldo de vez en cuando, o úsalo para pasar todo a otro teléfono.'),
+    el('div', { class: 'botonera' },
+      el('button', { class: 'btn btn-suave', onclick: () => bajar(`jornada_respaldo_${isoDia(new Date())}.json`, JSON.stringify(D), 'application/json') }, 'Guardar respaldo'),
+      el('button', { class: 'btn btn-suave', onclick: () => archivo.click() }, 'Cargar respaldo'), archivo));
+
+  poner(v, form, D.trabajadores.length ? el('h2', { style: 'font-size:22px' }, `Equipo (${activos().length})`) : null, lista, ajustes, respaldo);
+}
+
+// ---------- arranque ----------
+document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => ir(b.dataset.tab)));
+// con el teclado abierto se esconde la barra de abajo (subía y tapaba los campos, visto en el S25);
+// cuenta solo si hay un campo activo Y la pantalla se achicó: cerrar el teclado con «atrás» la devuelve
+let altoMax = innerHeight;
+const enCampo = () => document.activeElement?.matches?.('input:not([type=radio]):not([type=checkbox]):not([type=file]),select,textarea');
+const revisarTeclado = () => { altoMax = Math.max(altoMax, innerHeight); document.body.classList.toggle('escribiendo', !!enCampo() && innerHeight < altoMax - 120); };
+addEventListener('resize', revisarTeclado);
+document.addEventListener('focusin', () => setTimeout(revisarTeclado, 300));
+document.addEventListener('focusout', () => setTimeout(revisarTeclado, 150));
+tic(); setInterval(() => { const antes = $('#hora').textContent; tic(); if (antes.slice(0, 2) !== $('#hora').textContent.slice(0, 2) && pestaña === 'hoy') pintar(); }, 15000);
+pintar();
+</script>
+</body>
+</html>
