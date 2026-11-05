@@ -36,7 +36,7 @@ h2{font-size:22px} h3{font-size:18px}
 .top small{display:block;font-family:var(--body);font-size:12px;opacity:.8;font-weight:400}
 main{padding:14px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:1100px;margin:0 auto}
 section.s{display:none;flex-direction:column;gap:14px} section.s.on{display:flex}
-nav.navb{position:fixed;left:0;right:0;bottom:0;background:var(--nav);display:grid;grid-template-columns:repeat(8,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav.navb{position:fixed;left:0;right:0;bottom:0;background:var(--nav);display:grid;grid-template-columns:repeat(9,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
 nav.navb button{background:none;border:0;color:var(--navtx);font:600 10.5px var(--body);padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
 nav.navb button svg{width:22px;height:22px}
 nav.navb button.on{color:#fff;box-shadow:inset 0 3px 0 var(--accent)}
@@ -91,7 +91,7 @@ td{border-bottom:1px solid var(--line);padding:5px 8px;font-variant-numeric:tabu
 .job b{font-family:var(--display);font-size:19px;display:block}
 .glosa{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 22px;margin:16px 0 0}
 .glosa dt{font-family:var(--display);font-weight:600;font-size:17px} .glosa dd{margin:2px 0 0;font-size:14px;color:var(--muted)}
-@media (min-width:900px){ .top{position:static} nav.navb{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;grid-template-columns:repeat(8,auto);justify-content:center;gap:4px} nav.navb button{flex-direction:row;font-size:15px;padding:12px 18px;gap:8px;min-height:48px;align-items:center} nav.navb button.on{box-shadow:inset 0 -3px 0 var(--accent)} main{padding-bottom:30px} }
+@media (min-width:900px){ .top{position:static} nav.navb{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;grid-template-columns:repeat(9,auto);justify-content:center;gap:4px} nav.navb button{flex-direction:row;font-size:15px;padding:12px 18px;gap:8px;min-height:48px;align-items:center} nav.navb button.on{box-shadow:inset 0 -3px 0 var(--accent)} main{padding-bottom:30px} }
 .paso{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;text-align:left;font:inherit;color:var(--ink)}
 .paso .n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;background:var(--line);color:var(--ink)}
 .paso.ok .n{background:var(--ok);color:#fff} .paso.op .n{background:var(--steel-soft);color:var(--steel)}
@@ -124,10 +124,10 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
     <div class="card"><h2>Mis trabajos</h2><p class="mini" style="margin:4px 0 10px">Cada obra queda guardada en este teléfono. Toca una para abrirla.</p><div id="lista" style="display:flex;flex-direction:column;gap:8px"></div>
       <div class="row" style="margin-top:12px"><button class="b pri" data-ir2="materiales">Materiales de la obra abierta</button><button class="b pri" id="nuevo">+ Nuevo desde medidas</button><button class="b pri" id="nuevo-foto" style="font-size:16px;font-weight:700">📷 NUEVO DESDE FOTO</button><button class="b" id="duplicar">Duplicar</button><button class="b del" id="borrar">Borrar</button></div>
       <p class="mini" id="msg-trab" style="margin:8px 0 0"></p></div>
-    <div class="card"><details><summary>Pasar a otro teléfono</summary><div class="body">
-      <p class="mini">Copia el texto del trabajo abierto y pégalo en el otro teléfono.</p>
+    <div class="card"><details><summary>Pasar a otro teléfono · o cargar un diseño 3D</summary><div class="body">
+      <p class="mini">Copia el texto del trabajo abierto y pégalo en el otro teléfono. También puedes pegar aquí el <b>JSON de un diseño del Diseñador 3D</b> (botón «Exportar al Cubicador») y se crea como obra nueva.</p>
       <div class="row"><button class="b" id="exportar">Copiar trabajo</button><button class="b" id="importar">Cargar lo pegado</button></div>
-      <textarea id="txt" placeholder="Pega aquí un trabajo copiado"></textarea></div></details></div>
+      <textarea id="txt" placeholder="Pega aquí un trabajo copiado, o el JSON de un diseño 3D"></textarea></div></details></div>
     <div class="card"><details><summary>Medidas base y reglas</summary><div class="body"><div class="row" id="params"></div></div></details></div>
   </section>
 
@@ -166,6 +166,24 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
   <!-- TECHO -->
   <section class="s" id="s-techo"><div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin-bottom:4px">Cerchas y techumbre</h2><button class="b" data-dl="techo">⬇️ Descargar o imprimir</button></div><div id="techo-out"></div></div></section>
 
+  <!-- TABIQUES NO UNIFORMES -->
+  <section class="s" id="s-nounif"><div class="card">
+    <h2 style="margin-bottom:4px">Tabiques no uniformes</h2>
+    <p class="mini" style="margin:4px 0 10px">Muros que no son rectangulares: frontón a dos aguas, media agua (trapecio) o pentágono (cumbrera descentrada, para un ala que topa un volumen más alto). Reusa el mismo motor: pies derechos a la grilla, de LARGO VARIABLE, solera inferior y superior inclinada, superficie y OSB. Si el tramo es vidriado, avisa que va pórtico. Medidas en metros (coma decimal).</p>
+    <div class="row">
+      <label class="f">Nombre<input type="text" id="nu-nom" placeholder="Frontón norte" style="width:150px"></label>
+      <label class="f">Forma<select id="nu-forma"><option value="triangulo">Frontón 2 aguas</option><option value="trapecio">Media agua</option><option value="pentagono">Pentágono</option></select></label>
+      <label class="f">Ancho (m)<input type="text" class="n" id="nu-ancho" placeholder="8"></label>
+      <label class="f">Alto muro (m)<input type="text" class="n" id="nu-hm" placeholder="2,4"></label>
+      <label class="f">Pendiente %<input type="text" class="n" id="nu-pend" placeholder="30"></label>
+      <label class="f">Alto der. (m)·media agua<input type="text" class="n" id="nu-h2" placeholder="3,4"></label>
+      <label class="f">Cumbrera a (m)·pentág.<input type="text" class="n" id="nu-xc" placeholder="2,8"></label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="nu-vid">Vidriado</label>
+      <button class="b pri" id="nu-add" style="align-self:end">+ Agregar</button>
+    </div>
+  </div>
+  <div id="nu-out" style="display:flex;flex-direction:column;gap:12px"></div></section>
+
   <!-- MATERIALES -->
   <section class="s" id="s-materiales">
     <div class="card"><div class="row" style="justify-content:space-between"><h2>Materiales</h2><div class="row"><button class="b pri" data-dl="materiales">⬇️ Descargar todo (PDF)</button><button class="b" id="copiar-lista">Copiar lista</button></div></div><div id="tiles" style="margin-top:6px"></div><p class="mini" id="msg-lista"></p></div>
@@ -177,6 +195,11 @@ input[type=date],input[type=time]{font:inherit;font-size:16px;color:var(--ink);b
   <section class="s" id="s-valor">
     <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Valor de los materiales</h2><div class="row"><button class="b" data-dl="valor">⬇️ Descargar</button><button class="b pri" id="copiar-valor">Copiar presupuesto</button></div></div>
       <p class="mini" style="margin:4px 0 10px">Las cantidades salen solas de la cubicación. Escribe el precio unitario de cada cosa (en pesos) y se suma todo. Los precios quedan guardados en el teléfono y sirven para las próximas obras.</p>
+      <div class="row" id="uf-box" style="margin:0 0 12px;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px">
+        <span class="chip">UF hoy: <b id="uf-val">cargando…</b><span class="mini" id="uf-fecha" style="margin-left:5px"></span></span>
+        <label class="chip" style="display:flex;gap:6px;align-items:center">o a mano <input type="text" class="n" id="uf-manual" inputmode="decimal" placeholder="UF $" style="width:92px"></label>
+        <span class="chip">Conversor <input type="text" class="n" id="uf-conv" inputmode="decimal" placeholder="UF" style="width:58px"> UF = <b id="uf-conv-out">—</b></span>
+      </div>
       <div class="tw"><table id="tabla-valor"></table></div>
       <div class="row" style="margin-top:10px;align-items:center"><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-iva" style="margin:0">Sumar IVA (19 %)</label><label class="chip" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="con-resp" style="margin:0">Mis precios ya traen respaldo (precio = materiales + mano de obra)</label><span class="mini" id="msg-valor"></span></div></div>
     <details class="card" style="margin-top:12px"><summary><b>💼 Precio al cliente</b> <span class="mini">· aparte del costo</span></summary><p class="mini" style="margin:6px 0">Materiales a costo más un recargo (35 % como mínimo) y la mano de obra, que se cobra casi lo mismo que cuestan los materiales. Los porcentajes se pueden cambiar.</p><div class="tw" id="precio-cliente"></div></details>
@@ -550,13 +573,13 @@ const SUPUESTOS=[
   'El programa no verifica que la planta cierre: confía en los largos ingresados.',
   'Por fuera la plancha baja 3 a 4 cm bajo el piso para tapar la unión y que no filtre agua; por eso se usa de 2,40 a 2,44 en un muro de 2,40 (Cristian). La OSB 1,22 × 2,44 va VERTICAL y el internit exterior 1,20 × 2,40 va HORIZONTAL encima, para cruzar las juntas y que no queden aperturas (Cristian). Muros oeste y sur llevan ese internit (contrato).',
   'Planchas de muro: una fila a lo alto (alto 2,40). En la esquina la OSB no descuenta el traslape con el muro vecino. Una plancha cortada por un vano se cuenta entera; los recortes no se reaprovechan entre muros.',
-  'Forro interior por cara: terciado ranurado 1,22 × 2,44, internit 1,20 × 2,40 o volcanita 1,20 × 2,40. La grilla de cada cara sigue el ancho de su plancha. En la casa de La casa de ejemplo: terciado en general e internit en baños y cocina (contrato); el cielo es de volcanita.',
+  'Forro interior por cara: terciado ranurado 1,22 × 2,44, internit 1,20 × 2,40 o volcanita 1,20 × 2,40. La grilla de cada cara sigue el ancho de su plancha. En la casa de Sylvana: terciado en general e internit en baños y cocina (contrato); el cielo es de volcanita.',
   'Cielo: el ángulo perimetral rodea cada habitación (tiras de 3 m, los sobrantes se usan en otro lado de la misma obra). La primera omega va a 40 de la pared y luego cada 40 a eje; en la pared apoya el perimetral. Omegas en perfiles de 6 m; un tramo más largo se empalma sin contar traslape.',
   'Plancha acanalada 0,851 × largo; útil = ancho − 2 rolones (≈0,70). Si una plancha alcanza la caída con 5 cm de margen, va una sola; si no, dos traslapadas (Cristian). Se coloca primero toda la línea de abajo y la de arriba se monta encima, con unos 50 cm de traslape que deben caer sobre una costanera, para que no entre agua. La costanera más alta va a 12 cm de la cumbrera por cada lado, para atornillar el caballete.',
   'Cercha reticulada tupida (Cristian, 2-oct): una W con solo 4 diagonales no da la rigidez ni aguanta la carga. Cada caída lleva al menos 8 elementos: montante junto al borde para amarrar el ángulo, y montante + diagonal en cada paño (5 paños de 0,67 en 3,35). Diagonales tipo Pratt: van hacia el centro y bajo el peso del techo trabajan a tracción, por eso aguantan con perfil liviano (confirmado con la teoría de cerchas; con viento que levanta el techo se invierten los esfuerzos). Separación entre cerchas 1,00 desde el borde (Cintac: máx. 1,20).',
   'Diagonales en C 90 para aprovechar los despuntes de los pies derechos (se puede cambiar a C 60). El cordón inferior mayor a 6 m se empalma sobre el apoyo con traslape.',
   'Aleros: 30 cm al frente y en los costados, sin alero atrás (contrato). Costados (Cristian): la omega estructural sigue de largo; en la caída, perfil U atornillado desde arriba con el lado cerrado hacia afuera para recibir el internit; abajo, omegas de cielo del ancho del alero cada 40 tomadas al perimetral. El U se asumió U 92 ⚠️. El bajo alero del frente se armó igual ⚠️ por confirmar. Costaneras: omega estructural cada 55 cm (contrato). Faltan: cruz de San Andrés entre cerchas, estabilizadores, frontones y bajo alero.',
-  'Pendiente del muro real de La casa de ejemplo: las cotas 1,12 y 2,31 de tu ejemplo todavía no las explica ninguna regla.'
+  'Pendiente del muro real de Sylvana: las cotas 1,12 y 2,31 de tu ejemplo todavía no las explica ninguna regla.'
 ];
 const P=Object.fromEntries(PARAMS.map(p=>[p[0],p[2]]));
 
@@ -570,7 +593,7 @@ function largoPerfil(k,p){ return ({'C 90':p.lC90,'U 92':p.lU92,'C 60':p.lC60,'U
 /* MOTOR-INICIO */
 const MATS={terciado:'Terciado ranurado',internit:'Internit',volcanita:'Volcanita'};
 function matOf(m,p){ return m==='ninguno'?{w:p.vol,h:p.volH,none:true}:m==='terciado'?{w:p.osb,h:p.osbH}:{w:p.vol,h:p.volH}; }
-// ALTURA VARIABLE (Cristian, 17-oct-2026, casa de ejemplo de varias esquinas): con techos de una o varias aguas cada muro tiene su alto.
+// ALTURA VARIABLE (Cristian, 17-oct-2026, casa Casa 82 m² (L)): con techos de una o varias aguas cada muro tiene su alto.
 // w.alt = [[x, alto], …] a lo largo del muro (cm); entre puntos va en recta; dos puntos en el mismo x = un salto (quiebre).
 // Sin w.alt el muro tiene el alto general (p.H) y todo se calcula exactamente igual que antes.
 // franjas de plancha (lo que sobra arriba de las planchas enteras) juntadas de mayor a menor en planchas de alto plH
@@ -745,7 +768,7 @@ function frame(w,perim,p,forcedU){
       for(let i=0;i<xs.length-1;i++){ const u=xs[i],v=xs[i+1]; l+=Math.hypot(v-u,hAt(v-0.02)-hAt(u+0.02)); if(i>0) l+=Math.abs(hAt(u+0.02)-hAt(u-0.02)); } return l; };
     const lTop=largoTop(a,b);
     pcU(lTop,'solera superior');
-    // EETT casa de ejemplo de varias esquinas (17-oct): solera de refuerzo compuesta — un C 90 envuelto en un U 92 — sobre la solera superior
+    // EETT casa Casa 82 m² (L) (17-oct): solera de refuerzo compuesta — un C 90 envuelto en un U 92 — sobre la solera superior
     if(p.soleraComp){ pcU(lTop,'solera compuesta (U)'); let x=lTop; while(x>BAR+0.01){ pc(C,BAR,'solera compuesta (C)'); x-=BAR-(p.trSol||50); } pc(C,x,'solera compuesta (C)'); }
     // y un refuerzo horizontal a 1,22 del piso (para fijar las placas de OSB): se corta en cada vano que pasa por esa altura
     if(p.refH>0&&perim){ let x=a; vanos.filter(v=>v.x>=a-0.05&&v.x+v.w<=b+0.05).forEach(v=>{ const door=v.t==='puerta', head=door?(v.h||p.doorH):(v.cab||p.winHead), sill=door?0:head-v.h;
@@ -982,7 +1005,7 @@ function techo(state,res){
     nudos:nds.length, hexUnion, hexCercha:nds.length*hexUnion, hexTotal:nds.length*hexUnion*n};
 }
 
-// CERCHAS DEL PLANO (Cristian, 17-oct-2026, casa de ejemplo de varias esquinas): cuando el arquitecto ya diseñó las cerchas (techo de
+// CERCHAS DEL PLANO (Cristian, 17-oct-2026, casa Casa 82 m² (L)): cuando el arquitecto ya diseñó las cerchas (techo de
 // varias aguas, limahoyas, cerchas distintas) NO se calculan: se copian del plano. Por cada tipo: cuántas y los metros de
 // C 90 y de C 60 de UNA cercha, y otro perfil si lleva (en metros o en piezas, ej. CA 150 × 1,6 que pasa de 6 m).
 // Piezas de 6 m = ⌈metros totales ÷ 6 × 1,1⌉ (10 % de despunte). Cruces de San Andrés en C 60 y costaneras omega, opcionales.
@@ -1137,7 +1160,7 @@ function radier(state,res){
   const cen=central?largo-2*c:0;               // fundación corrida bajo el tabique de apoyo (a lo largo de la casa)
   const mlCim=perim+cen;
   const seccion=c*(prof+sobre);                     // cm²
-  // vigas de fundación interiores (EETT de la casa de ejemplo de varias esquinas, 17-oct): metros escritos a mano, sección propia
+  // vigas de fundación interiores (EETT de la casa Casa 82 m² (L), 17-oct): metros escritos a mano, sección propia
   const mlVig=(b.mlVigas||0), vA=b.vigaAncho||20, vH=b.vigaAlto||40, m3Vig=mlVig*vA*vH/1e6;
   const m3Cim=mlCim*seccion/1e6+m3Vig;
   const m2Losa=(Ar-c*P+4*c*c-cen*c-mlVig*vA)/1e4;   // la losa va DENTRO del sobrecimiento (y descuenta las vigas)
@@ -1485,7 +1508,7 @@ function perimetro(W, H, rc) {
   return {lados, esq, a, b, area: W * H - a * b, perim: 2 * (W + H)};
 }
 
-// VARIAS ESQUINAS (Cristian, 17-oct-2026, casa de ejemplo de varias esquinas): un rectángulo al que le faltan rectángulos en varias
+// VARIAS ESQUINAS (Cristian, 17-oct-2026, casa 82 m² (L)): un rectángulo al que le faltan rectángulos en varias
 // esquinas (forma de Z, o una esquina escalonada = dos recortes en la misma esquina). Se arma la planta por celdas, se
 // recorre el borde en sentido horario y cada lado es un muro: A, B, C… partiendo por el lado de arriba más a la izquierda.
 function perimetroVarios(W, H, recortes) {
@@ -1656,7 +1679,7 @@ function plantaAEstado(pl, p) {
   // ---- forro de cada cara según el recinto que mira ----
   const humedo = t => t === 'baño' || t === 'cocina';
   const matEn = (x, y) => {
-    if (pl.forroBase === 'ninguno') return 'ninguno';   // sin forro interior (Cristian, casa de ejemplo de varias esquinas)
+    if (pl.forroBase === 'ninguno') return 'ninguno';   // sin forro interior (Cristian, casa 82 m² (L))
     if ((pl.zonas || []).some(z => humedo(z.tipo) && x >= z.x0 && x <= z.x1 && y >= z.y0 && y <= z.y1)) return 'internit';
     const r = regionDe(x, y); return r && humedo(r.tipo) ? 'internit' : (pl.forroBase || 'terciado');
   };
@@ -1939,7 +1962,7 @@ function cerchaPiezas(T){
 }
 const cerG1=n=>n.toFixed(1).replace('.',',');
 // ÁNGULOS DE CORTE (v0.18b, revisor + Cristian): salen de la geometría de la cercha, no son fijos. «fuera de escuadra» = cuánto se gira el corte
-// respecto de un corte recto. Ej. casa de ejemplo (19,7°): cumbrera y alero a plomo 19,7°; montantes recto abajo y 19,7° arriba.
+// respecto de un corte recto. Ej. Sylvana (19,7°): cumbrera y alero a plomo 19,7°; montantes recto abajo y 19,7° arriba.
 function cerCortes(T,z){ const {L,half,h}=T, ang=T.ang, g=cerG1, dir=(a,b)=>Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI;
   const entre=(d1,d2)=>{ let d=Math.abs(d1-d2)%180; return Math.min(d,180-d); };
   const w=z.inst[0];
@@ -2142,7 +2165,7 @@ const MODO_OBRA=/*MODO_OBRA*/false;   // true en la app «Registro de Obra» (ar
 
 /* ---------- trabajos guardados ---------- */
 const KT='cubicador-trabajos-v1';
-const SYL={"id":"sylvana","nombre":"Casa de ejemplo 9 × 6,70","fecha":"2026-10-02","planta":{"ancho":900,"fondo":670,"forroBase":"terciado","intExt":["C","D"],"tabiques":[{"nombre":"Tabique central","perfil":90,"o":"h","eje":315,"desde":0,"hasta":900,"fijo":true},{"nombre":"T1 dormitorio 1 / baños","perfil":60,"o":"v","eje":385,"desde":0,"hasta":315},{"nombre":"T2 baños / dormitorio 2","perfil":60,"o":"v","eje":577,"desde":0,"hasta":315},{"nombre":"T3 entre baños","perfil":60,"o":"h","eje":175,"desde":385,"hasta":577},{"nombre":"T4 muro corto cocina","perfil":60,"o":"v","eje":287,"desde":561,"hasta":670}],"vanos":[{"muro":"A","tipo":"ventana","desde":269.9,"ancho":60,"alto":140},{"muro":"A","tipo":"ventana","desde":502.9,"ancho":60,"alto":60},{"muro":"B","tipo":"ventana","desde":100,"ancho":120,"alto":100},{"muro":"B","tipo":"ventana","desde":410.3,"ancho":160,"alto":140,"fijo":true},{"muro":"C","tipo":"puerta","desde":122,"ancho":160,"alto":210,"fijo":true},{"muro":"C","tipo":"ventana","desde":427.9,"ancho":60,"alto":140},{"muro":"C","tipo":"puerta","desde":522.8,"ancho":85,"alto":205},{"muro":"C","tipo":"ventana","desde":722.8,"ancho":140,"alto":60,"cab":180},{"muro":"D","tipo":"puerta","desde":245.4,"ancho":75,"alto":205},{"muro":"D","tipo":"ventana","desde":450.3,"ancho":120,"alto":100},{"muro":"T0","tipo":"puerta","desde":283.9,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":482,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":593.3,"ancho":75,"alto":205},{"muro":"T1","tipo":"puerta","desde":11.7,"ancho":75,"alto":205}],"recintos":[{"nombre":"Dormitorio 1","tipo":"dormitorio","x":200,"y":150},{"nombre":"Baño 1","tipo":"baño","x":480,"y":90},{"nombre":"Baño 2","tipo":"baño","x":480,"y":250},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":740,"y":150},{"nombre":"Living - comedor - cocina","tipo":"living","x":600,"y":500}],"zonas":[{"tipo":"cocina","x0":0,"y0":319.5,"x1":295,"y1":670}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":90}},"p":{}};
+const SYL={"id":"sylvana","nombre":"Casa 64 m² · piso sobre apoyos de fierro","fecha":"2026-10-02","planta":{"ancho":900,"fondo":670,"forroBase":"terciado","intExt":["C","D"],"tabiques":[{"nombre":"Tabique central","perfil":90,"o":"h","eje":315,"desde":0,"hasta":900,"fijo":true},{"nombre":"T1 dormitorio 1 / baños","perfil":60,"o":"v","eje":385,"desde":0,"hasta":315},{"nombre":"T2 baños / dormitorio 2","perfil":60,"o":"v","eje":577,"desde":0,"hasta":315},{"nombre":"T3 entre baños","perfil":60,"o":"h","eje":175,"desde":385,"hasta":577},{"nombre":"T4 muro corto cocina","perfil":60,"o":"v","eje":287,"desde":561,"hasta":670}],"vanos":[{"muro":"A","tipo":"ventana","desde":269.9,"ancho":60,"alto":140},{"muro":"A","tipo":"ventana","desde":502.9,"ancho":60,"alto":60},{"muro":"B","tipo":"ventana","desde":100,"ancho":120,"alto":100},{"muro":"B","tipo":"ventana","desde":410.3,"ancho":160,"alto":140,"fijo":true},{"muro":"C","tipo":"puerta","desde":122,"ancho":160,"alto":210,"fijo":true},{"muro":"C","tipo":"ventana","desde":427.9,"ancho":60,"alto":140},{"muro":"C","tipo":"puerta","desde":522.8,"ancho":85,"alto":205},{"muro":"C","tipo":"ventana","desde":722.8,"ancho":140,"alto":60,"cab":180},{"muro":"D","tipo":"puerta","desde":245.4,"ancho":75,"alto":205},{"muro":"D","tipo":"ventana","desde":450.3,"ancho":120,"alto":100},{"muro":"T0","tipo":"puerta","desde":283.9,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":482,"ancho":75,"alto":205},{"muro":"T0","tipo":"puerta","desde":593.3,"ancho":75,"alto":205},{"muro":"T1","tipo":"puerta","desde":11.7,"ancho":75,"alto":205}],"recintos":[{"nombre":"Dormitorio 1","tipo":"dormitorio","x":200,"y":150},{"nombre":"Baño 1","tipo":"baño","x":480,"y":90},{"nombre":"Baño 2","tipo":"baño","x":480,"y":250},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":740,"y":150},{"nombre":"Living - comedor - cocina","tipo":"living","x":600,"y":500}],"zonas":[{"tipo":"cocina","x0":0,"y0":319.5,"x1":295,"y1":670}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":90}},"p":{}};
 function casaVacia(nombre,ancho,fondo){ return {id:Date.now().toString(36),nombre,fecha:new Date().toISOString().slice(0,10),
   planta:{ancho,fondo,forroBase:'terciado',intExt:[],tabiques:[],vanos:[],recintos:[{nombre:'Casa',tipo:'living',x:ancho/2,y:fondo/2}],zonas:[],
   techo:{on:false,alto:120,sep:100,alero:30,aleroAtras:0,aleroLat:30,cost:55,trasl:40,panos:5,webs:90,cumb:12}},p:{}}; }
@@ -2150,30 +2173,81 @@ let D; try{ D=JSON.parse(localStorage.getItem(KT)||'null'); }catch(e){ D=null; }
 if(!D||!D.trabajos||!D.trabajos.length) D={trabajos:[JSON.parse(JSON.stringify(SYL))],abierto:SYL.id};
 const guardar=()=>{ try{ localStorage.setItem(KT,JSON.stringify(D)); }catch(e){} };
 // arreglo de datos del ejemplo guardado en teléfonos con versiones anteriores (4-oct): puerta del muro D de 0,75 según el
-// plano, y la base de casa de ejemplo fija en «lado corto» (los 33 pollos que definió Cristian)
+// plano, y la base de Sylvana fija en «lado corto» (los 33 pollos que definió Cristian)
 D.trabajos.forEach(t=>{ if(t.id!=='sylvana'||t.fix0410) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='D'&&v.tipo==='puerta'&&v.ancho===85) v.ancho=75; });
   t.planta.base=Object.assign({dirPiso:'corto',entramado:'metalcon',perfilPiso:90},t.planta.base||{}); t.fix0410=true; guardar(); });
 // 10-oct (Cristian): la ventana del lavaplatos (muro C, frente) es horizontal 1,40 × 0,60, alféizar a 1,20 y dintel a 1,80
 D.trabajos.forEach(t=>{ if(t.id!=='sylvana'||t.fix1010) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='C'&&v.tipo==='ventana'&&v.ancho===120&&v.alto===100){ v.desde-=10; v.ancho=140; v.alto=60; v.cab=180; } });
   t.fix1010=true; guardar(); });
-// 17-oct (Cristian): la casa de ejemplo de varias esquinas queda en la lista como ejemplo de planta con varias esquinas, muros de alto
+// 17-oct (Cristian): la casa Casa 82 m² (L) queda en la lista como ejemplo de planta con varias esquinas, muros de alto
 // variable, sobretabique, cerchas del plano y hormigón por vaciado (se agrega una sola vez; si se borra, no vuelve)
-const NL={"id":"ejemplo-varias-esquinas","nombre":"Casa de ejemplo de varias esquinas · Etapa 1","fecha":"2026-10-17","planta":{"ancho":1362,"fondo":825,"forroBase":"ninguno","sinAislacion":true,"intExt":[],"recortes":[{"esquina":"NW","ancho":564,"fondo":180},{"esquina":"NW","ancho":356,"fondo":241},{"esquina":"SE","ancho":312,"fondo":357}],"alturas":{"A":{"hS":358,"hE":261,"qx":486,"qa":261,"qb":261},"B":{"hS":261,"hE":261,"qx":234,"qa":338,"qb":338},"C":{"hS":261,"hE":261},"D":{"hS":261,"hE":261},"E":{"hS":261,"hE":260,"qx":694,"qa":400,"qb":304},"F":{"hS":260,"hE":260},"G":{"hS":260,"hE":304},"H":{"hS":400,"hE":400},"I":{"hS":400,"hE":358},"J":{"hS":358,"hE":358}},"tabiques":[{"nombre":"B acceso / estar","perfil":90,"o":"v","eje":362,"desde":241,"hasta":334},{"nombre":"C acceso / baño","perfil":90,"o":"v","eje":570,"desde":180,"hasta":334},{"nombre":"E baño / Simón","perfil":90,"o":"v","eje":742,"desde":0,"hasta":338},{"nombre":"F dormitorios","perfil":90,"o":"v","eje":1044,"desde":0,"hasta":468},{"nombre":"Pasillo oeste","perfil":90,"o":"h","eje":338,"desde":358,"hasta":450},{"nombre":"Pasillo norte","perfil":90,"o":"h","eje":338,"desde":566,"hasta":1044},{"nombre":"Cocina norte","perfil":90,"o":"h","eje":462,"desde":664,"hasta":1044},{"nombre":"D cocina / estar","perfil":90,"o":"v","eje":668,"desde":466,"hasta":825}],"sobretabiques":[{"nombre":"Sobretabique ventanas altas (sobre cercha viga)","largo":570,"alto":96,"apoyo":"cercha","exterior":true},{"nombre":"Muro suelto del acceso (norte)","largo":108,"alto":369,"apoyo":"radier"}],"vanos":[{"muro":"A","tipo":"ventana","desde":117,"ancho":50,"alto":170,"cab":220},{"muro":"A","tipo":"ventana","desde":299,"ancho":110,"alto":170,"cab":220},{"muro":"A","tipo":"ventana","desde":561,"ancho":150,"alto":120,"cab":220},{"muro":"D","tipo":"puerta","desde":67,"ancho":70,"alto":203},{"muro":"E","tipo":"ventana","desde":83,"ancho":135,"alto":120,"cab":220},{"muro":"E","tipo":"ventana","desde":230,"ancho":135,"alto":120,"cab":220},{"muro":"E","tipo":"ventana","desde":399,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":546,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":693,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":840,"ancho":135,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":36,"ancho":58,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":389,"ancho":100,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":501,"ancho":58,"alto":170,"cab":220},{"muro":"I","tipo":"puerta","desde":93,"ancho":95,"alto":223},{"muro":"T5","tipo":"puerta","desde":90,"ancho":75,"alto":203},{"muro":"T5","tipo":"puerta","desde":335,"ancho":75,"alto":203},{"muro":"T3","tipo":"puerta","desde":341,"ancho":80,"alto":203},{"muro":"T7","tipo":"puerta","desde":120,"ancho":192,"alto":213},{"muro":"S0","tipo":"ventana","desde":21,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":99,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":177,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":255,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":333,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":411,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":489,"ancho":58,"alto":60,"cab":71}],"recintos":[{"nombre":"Espacio familiar","tipo":"living","x":250,"y":600},{"nombre":"Baño familiar","tipo":"baño","x":650,"y":150},{"nombre":"Dormitorio Simón","tipo":"dormitorio","x":890,"y":170},{"nombre":"Dormitorio principal","tipo":"dormitorio","x":1200,"y":230},{"nombre":"Cocina","tipo":"cocina","x":850,"y":650}],"zonas":[],"techo":{"on":true,"alto":120,"sep":100,"alero":40,"aleroAtras":40,"aleroLat":40,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12,"plano":{"on":true,"crucesM":6800,"omegaM":18400,"m2":110.5,"osb":true,"cubML":12900,"cubNom":"Zincalum Z-Rib 0,5 terracota (ancho útil 0,99)","hojaML":5360,"canalML":1650,"bajadas":4,"tipos":[{"nombre":"Cercha 1","cant":8,"c90":800,"c60":560},{"nombre":"Cercha 2","cant":4,"c90":430,"c60":830,"otro":"CA 150 × 1,6 mm","otroPz":2},{"nombre":"Cercha 3","cant":5,"c90":1360,"c60":1860},{"nombre":"Cercha 4","cant":2,"c90":1500,"c60":1900},{"nombre":"Cercha 5","cant":4,"c90":1100,"c60":540},{"nombre":"Cercha 5B","cant":4,"c90":900,"c60":450},{"nombre":"Cercha viga","cant":1,"c90":1140,"c60":1430}]}},"base":{"on":true,"tipo":"radier","espLosa":10,"cimAncho":25,"cimProf":40,"sobreAlto":10,"perdida":0,"emplantillado":5,"mlVigas":2352,"vigaAncho":20,"vigaAlto":40,"fundCentral":false,"perno":"expansion"}},"p":{"soleraComp":true,"refH":122,"bajaPl":5},"respaldo":true,"moGlobal":11000000};
+const NL={"id":"navia-raul","nombre":"Casa 82 m² · planta en L","fecha":"2026-10-17","planta":{"ancho":1362,"fondo":825,"forroBase":"ninguno","sinAislacion":true,"intExt":[],"recortes":[{"esquina":"NW","ancho":564,"fondo":180},{"esquina":"NW","ancho":356,"fondo":241},{"esquina":"SE","ancho":312,"fondo":357}],"alturas":{"A":{"hS":358,"hE":261,"qx":486,"qa":261,"qb":261},"B":{"hS":261,"hE":261,"qx":234,"qa":338,"qb":338},"C":{"hS":261,"hE":261},"D":{"hS":261,"hE":261},"E":{"hS":261,"hE":260,"qx":694,"qa":400,"qb":304},"F":{"hS":260,"hE":260},"G":{"hS":260,"hE":304},"H":{"hS":400,"hE":400},"I":{"hS":400,"hE":358},"J":{"hS":358,"hE":358}},"tabiques":[{"nombre":"B acceso / estar","perfil":90,"o":"v","eje":362,"desde":241,"hasta":334},{"nombre":"C acceso / baño","perfil":90,"o":"v","eje":570,"desde":180,"hasta":334},{"nombre":"E baño / dorm 2","perfil":90,"o":"v","eje":742,"desde":0,"hasta":338},{"nombre":"F dormitorios","perfil":90,"o":"v","eje":1044,"desde":0,"hasta":468},{"nombre":"Pasillo oeste","perfil":90,"o":"h","eje":338,"desde":358,"hasta":450},{"nombre":"Pasillo norte","perfil":90,"o":"h","eje":338,"desde":566,"hasta":1044},{"nombre":"Cocina norte","perfil":90,"o":"h","eje":462,"desde":664,"hasta":1044},{"nombre":"D cocina / estar","perfil":90,"o":"v","eje":668,"desde":466,"hasta":825}],"sobretabiques":[{"nombre":"Sobretabique ventanas altas (sobre cercha viga)","largo":570,"alto":96,"apoyo":"cercha","exterior":true},{"nombre":"Muro suelto del acceso (norte)","largo":108,"alto":369,"apoyo":"radier"}],"vanos":[{"muro":"A","tipo":"ventana","desde":117,"ancho":50,"alto":170,"cab":220},{"muro":"A","tipo":"ventana","desde":299,"ancho":110,"alto":170,"cab":220},{"muro":"A","tipo":"ventana","desde":561,"ancho":150,"alto":120,"cab":220},{"muro":"D","tipo":"puerta","desde":67,"ancho":70,"alto":203},{"muro":"E","tipo":"ventana","desde":83,"ancho":135,"alto":120,"cab":220},{"muro":"E","tipo":"ventana","desde":230,"ancho":135,"alto":120,"cab":220},{"muro":"E","tipo":"ventana","desde":399,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":546,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":693,"ancho":135,"alto":170,"cab":220},{"muro":"E","tipo":"ventana","desde":840,"ancho":135,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":36,"ancho":58,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":389,"ancho":100,"alto":170,"cab":220},{"muro":"F","tipo":"ventana","desde":501,"ancho":58,"alto":170,"cab":220},{"muro":"I","tipo":"puerta","desde":93,"ancho":95,"alto":223},{"muro":"T5","tipo":"puerta","desde":90,"ancho":75,"alto":203},{"muro":"T5","tipo":"puerta","desde":335,"ancho":75,"alto":203},{"muro":"T3","tipo":"puerta","desde":341,"ancho":80,"alto":203},{"muro":"T7","tipo":"puerta","desde":120,"ancho":192,"alto":213},{"muro":"S0","tipo":"ventana","desde":21,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":99,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":177,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":255,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":333,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":411,"ancho":58,"alto":60,"cab":71},{"muro":"S0","tipo":"ventana","desde":489,"ancho":58,"alto":60,"cab":71}],"recintos":[{"nombre":"Espacio familiar","tipo":"living","x":250,"y":600},{"nombre":"Baño familiar","tipo":"baño","x":650,"y":150},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":890,"y":170},{"nombre":"Dormitorio principal","tipo":"dormitorio","x":1200,"y":230},{"nombre":"Cocina","tipo":"cocina","x":850,"y":650}],"zonas":[],"techo":{"on":true,"alto":120,"sep":100,"alero":40,"aleroAtras":40,"aleroLat":40,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12,"plano":{"on":true,"crucesM":6800,"omegaM":18400,"m2":110.5,"osb":true,"cubML":12900,"cubNom":"Zincalum Z-Rib 0,5 terracota (ancho útil 0,99)","hojaML":5360,"canalML":1650,"bajadas":4,"tipos":[{"nombre":"Cercha 1","cant":8,"c90":800,"c60":560},{"nombre":"Cercha 2","cant":4,"c90":430,"c60":830,"otro":"CA 150 × 1,6 mm","otroPz":2},{"nombre":"Cercha 3","cant":5,"c90":1360,"c60":1860},{"nombre":"Cercha 4","cant":2,"c90":1500,"c60":1900},{"nombre":"Cercha 5","cant":4,"c90":1100,"c60":540},{"nombre":"Cercha 5B","cant":4,"c90":900,"c60":450},{"nombre":"Cercha viga","cant":1,"c90":1140,"c60":1430}]}},"base":{"on":true,"tipo":"radier","espLosa":10,"cimAncho":25,"cimProf":40,"sobreAlto":10,"perdida":0,"emplantillado":5,"mlVigas":2352,"vigaAncho":20,"vigaAlto":40,"fundCentral":false,"perno":"expansion"}},"p":{"soleraComp":true,"refH":122,"bajaPl":5},"respaldo":true,"moGlobal":11000000};
 if(NL&&!D.nl1710){ if(!D.trabajos.some(t=>t.id===NL.id)) D.trabajos.push(JSON.parse(JSON.stringify(NL))); D.nl1710=true; guardar(); }
+// 26-oct: cabañas del conjunto como prediseños de ejemplo (se agregan una sola vez; si se borran, no vuelven)
+const CAB=[{"id":"cabana-30","nombre":"Cabaña 30 m² · nivel abajo (radier)","fecha":"2026-10-26","planta":{"ancho":429,"fondo":705,"forroBase":"ninguno","intExt":[],"tabiques":[{"nombre":"Comedor / servicios","perfil":90,"o":"h","eje":205,"desde":0,"hasta":429},{"nombre":"Servicios / dormitorio","perfil":90,"o":"h","eje":445,"desde":0,"hasta":429},{"nombre":"Baño / cocina","perfil":90,"o":"v","eje":160,"desde":205,"hasta":445}],"vanos":[{"muro":"C","tipo":"puerta","desde":60,"ancho":90,"alto":205},{"muro":"C","tipo":"ventana","desde":300,"ancho":80,"alto":100,"cab":210},{"muro":"A","tipo":"ventana","desde":175,"ancho":80,"alto":120,"cab":210},{"muro":"B","tipo":"ventana","desde":300,"ancho":70,"alto":100,"cab":210},{"muro":"D","tipo":"ventana","desde":300,"ancho":50,"alto":60,"cab":210},{"muro":"T1","tipo":"puerta","desde":300,"ancho":75,"alto":205},{"muro":"T2","tipo":"puerta","desde":40,"ancho":70,"alto":205}],"recintos":[{"nombre":"Comedor","tipo":"living","x":250,"y":100},{"nombre":"Baño","tipo":"baño","x":80,"y":320},{"nombre":"Cocina","tipo":"cocina","x":300,"y":320},{"nombre":"Dormitorio","tipo":"dormitorio","x":215,"y":575}],"zonas":[{"tipo":"cocina","x0":160,"y0":205,"x1":429,"y1":445}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"on":true,"tipo":"radier","espLosa":10,"cimAncho":25,"cimProf":40,"sobreAlto":10,"perdida":0,"emplantillado":5,"mlVigas":0,"fundCentral":false,"perno":"expansion"}},"p":{}},{"id":"cabana-30-alta","nombre":"Cabaña 30 m² · nivel alto sobre fierro 100×100","fecha":"2026-10-26","planta":{"ancho":429,"fondo":705,"forroBase":"ninguno","intExt":[],"tabiques":[{"nombre":"Comedor / servicios","perfil":90,"o":"h","eje":205,"desde":0,"hasta":429},{"nombre":"Servicios / dormitorio","perfil":90,"o":"h","eje":445,"desde":0,"hasta":429},{"nombre":"Baño / cocina","perfil":90,"o":"v","eje":160,"desde":205,"hasta":445}],"vanos":[{"muro":"C","tipo":"puerta","desde":60,"ancho":90,"alto":205},{"muro":"C","tipo":"ventana","desde":300,"ancho":80,"alto":100,"cab":210},{"muro":"A","tipo":"ventana","desde":175,"ancho":80,"alto":120,"cab":210},{"muro":"B","tipo":"ventana","desde":300,"ancho":70,"alto":100,"cab":210},{"muro":"D","tipo":"ventana","desde":300,"ancho":50,"alto":60,"cab":210},{"muro":"T1","tipo":"puerta","desde":300,"ancho":75,"alto":205},{"muro":"T2","tipo":"puerta","desde":40,"ancho":70,"alto":205}],"recintos":[{"nombre":"Comedor","tipo":"living","x":250,"y":100},{"nombre":"Baño","tipo":"baño","x":80,"y":320},{"nombre":"Cocina","tipo":"cocina","x":300,"y":320},{"nombre":"Dormitorio","tipo":"dormitorio","x":215,"y":575}],"zonas":[{"tipo":"cocina","x0":160,"y0":205,"x1":429,"y1":445}],"techo":{"on":true,"caidas":"frente","alto":120,"sep":100,"alero":30,"aleroAtras":0,"aleroLat":30,"cost":55,"trasl":40,"panos":5,"webs":90,"cumb":12},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":150}},"p":{}}];
+if(CAB&&CAB.length&&!D.cab2610){ CAB.forEach(c=>{ if(!D.trabajos.some(t=>t.id===c.id)) D.trabajos.push(JSON.parse(JSON.stringify(c))); }); D.cab2610=true; guardar(); }
+// 5-nov: casa de Karen (Natales) con la IDEA 1 de la remodelación, como anteproyecto (se agrega una sola vez)
+const KAR={"id":"karen-idea1","nombre":"Casa Karen 86 m² · Idea 1 (anteproyecto)","fecha":"2026-11-05","planta":{"ancho":1340,"fondo":720,"forroBase":"volcanita","intExt":[],"recortes":[{"esquina":"NW","ancho":370,"fondo":140},{"esquina":"NE","ancho":370,"fondo":140}],"tabiques":[{"nombre":"Franja servicios / dormitorios-living","perfil":90,"o":"h","eje":470,"desde":0,"hasta":1340},{"nombre":"Dormitorio 1 / living","perfil":90,"o":"v","eje":370,"desde":140,"hasta":470},{"nombre":"Living / dormitorio 2","perfil":90,"o":"v","eje":970,"desde":140,"hasta":470},{"nombre":"Baño 1 / closet 1","perfil":90,"o":"v","eje":230,"desde":470,"hasta":720},{"nombre":"Closet 1 / cocina","perfil":90,"o":"v","eje":370,"desde":470,"hasta":720},{"nombre":"Cocina / vestíbulo","perfil":90,"o":"v","eje":820,"desde":470,"hasta":720},{"nombre":"Vestíbulo / baño 2 (puerta nueva)","perfil":90,"o":"v","eje":1110,"desde":470,"hasta":720}],"vanos":[{"muro":"A","tipo":"puerta","desde":192,"ancho":220,"alto":210},{"muro":"C","tipo":"ventana","desde":86,"ancho":200,"alto":120},{"muro":"D","tipo":"ventana","desde":130,"ancho":100,"alto":100},{"muro":"E","tipo":"ventana","desde":84,"ancho":60,"alto":60},{"muro":"E","tipo":"puerta","desde":407,"ancho":85,"alto":205},{"muro":"E","tipo":"ventana","desde":769,"ancho":120,"alto":100},{"muro":"E","tipo":"ventana","desde":1195,"ancho":60,"alto":60},{"muro":"F","tipo":"ventana","desde":350,"ancho":100,"alto":100},{"muro":"G","tipo":"ventana","desde":86,"ancho":200,"alto":120},{"muro":"T0","tipo":"puerta","desde":70,"ancho":80,"alto":205},{"muro":"T0","tipo":"puerta","desde":260,"ancho":80,"alto":205},{"muro":"T0","tipo":"puerta","desde":840,"ancho":100,"alto":205},{"muro":"T1","tipo":"puerta","desde":174,"ancho":80,"alto":205},{"muro":"T2","tipo":"puerta","desde":174,"ancho":80,"alto":205},{"muro":"T5","tipo":"puerta","desde":30,"ancho":80,"alto":205},{"muro":"T6","tipo":"puerta","desde":45,"ancho":70,"alto":205}],"recintos":[{"nombre":"Dormitorio 1","tipo":"dormitorio","x":185,"y":305},{"nombre":"Living - comedor","tipo":"living","x":670,"y":280},{"nombre":"Dormitorio 2","tipo":"dormitorio","x":1155,"y":305},{"nombre":"Baño 1","tipo":"baño","x":115,"y":595},{"nombre":"Closet 1","tipo":"dormitorio","x":300,"y":595},{"nombre":"Cocina (+ ex logia)","tipo":"living","x":595,"y":595},{"nombre":"Vestíbulo","tipo":"living","x":965,"y":595},{"nombre":"Baño 2","tipo":"baño","x":1225,"y":595}],"zonas":[{"tipo":"cocina","x0":370,"y0":470,"x1":820,"y1":720}],"techo":{"on":false},"base":{"dirPiso":"corto","entramado":"metalcon","perfilPiso":90}},"p":{}};
+if(KAR&&!D.kar0511){ if(!D.trabajos.some(t=>t.id===KAR.id)) D.trabajos.push(JSON.parse(JSON.stringify(KAR))); D.kar0511=true; guardar(); }
 // v0.20 (revisor): en el ejemplo ya guardado, la 5ª ventana del muro sur (E) va a 6,93 (lámina L7), el sobretabique de las
 // ventanas altas es exterior y la OSB baja 5 cm bajo la solera (EETT III.6.2)
-D.trabajos.forEach(t=>{ if(t.id!=='ejemplo-varias-esquinas'||t.fix1710b) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='E'&&v.desde===705) v.desde=693; });
+D.trabajos.forEach(t=>{ if(t.id!=='navia-raul'||t.fix1710b) return; (t.planta.vanos||[]).forEach(v=>{ if(v.muro==='E'&&v.desde===705) v.desde=693; });
   ((t.planta.sobretabiques||[])[0]||{}).exterior=true; t.p=Object.assign({},t.p||{},{bajaPl:5}); t.fix1710b=true; guardar(); });
 const J=()=>D.trabajos.find(t=>t.id===D.abierto)||D.trabajos[0];
 const PJ=()=>Object.assign({},P,{pegado:true,forroDef:(J().planta.forroBase||'terciado')},J().p||{});
 
 /* ---------- navegación ---------- */
-const ICON={obra:'<path d="M9 4h6v3H9z"/><path d="M7 5H5v15h14V5h-2"/><path d="M8 11h8M8 15h5"/>',trabajos:'<path d="M4 6h16M4 12h16M4 18h10"/>',planta:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h9M13 4v16"/>',tabiques:'<path d="M5 4v16M10 4v16M15 4v16M20 4v16M3 4h18M3 20h18"/>',techo:'<path d="M3 13 12 5l9 8M6 13h12M9 13l3-5 3 5"/>',materiales:'<rect x="4" y="5" width="16" height="4"/><rect x="4" y="11" width="16" height="4"/><rect x="4" y="17" width="16" height="3"/>',glosario:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 9h7M8 13h7"/>',valor:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c0-1.4-1.3-2.3-3-2.3s-3 .9-3 2.3c0 3 6 1.6 6 4.6 0 1.4-1.3 2.4-3 2.4s-3-1-3-2.4M12 5.5v13"/>'};
-const PANT=MODO_OBRA?[['trabajos','Obras'],['obra','Registro']]:[['trabajos','Trabajos'],['planta','Planta'],['tabiques','Tabiques'],['techo','Techo'],['materiales','Materiales'],['valor','Valor'],['obra','Obra'],['glosario','Glosario']];
+const ICON={obra:'<path d="M9 4h6v3H9z"/><path d="M7 5H5v15h14V5h-2"/><path d="M8 11h8M8 15h5"/>',trabajos:'<path d="M4 6h16M4 12h16M4 18h10"/>',planta:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h9M13 4v16"/>',tabiques:'<path d="M5 4v16M10 4v16M15 4v16M20 4v16M3 4h18M3 20h18"/>',techo:'<path d="M3 13 12 5l9 8M6 13h12M9 13l3-5 3 5"/>',nounif:'<path d="M4 20h16L12 6z"/><path d="M12 6v14"/>',materiales:'<rect x="4" y="5" width="16" height="4"/><rect x="4" y="11" width="16" height="4"/><rect x="4" y="17" width="16" height="3"/>',glosario:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 9h7M8 13h7"/>',valor:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c0-1.4-1.3-2.3-3-2.3s-3 .9-3 2.3c0 3 6 1.6 6 4.6 0 1.4-1.3 2.4-3 2.4s-3-1-3-2.4M12 5.5v13"/>'};
+const PANT=MODO_OBRA?[['trabajos','Obras'],['obra','Registro']]:[['trabajos','Trabajos'],['planta','Planta'],['tabiques','Tabiques'],['techo','Techo'],['nounif','No unif.'],['materiales','Materiales'],['valor','Valor'],['obra','Obra'],['glosario','Glosario']];
 $('#nav').innerHTML=PANT.map(([k,n])=>`<button data-ir="${k}" class="${k==='trabajos'?'on':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>${n}</button>`).join('');
 function ir(k){ document.querySelectorAll('section.s').forEach(s=>s.classList.toggle('on',s.id==='s-'+k)); document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.ir===k)); try{ localStorage.setItem('cub-pant',k); }catch(e){} window.scrollTo(0,0); }
 $('#nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) ir(b.dataset.ir); });
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-ir2]'); if(b) ir(b.dataset.ir2); });
+
+/* ---------- pestaña «tabiques no uniformes» · reusa el motor (PARAMS, fm, r1, num) ---------- */
+const NU_P=Object.fromEntries(PARAMS.map(a=>[a[0],a[2]]));
+function nuTop(w){ const A=w.ancho;
+  if(w.forma==='trapecio'){ const H1=+w.hm||0, H2=+w.h2||H1; return {A, f:x=>H1+(H2-H1)*x/A, cum:Math.max(H1,H2)}; }
+  if(w.forma==='pentagono'){ const HM=+w.hm||0, P=(+w.pend||0)/100, xc=Math.min(Math.max(+w.xc||A/2,1),A-1), fl=Math.min(xc,A-xc)*P; return {A, f:x=>HM+(x<=xc?fl*x/xc:fl*(A-x)/(A-xc)), cum:HM+fl}; }
+  const HM=+w.hm||0, P=(+w.pend||0)/100, fl=(A/2)*P; return {A, f:x=>HM+fl*(1-Math.abs(x-A/2)/(A/2)), cum:HM+fl};
+}
+function nuCalc(w){ const o=nuTop(w), A=o.A, f=o.f, step=NU_P.step||40, bar=NU_P.bar||600;
+  const xs=[]; for(let x=0;x<A-0.01;x+=step) xs.push(x); xs.push(A);
+  const alt=xs.map(x=>r1(f(x)));
+  const mlPD=alt.reduce((a,h)=>a+h,0)/100;
+  const tiras=Math.ceil(mlPD/(bar/100)-1e-9);
+  let area=0, sup=0;
+  for(let i=1;i<xs.length;i++){ const dx=xs[i]-xs[i-1]; area+=(f(xs[i-1])+f(xs[i]))/2*dx; sup+=Math.hypot(dx,f(xs[i])-f(xs[i-1])); }
+  area/=10000; sup/=100;
+  const osb=Math.ceil(area*1.15/((NU_P.osb*NU_P.osbH)/10000)-1e-9);
+  return {A,cum:o.cum,nPD:alt.length,mlPD,tiras,area,solSup:sup,solInf:A/100,osb};
+}
+function pintarNoUnif(){ const out=$('#nu-out'); if(!out) return; const j=J(), pl=j&&j.planta; if(!pl){ out.innerHTML=''; return; } pl.noUnif=pl.noUnif||[];
+  if(!pl.noUnif.length){ out.innerHTML='<p class="mini">Aún no agregas tabiques no uniformes. Llena los datos de arriba y toca «+ Agregar».</p>'; return; }
+  const NOM={triangulo:'Frontón a dos aguas',trapecio:'Media agua (trapecio)',pentagono:'Pentágono (cumbrera descentrada)'};
+  out.innerHTML=pl.noUnif.map((w,i)=>{ const c=nuCalc(w), o=nuTop(w), A=o.A, f=o.f;
+    const W=280,H=150,pad=16,hmax=c.cum||1,sx=(W-2*pad)/A,sy=(H-2*pad)/hmax,Y=h=>(H-pad-h*sy).toFixed(1),X=x=>(pad+x*sx).toFixed(1);
+    const top=[]; for(let x=0;x<A-0.01;x+=(NU_P.step||40)) top.push(x); top.push(A);
+    const pts=top.map(x=>X(x)+','+Y(f(x))).join(' ');
+    const studs=w.vidriado?'':top.map(x=>`<line x1="${X(x)}" y1="${Y(0)}" x2="${X(x)}" y2="${Y(f(x))}" stroke="#2d6a4f" stroke-width="1"/>`).join('');
+    const svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:320px;height:auto;background:var(--panel2);border-radius:8px"><polygon points="${X(0)},${Y(0)} ${pts} ${X(A)},${Y(0)}" fill="${w.vidriado?'#9fd4ec55':'#eef3f055'}" stroke="#333" stroke-width="1.3"/>${studs}<line x1="${X(0)}" y1="${Y(0)}" x2="${X(A)}" y2="${Y(0)}" stroke="#c0392b" stroke-width="2"/></svg>`;
+    const li=w.vidriado
+      ? `<li class="warn"><b>Tramo VIDRIADO:</b> va PÓRTICO (pilares + viga/dintel), no pies derechos tupidos. El vidrio no es estructural; las fuerzas van a los muros perpendiculares.</li>`
+      : `<li class="info"><b>${c.nPD}</b> pies derechos (cada ${fm(NU_P.step)} m), de largo variable → <b>${c.mlPD.toFixed(1)} m</b> de perfil = <b>${c.tiras}</b> tiras de ${fm(NU_P.bar)} m.</li>`;
+    return `<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">${esc(w.nombre||'Tabique '+(i+1))} · <span class="mini">${NOM[w.forma]||''}</span></h3><button class="b del" data-nu-del="${i}">Borrar</button></div>
+      ${svg}
+      <ul class="notes">${li}
+      <li class="info">Solera inferior <b>${c.solInf.toFixed(2)} m</b> · solera superior inclinada <b>${c.solSup.toFixed(2)} m</b> (cortada en ángulo; doble en la cumbrera). Cumbrera a <b>${fm(c.cum)} m</b>.</li>
+      <li class="info">Superficie <b>${c.area.toFixed(1)} m²</b> → <b>${c.osb}</b> planchas OSB de ${fm(NU_P.osb)}×${fm(NU_P.osbH)} m (+15 % por cortes en ángulo).</li></ul></div>`;
+  }).join('');
+}
+if($('#nu-add')) $('#nu-add').onclick=()=>{ const j=J(), pl=j&&j.planta; if(!pl){ alert('Primero crea o abre una obra en «Trabajos».'); return; } pl.noUnif=pl.noUnif||[]; const g=id=>$('#'+id);
+  const ancho=m2cm(g('nu-ancho').value); if(!(ancho>0)){ g('nu-ancho').focus(); return; }
+  pl.noUnif.push({ nombre:(g('nu-nom').value||'').trim(), forma:g('nu-forma').value, ancho, hm:m2cm(g('nu-hm').value)||0, pend:num(g('nu-pend').value)||0, h2:m2cm(g('nu-h2').value)||0, xc:m2cm(g('nu-xc').value)||0, vidriado:g('nu-vid').checked });
+  guardar(); ['nu-nom','nu-ancho','nu-hm','nu-pend','nu-h2','nu-xc'].forEach(id=>g(id)&&(g(id).value='')); g('nu-vid').checked=false; pintarNoUnif(); };
+if($('#nu-out')) $('#nu-out').addEventListener('click',e=>{ const d=e.target.closest('[data-nu-del]'); if(!d) return; const j=J(), pl=j&&j.planta; if(!pl) return; pl.noUnif.splice(+d.dataset.nuDel,1); guardar(); pintarNoUnif(); });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-ir],[data-ir2]'); if(b && (b.dataset.ir==='nounif'||b.dataset.ir2==='nounif')) setTimeout(pintarNoUnif,0); });
+setTimeout(pintarNoUnif,0);
 // ir directo al dibujo de la base: abre la sección «Base» de Materiales y baja hasta el plano de pollos
 document.addEventListener('click',e=>{ if(!e.target.closest('[data-ir-base]')) return; ir('materiales');
   setTimeout(()=>{ const d=[...document.querySelectorAll('#tiles details.card.sub')].find(x=>/^\s*Base/.test(x.querySelector('summary').textContent)); if(!d) return; d.open=true; (d.querySelector('svg')||d).scrollIntoView({behavior:'smooth',block:'center'}); },150); });
@@ -2205,7 +2279,18 @@ $('#duplicar').onclick=()=>{ const t=JSON.parse(JSON.stringify(J())); t.id=Date.
 $('#borrar').onclick=()=>{ const m=$('#msg-trab'); m.innerHTML=`¿Borrar «${esc(J().nombre)}»? No se puede deshacer. <button class="b del" id="br-ok">Sí, borrar</button> <button class="b" id="br-no">No</button>`;
   $('#br-no').onclick=()=>m.textContent=''; $('#br-ok').onclick=()=>{ D.trabajos=D.trabajos.filter(t=>t.id!==D.abierto); if(!D.trabajos.length) D.trabajos=[JSON.parse(JSON.stringify(SYL))]; D.abierto=D.trabajos[0].id; guardar(); m.textContent='Borrado.'; todo(); }; };
 $('#exportar').onclick=()=>{ const t=JSON.stringify(J()); $('#txt').value=t; try{ navigator.clipboard.writeText(t).then(()=>$('#msg-trab').textContent='Trabajo copiado.',()=>$('#txt').select()); }catch(e){ $('#txt').select(); } };
-$('#importar').onclick=()=>{ try{ const t=JSON.parse($('#txt').value); if(!t.planta) throw 0; t.id=Date.now().toString(36); D.trabajos.unshift(t); D.abierto=t.id; guardar(); todo(); $('#msg-trab').textContent='Trabajo cargado.'; }catch(e){ $('#msg-trab').textContent='El texto pegado no es un trabajo del cubicador.'; } };
+$('#importar').onclick=()=>{ try{
+    const o=JSON.parse($('#txt').value); let t;
+    if(o && o.planta){ t=o; }                                  // trabajo completo del cubicador
+    else if(o && o.ancho>0 && o.fondo>0){                      // planta "pelada" del Diseñador 3D
+      const pl={ ancho:Math.round(o.ancho), fondo:Math.round(o.fondo), forroBase:o.forroBase||'ninguno', intExt:o.intExt||[],
+        tabiques:(o.tabiques||[]).map(x=>Object.assign({perfil:90}, x)), vanos:o.vanos||[], recintos:o.recintos||[], zonas:o.zonas||[],
+        techo:{on:false}, base:{on:true,tipo:'radier',espLosa:10,cimAncho:25,cimProf:40,sobreAlto:10,perdida:0,emplantillado:5} };
+      t={ nombre:(o.nombre||'Diseño 3D')+' (del 3D)', fecha:new Date().toISOString().slice(0,10), planta:pl, p:{} };
+    } else throw 0;
+    t.id=Date.now().toString(36); D.trabajos.unshift(t); D.abierto=t.id; guardar(); todo(); ir(MODO_OBRA?'obra':'planta');
+    $('#msg-trab').textContent='Diseño cargado. Revisa la planta y los materiales (el techo va aparte).';
+  }catch(e){ $('#msg-trab').textContent='El texto pegado no es un trabajo ni un diseño 3D válido.'; } };
 
 /* ---------- formularios de la planta ---------- */
 const F=(path,val,label,tipo)=>`<label class="f">${label}<input type="text" class="n" data-p="${path}" data-t="${tipo||'m'}" inputmode="decimal" value="${tipo==='c'?String(val??''):(isNaN(val)?'':fm(val))}"></label>`;
@@ -2523,7 +2608,7 @@ function pintarValor(){ D.precios=D.precios||{}; if(!D.preciosRef){ Object.entri
   $('#tabla-valor').innerHTML=`<thead><tr><th>Material</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead><tbody>${filas}</tbody>
     <tfoot><tr><td colspan="3">Materiales</td><td class="m">${plata(netoMat)}</td></tr>
     <tr><td>Mano de obra</td><td colspan="2">${resp?`<input type="text" class="n" inputmode="numeric" id="mo-global" value="${moG?moG.toLocaleString('es-CL'):''}" placeholder="$ sueldos y traslados" style="width:150px"> en total (sueldos y traslados)`:`<input type="text" class="n" inputmode="numeric" id="mo-dias" value="${dias||''}" placeholder="días" style="width:64px"> días × <input type="text" class="n" inputmode="numeric" id="mo-dia" value="${porDia.toLocaleString('es-CL')}" style="width:96px"> al día`}</td><td class="m">${mo?plata(mo):'—'}</td></tr>
-    <tr><td colspan="3"><b>Neto</b></td><td class="m"><b>${plata(neto)}</b></td></tr>${D.conIVA?`<tr><td colspan="3">IVA 19 %</td><td class="m">${plata(iva)}</td></tr>`:''}<tr><td colspan="3"><b style="font-size:18px">Total</b></td><td class="m"><b style="font-size:18px">${plata(neto+iva)}</b></td></tr>${netoEx?`<tr><td colspan="3"><b>Trabajos aparte</b>${D.conIVA?' + IVA':''}</td><td class="m"><b>${plata(netoEx*(D.conIVA?1.19:1))}</b></td></tr>`:''}</tfoot>`;
+    <tr><td colspan="3"><b>Neto</b></td><td class="m"><b>${plata(neto)}</b></td></tr>${D.conIVA?`<tr><td colspan="3">IVA 19 %</td><td class="m">${plata(iva)}</td></tr>`:''}<tr><td colspan="3"><b style="font-size:18px">Total</b></td><td class="m"><b style="font-size:18px">${plata(neto+iva)}</b></td></tr>${ufActual()>0?`<tr><td colspan="3" class="mini">Total en UF · UF ${plata(ufActual())}</td><td class="m mini">${((neto+iva)/ufActual()).toLocaleString('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2})} UF</td></tr>`:''}${netoEx?`<tr><td colspan="3"><b>Trabajos aparte</b>${D.conIVA?' + IVA':''}</td><td class="m"><b>${plata(netoEx*(D.conIVA?1.19:1))}</b></td></tr>`:''}</tfoot>`;
   // PRECIO AL CLIENTE (Cristian, 4-oct): materiales a costo + 35 % como mínimo; la mano de obra se cobra casi lo mismo que
   // cuestan los materiales. Va en su propio apartado, no se mezcla con el costo.
   // PRECIOS CON RESPALDO (Cristian, 17-oct): sus precios ya vienen más caros a propósito (material perdido, errores);
@@ -2537,7 +2622,7 @@ function pintarValor(){ D.precios=D.precios||{}; if(!D.preciosRef){ Object.entri
       <tr><td>Por m² de obra (<input type="text" class="n" inputmode="decimal" id="cli-m2" value="${String(m2c).replace('.',',')}" style="width:64px"> m²)</td><td class="m"><b>${m2c?plata(totI/m2c):'—'}</b></td></tr></tbody></table>${falta?`<p class="mini">⚠️ Faltan ${falta} precios de materiales.</p>`:''}`:'<p class="mini">Pon los precios de los materiales para ver el precio al cliente.</p>';
     $('#con-iva').checked=!!D.conIVA; $('#con-resp').checked=true;
     $('#msg-valor').textContent=falta?`Faltan ${falta} precio${falta>1?'s':''} por poner: el total todavía no los incluye.`:'Todos los materiales tienen precio.';
-    valorTexto=`${J().nombre}\n`+ITEMS.map(x=>`${x.cant} ${x.un} · ${x.nombre}${D.precios[x.key]?` · ${plata(D.precios[x.key])} c/u = ${plata(D.precios[x.key]*x.cant)}`:''}`).join('\n')+`\nMateriales: ${plata(netoMat)}\nMano de obra (sueldos y traslados): ${plata(moG)}\nTotal: ${plata(totI)}${D.conIVA?' (con IVA)':''}${m2c?`\nPor m² (${String(m2c).replace('.',',')} m²): ${plata(totI/m2c)}`:''}${netoEx?`\nTrabajos aparte: ${plata(netoEx*(D.conIVA?1.19:1))}`:''}${falta?`\n(Faltan ${falta} precios)`:''}`;
+    valorTexto=`${J().nombre}\n`+ITEMS.map(x=>`${x.cant} ${x.un} · ${x.nombre}${D.precios[x.key]?` · ${plata(D.precios[x.key])} c/u = ${plata(D.precios[x.key]*x.cant)}`:''}`).join('\n')+`\nMateriales: ${plata(netoMat)}\nMano de obra (sueldos y traslados): ${plata(moG)}\nTotal: ${plata(totI)}${D.conIVA?' (con IVA)':''}${ufActual()>0?` (${(totI/ufActual()).toFixed(2)} UF · UF ${plata(ufActual())})`:''}${m2c?`\nPor m² (${String(m2c).replace('.',',')} m²): ${plata(totI/m2c)}`:''}${netoEx?`\nTrabajos aparte: ${plata(netoEx*(D.conIVA?1.19:1))}`:''}${falta?`\n(Faltan ${falta} precios)`:''}`;
     return; }
   $('#con-resp').checked=false;
   const rec=J0.recargo!=null?+J0.recargo:35, fmo=J0.moFactor!=null?+J0.moFactor:100;
@@ -2550,7 +2635,7 @@ function pintarValor(){ D.precios=D.precios||{}; if(!D.preciosRef){ Object.entri
     <tr><td><b>Te queda</b></td><td class="m"><b>${plata(gan)}</b></td></tr></tbody></table>${falta?`<p class="mini">⚠️ Faltan ${falta} precios de materiales: el precio y lo que te queda todavía no están completos.</p>`:''}`:'<p class="mini">Pon los precios de los materiales para ver el precio al cliente.</p>';
   $('#con-iva').checked=!!D.conIVA;
   $('#msg-valor').textContent=falta?`Faltan ${falta} precio${falta>1?'s':''} por poner: el total todavía no los incluye.`:'Todos los materiales tienen precio.';
-  valorTexto=`${J().nombre}\n`+ITEMS.map(x=>`${x.cant} ${x.un} · ${x.nombre}${D.precios[x.key]?` · ${plata(D.precios[x.key])} c/u = ${plata(D.precios[x.key]*x.cant)}`:''}`).join('\n')+`\nMateriales: ${plata(netoMat)}${mo?`\nMano de obra: ${dias} días × ${plata(porDia)} = ${plata(mo)}`:''}\nNeto: ${plata(neto)}${D.conIVA?`\nIVA: ${plata(iva)}`:''}\nTotal: ${plata(neto+iva)}${netoEx?`\nTrabajos aparte: ${plata(netoEx*(D.conIVA?1.19:1))}`:''}${falta?`\n(Faltan ${falta} precios)`:''}`; }
+  valorTexto=`${J().nombre}\n`+ITEMS.map(x=>`${x.cant} ${x.un} · ${x.nombre}${D.precios[x.key]?` · ${plata(D.precios[x.key])} c/u = ${plata(D.precios[x.key]*x.cant)}`:''}`).join('\n')+`\nMateriales: ${plata(netoMat)}${mo?`\nMano de obra: ${dias} días × ${plata(porDia)} = ${plata(mo)}`:''}\nNeto: ${plata(neto)}${D.conIVA?`\nIVA: ${plata(iva)}`:''}\nTotal: ${plata(neto+iva)}${ufActual()>0?` (${((neto+iva)/ufActual()).toFixed(2)} UF · UF ${plata(ufActual())})`:''}${netoEx?`\nTrabajos aparte: ${plata(netoEx*(D.conIVA?1.19:1))}`:''}${falta?`\n(Faltan ${falta} precios)`:''}`; }
 let valorTexto='';
 document.addEventListener('change',e=>{ const el=e.target;
   if(el.id==='cli-rec'||el.id==='cli-mo'){ const v=num(el.value); const J0=J(); if(el.id==='cli-rec') J0.recargo=isNaN(v)?35:v; else J0.moFactor=isNaN(v)?100:v; guardar(); pintarValor(); return; }
@@ -2561,6 +2646,13 @@ document.addEventListener('change',e=>{ const el=e.target;
   if(el.dataset.precio!==undefined){ const v=num(String(el.value).replace(/\./g,'').replace(/\$/g,'')); D.precios=D.precios||{}; if(String(el.value).trim()===''||isNaN(v)||v<0) delete D.precios[el.dataset.precio]; else D.precios[el.dataset.precio]=v; guardar(); pintarValor(); }
   if(el.id==='con-iva'){ D.conIVA=el.checked; guardar(); pintarValor(); } });
 $('#copiar-valor').onclick=()=>{ try{ navigator.clipboard.writeText(valorTexto).then(()=>$('#msg-valor').textContent='Presupuesto copiado: pégalo en WhatsApp.',()=>$('#msg-valor').textContent=valorTexto); }catch(e){ $('#msg-valor').textContent=valorTexto; } };
+// ===== UF del día (mindicador.cl — API chilena gratis, con CORS). Sin internet, se pone a mano. =====
+let VALOR_UF=0;
+function ufActual(){ try{ const el=document.getElementById('uf-manual'); const m=el?num(String(el.value).replace(/\./g,'').replace(/\$/g,'')):NaN; if(!isNaN(m)&&m>0) return m; }catch(e){} return VALOR_UF||0; }
+function pintarUF(){ const v=document.getElementById('uf-val'); if(v&&VALOR_UF) v.textContent=plata(VALOR_UF); const c=document.getElementById('uf-conv'), o=document.getElementById('uf-conv-out'); if(c&&o){ const uf=ufActual(), n=num(String(c.value).replace(/\./g,'')); o.textContent=(uf>0&&c.value.trim()!==''&&!isNaN(n))?plata(Math.round(n*uf)):'—'; } }
+function cargarUF(){ fetch('https://mindicador.cl/api/uf').then(r=>r.json()).then(d=>{ const s=d&&d.serie&&d.serie[0]; if(s&&s.valor){ VALOR_UF=s.valor; const f=document.getElementById('uf-fecha'); if(f) f.textContent='('+new Date(s.fecha).toLocaleDateString('es-CL')+')'; pintarUF(); try{pintarValor();}catch(e){} } }).catch(()=>{ const v=document.getElementById('uf-val'); if(v&&!VALOR_UF) v.textContent='sin conexión — ponla a mano'; }); }
+document.addEventListener('input',e=>{ if(e.target.id==='uf-conv') pintarUF(); if(e.target.id==='uf-manual'){ pintarUF(); try{pintarValor();}catch(_){} } });
+try{ cargarUF(); }catch(e){}
 function radierHTML(BA){
   const W=BA.largo, H=BA.L, c=BA.c, pad=40, mono='font-family="IBM Plex Mono,monospace"';
   let g=`<rect x="0" y="0" width="${W}" height="${H}" fill="var(--steel)"/><rect x="${c}" y="${c}" width="${W-2*c}" height="${H-2*c}" fill="var(--panel2)"/>`;
@@ -3215,7 +3307,7 @@ if(MODO_OBRA){
   document.querySelectorAll('#s-trabajos details').forEach(d=>{ const c=d.closest('.card'); if(c) c.style.display='none'; });
   $('#nuevo').textContent='+ Obra nueva';
   // obra nueva: solo el nombre (la planta queda de ejemplo; la cubicación se hace en el Cubicador)
-  $('#nuevo').onclick=()=>{ const m=$('#msg-trab'); m.innerHTML=`Nombre de la obra <input type="text" id="nv-n" placeholder="Ej.: Casa casa de ejemplo" style="width:220px"> <button class="b pri" id="nv-ok">Crear</button>`;
+  $('#nuevo').onclick=()=>{ const m=$('#msg-trab'); m.innerHTML=`Nombre de la obra <input type="text" id="nv-n" placeholder="Ej.: Casa Sylvana" style="width:220px"> <button class="b pri" id="nv-ok">Crear</button>`;
     $('#nv-ok').onclick=()=>{ const n=$('#nv-n').value.trim(); if(!n) return; const t=casaVacia(n,900,670); t.soloRegistro=true; D.trabajos.unshift(t); D.abierto=t.id; guardar(); m.textContent=''; todo(); ir('obra'); }; };
 }
 function todo(){ pintarLista(); pintarForms(); pintarFotoCtrl(); calcularYMostrar(); pintarObra(); }
