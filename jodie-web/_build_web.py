@@ -95,6 +95,8 @@ CSS = r"""
 .w-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
 .w-fotos img{width:100%;border-radius:14px;cursor:zoom-in;box-shadow:0 4px 14px rgba(181,114,111,.18);transition:transform .2s}
 .w-fotos img:hover{transform:scale(1.02)}
+.w-galt{font-family:'Playfair Display',serif;font-weight:500;font-size:21px;color:var(--ink);margin:30px 0 12px;display:flex;align-items:baseline;gap:14px}
+.w-galt a{font-family:'Poppins',sans-serif;font-size:13px;color:var(--rose-deep);cursor:pointer}
 .w-band{margin:56px 0 8px;background:linear-gradient(120deg,#F6DBD9,#F3C9CD);border-radius:26px;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .w-band h3{font-family:'Playfair Display',serif;font-weight:500;color:var(--rose-deep);font-size:26px}
 .w-band p{color:#8E6A70;font-size:14.5px;margin-top:6px}
@@ -153,7 +155,8 @@ window.addEventListener('popstate',aplicarRuta);
       return '<div class="w-card"><div class="e">'+t.e+'</div><h3>'+t.n+'</h3><small>⏱ '+t.dur+(t.eval?' · requiere evaluación':'')+'</small>'
        +'<p>'+(t.d||t.resumen||'')+'</p><div class="acts"><button class="w-btn alt" onclick="openDetail('+i+')">Ver ficha</button><button class="w-btn" onclick="agendarDe('+i+')">Agendar</button></div></div>';
     }).join('')+'</div></section>'
-   +gal.map(function(t){ return '<section class="w-sec"><h2>Resultados reales</h2><div class="w-lead">'+t.galeria.t+' con '+t.n.toLowerCase()+'. Pacientes reales de Patagonia Glow, publicadas con su autorización. Los resultados pueden variar entre personas.</div><div class="w-fotos">'+galFotos(t.galeria)+'</div></section>'; }).join('')
+   +(gal.length?'<section class="w-sec"><h2>Resultados reales</h2><div class="w-lead">Pacientes reales de Patagonia Glow, publicadas con su autorización. Los resultados pueden variar entre personas.</div>'
+     +gal.map(function(t){ var i=TREATMENTS.indexOf(t); return '<h3 class="w-galt">'+t.galeria.t+' <a onclick="openDetail('+i+')">Ver ficha ›</a></h3><div class="w-fotos">'+galFotos(t.galeria)+'</div>'; }).join('')+'</section>':'')
    +'<div class="w-band"><div><h3>¿No sabes qué tratamiento elegir?</h3><p>Responde unas preguntas y te orientamos. Siempre se confirma en tu evaluación.</p></div><button class="w-btn" onclick="openTest()">Hacer el test</button></div>';
   w.after(home);
   var f=document.createElement('footer'); f.className='w-foot';
