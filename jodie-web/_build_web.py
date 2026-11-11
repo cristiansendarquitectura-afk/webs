@@ -5,6 +5,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 APP = os.path.join(AQUI, '..', 'jodie')
 s = open(os.path.join(APP, 'index.html'), encoding='utf-8').read()
 shutil.copy(os.path.join(APP, 'logo-montana.png'), AQUI)
+shutil.copy(os.path.join(APP, 'apple-touch-icon.png'), AQUI)
 if os.path.isdir(os.path.join(AQUI, 'img')): shutil.rmtree(os.path.join(AQUI, 'img'))
 shutil.copytree(os.path.join(APP, 'img'), os.path.join(AQUI, 'img'))
 
