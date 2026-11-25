@@ -1171,7 +1171,7 @@ const TREATMENTS=[
   posteriores:['Evita maquillaje y sol directo por unas horas.','Hidrata y usa protector solar.'],
   contra:['Lesiones o infección activa en la piel.','Rosácea o irritación marcada (se valora antes).'],
   galeria:{t:'Limpieza facial profunda',dir:'limpieza-facial',n:2}},
- {e:'🧬',n:'ADN de salmón con Dermapen',cat:['rejuvenecimiento','lineas','hidratacion'],dur:'45 min',precio:'',eval:true,
+ {e:'🧬',n:'ADN de salmón con Dermapen',cat:['rejuvenecimiento','lineas','hidratacion'],dur:'45 min',precio:'$170.000',precios:[{z:'Mesoterapia con Dermapen · 3 sesiones',p:170000,nl:230000}],eval:true,
   d:'Apoya la hidratación, la elasticidad y la calidad de la piel. Resultados graduales.',
   b:['Elasticidad','Calidad de piel'],
   quees:'Tratamiento con polinucleótidos (PDRN) que favorece la calidad, hidratación y elasticidad de la piel.',
@@ -1185,7 +1185,7 @@ const TREATMENTS=[
   posteriores:['Evita maquillaje y calor intenso por unas horas.','Usa protector solar.'],
   contra:['Embarazo o lactancia.','Alergia al pescado/derivados (se revisa en evaluación).','Lesiones o infección en la piel.'],
   galeria:{t:'ADN de salmón',dir:'adn-salmon',n:2}},
- {e:'💉',n:'ADN de salmón inyectable',cat:['rejuvenecimiento','lineas','hidratacion','firmeza'],dur:'45–60 minutos',precio:'',eval:true,
+ {e:'💉',n:'ADN de salmón inyectable',cat:['rejuvenecimiento','lineas','hidratacion','firmeza'],dur:'45–60 minutos',precio:'$179.990',precios:[{z:'Pack: 2 sesiones de ADN de salmón inyectable + ADN de salmón con Dermapen (mesoterapia) + Limpieza facial profunda + diagnóstico de piel gratis',p:179990,nl:null,promo:true}],eval:true,
   d:'Microinyecciones de PDRN en puntos estratégicos para mejorar progresivamente la calidad de la piel.',
   b:['Bioestimulación','Calidad de piel'],
   quees:'Tratamiento de bioestimulación en el que se aplican pequeñas dosis de polinucleótidos (PDRN) directamente en puntos estratégicos de la piel mediante microinyecciones.',
@@ -1530,7 +1530,7 @@ function clp(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
 function fprecios(t){ if(!t.precios) return '';
   return '<div class="dp-h">Valores</div><div class="ptab">'+t.precios.map(function(x){
     return '<div class="prow"><div class="pz">'+x.z+'</div><div class="pv">'
-      +(x.nl?'<s>'+clp(x.nl)+'</s> ':'')+'<b>'+clp(x.p)+'</b>'+(x.nl?' <span class="ptag">Promoción</span>':'')
+      +(x.nl?'<s>'+clp(x.nl)+'</s> ':'')+'<b>'+clp(x.p)+'</b>'+((x.nl||x.promo)?' <span class="ptag">Promoción</span>':'')
       +'<small>IVA incluido · neto '+clp(Math.round(x.p/1.19))+'</small></div></div>'; }).join('')
     +'</div><div class="rdisc" style="margin-top:4px">Valores referenciales; el plan final se confirma en tu evaluación.</div>'; }
 function fgaleria(t){ if(!t.galeria) return ''; return '<div class="dp-h">Resultados reales · '+t.galeria.t+'</div><div class="galeria">'+galFotos(t.galeria)+'</div><div class="rdisc" style="margin-top:4px">Pacientes reales de Patagonia Glow, publicadas con su autorización. Toca una foto para verla grande.</div>'; }
@@ -1587,7 +1587,8 @@ function renderResumen(){
    +rrow('Hora', selTime||'Por elegir')
    +rrow('Duración', t.dur)
    +rrow('Valor total', precio)
-   +rrow('Abono para reservar', 'Se confirma al agendar')
+   +rrow('Abono para reservar', t.precio?'50% del total para agendar':'50% del total, se confirma al agendar')
+   +rrow('Saldo pendiente', t.precio?'El resto el día de tu sesión':'—')
    +   +'<div class="polbox"><b>Política de cancelación</b><p>'+POL_CANCEL+'</p><b>Atrasos</b><p>'+POL_ATRASO+'</p></div>'
    +(t.eval?'<button class="cta gold" style="margin-top:12px" onclick="go(\'evalprev\')">🩺 Completar evaluación previa</button>':'')
    +'</div>';
