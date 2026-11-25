@@ -788,7 +788,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 
       <div id="resumen"></div>
 
-      <button class="cta" style="margin-top:20px" onclick="confirmBooking()">Confirmar reserva</button>
+      <button class="cta" style="margin-top:20px" onclick="confirmBooking()">Solicitar reserva</button>
     </div>
   </section>
 
@@ -1598,16 +1598,20 @@ window.confirmBooking=function(){
   if(svcSel===null){toast('Elige un servicio primero 💗');return;}
   if(!selTime){toast('Elige un horario disponible ⏰');return;}
   var t=TREATMENTS[svcSel], b=document.getElementById('sheetBody');
-  b.innerHTML='<div class="demoji">✅</div><h4>¡Reserva confirmada!</h4>'
+  /* 25-nov: la reserva se envía por WhatsApp a Jodie (aún no hay agenda real).
+     Ella confirma la hora y manda los datos para el abono del 50 %. */
+  var msg='¡Hola Patagonia Glow! Quiero reservar una hora 💗\n\n'
+    +'• Tratamiento: '+t.n+'\n• Sede: '+selSede+'\n• Día: '+selDay+'\n• Hora: '+selTime+'\n'
+    +(t.precio?'• Valor: desde '+t.precio+' (IVA incluido)\n':'')
+    +'\n¿Me confirmas la hora y los datos para el abono del 50 %?';
+  var link=waLink(msg);
+  b.innerHTML='<div class="demoji">📲</div><h4>Último paso: envía tu solicitud</h4>'
     +'<div class="dur">'+t.n+' · '+selSede+' · Día '+selDay+' · '+selTime+'</div>'
-    +'<div class="confbtns">'
-    +'<button class="btn2" onclick="toast(\'Te enviaremos un recordatorio 🔔\')">🔔 Activar recordatorio</button>'
-    +'<button class="btn2" onclick="addToCalendar()">🗓️ Agregar al calendario</button>'
-    +'<button class="btn2" onclick="closeDetail()">↻ Reprogramar</button>'
-    +'</div>'
+    +'<p class="dtext" style="text-align:center;margin:12px 0">Tu hora queda reservada cuando Jodie te la <b>confirme por WhatsApp</b> y recibas los datos para el <b>abono del 50 %</b>.</p>'
+    +'<a class="cta" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="'+link+'" target="_blank" rel="noopener">Enviar por WhatsApp</a>'
     +(t.eval?'<div class="fbadge" style="margin-top:14px">🩺 Requiere evaluación previa. <a onclick="closeDetail();go(\'evalprev\')" style="color:var(--rose-deep);font-weight:600;text-decoration:underline;cursor:pointer">Completar ahora</a></div>':'')
     +flist('Indicaciones previas', t.previos)
-    +'<button class="cta" style="margin-top:16px" onclick="closeDetail();go(\'home\')">Listo</button>';
+    +'<button class="btn2" style="margin-top:16px;width:100%" onclick="closeDetail();go(\'home\')">Volver al inicio</button>';
   document.getElementById('sheet').classList.add('on'); document.getElementById('sheetBg').classList.add('on');
   var sh=document.getElementById('sheet'); if(sh) sh.scrollTop=0;
 };
