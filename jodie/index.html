@@ -386,6 +386,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .sheet .benefs span{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;color:var(--rose-deep);font-weight:500}
 
 /* ---------- FICHA COMPLETA (bottom sheet) ---------- */
+.ptab{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:4px 12px;margin:6px 0}
+.prow{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.prow .pz{font-size:13px;flex:1}
+.prow .pv{text-align:right;font-size:14px;white-space:nowrap}
+.prow .pv s{color:var(--muted);font-size:12px}
+.prow .pv small{display:block;font-size:10px;color:var(--muted)}
+.ptag{font-size:10px;background:var(--line);border-radius:8px;padding:1px 6px}
 .fmeta{display:flex;gap:10px;margin:10px 0 4px}
 .fmeta .fmi{flex:1;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
 .fmeta .fmi small{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -1007,7 +1015,7 @@ document.body.innerHTML = document.body.innerHTML
    precio:'' → se muestra "A confirmar en tu evaluación" (Jodie define los valores reales).
    Campos clínicos (sesiones, recuperación, contraindicaciones): Jodie debe revisarlos. */
 const TREATMENTS=[
- {e:'🌸',n:'Pink Glow',cat:['luminosidad','hidratacion'],dur:'45 min',precio:'',eval:false,
+ {e:'🌸',n:'Pink Glow',cat:['luminosidad','hidratacion'],dur:'45 min',precio:'$159.990',precios:[{z:'3 sesiones',p:159990,nl:220000}],eval:false,
   d:'Tratamiento de hidratación y luminosidad: deja la piel suave, fresca y con efecto glow.',
   b:['Hidratación','Luminosidad','Suavidad'],
   quees:'Un tratamiento facial de hidratación intensiva y luminosidad, pensado para dar un efecto de piel descansada y radiante.',
@@ -1026,7 +1034,7 @@ const TREATMENTS=[
     'quitar' desactiva pasos o partes de un paso para este tratamiento,
     ej: quitar:['dermo','altafrec']. Sin 'recup': el enrojecimiento va,
     tranquilo, dentro de los cuidados posteriores (pedido de Jodie). */
- {e:'💫',n:'BB Glow',cat:['luminosidad','manchas','marcas'],dur:'60 a 90 minutos',precio:'',eval:true,
+ {e:'💫',n:'BB Glow',cat:['luminosidad','manchas','marcas'],dur:'60 a 90 minutos',precio:'$179.990',precios:[{z:'4 sesiones',p:179990,nl:250000}],eval:true,
   plantilla:'dermapen', quitar:[],
   d:'Dermapen, activos elegidos para tu piel y un pigmento personalizado para una piel más luminosa y de tono más uniforme.',
   b:['Luminosidad','Tono más uniforme','Apariencia de manchas'],
@@ -1054,7 +1062,7 @@ const TREATMENTS=[
   contra:['Embarazo o lactancia.','Acné activo, heridas, herpes, irritación o infección en la piel.','Alergia a los activos.'],
   alerta:'Comunícate con Patagonia Glow si presentas dolor intenso o creciente, inflamación progresiva, secreción, ampollas, cambios importantes en la coloración o enrojecimiento que empeora después de 48 horas. Si presentas dificultad para respirar o inflamación de labios, lengua o rostro, busca atención de urgencia.',
   galeria:{t:'BB Glow',dir:'bb-glow',n:2}},
- {e:'🌿',n:'Limpieza Facial Profunda',cat:['hidratacion'],dur:'60 min',precio:'',eval:false,
+ {e:'🌿',n:'Limpieza Facial Profunda',cat:['hidratacion'],dur:'60 min',precio:'$40.000',precios:[{z:'Promoción',p:40000,nl:null}],eval:false,
   d:'Limpieza, extracción y descongestión de la piel. La base de cualquier rutina sana.',
   b:['Poros limpios','Piel fresca'],
   quees:'Un protocolo de higiene facial profunda que limpia, descongestiona y prepara la piel.',
@@ -1095,7 +1103,7 @@ const TREATMENTS=[
   previos:['Llegar sin maquillaje.','Informar medicamentos, enfermedades, alergias y procedimientos recientes.','Evitar alcohol durante las 24 horas previas.','No suspender medicamentos indicados por un médico sin su autorización.'],
   posteriores:['No tocar, presionar ni masajear la zona, salvo indicación profesional.','Evitar maquillaje durante las primeras 12–24 horas.','Evitar ejercicio intenso, sauna, piscina, calor y alcohol por 24–48 horas.','Evitar exposición solar directa y utilizar protector solar.','Seguir las indicaciones entregadas por la profesional.'],
   contra:['Embarazo o lactancia.','Infección, heridas o inflamación activa en la zona.','Antecedentes de alergia o hipersensibilidad a los componentes del producto.','Enfermedades autoinmunes, alteraciones de coagulación o enfermedades descompensadas, según evaluación.','Uso de anticoagulantes o medicamentos relevantes, que deben informarse previamente.']},
- {e:'🩸',n:'PRP Facial',cat:['rejuvenecimiento','marcas','lineas'],dur:'60 min',precio:'',eval:true,
+ {e:'🩸',n:'PRP Facial',cat:['rejuvenecimiento','marcas','lineas'],dur:'60 min',precio:'$159.990',precios:[{z:'Plasma rico en plaquetas · 3 sesiones',p:159990,nl:220000}],eval:true,
   d:'Plasma rico en plaquetas para favorecer la renovación de la piel y mejorar la textura.',
   b:['Renovación','Textura'],
   quees:'Tratamiento que utiliza tu propio plasma rico en plaquetas para estimular la renovación natural de la piel.',
@@ -1122,7 +1130,7 @@ const TREATMENTS=[
   previos:['Retira joyas de la zona.','Llega sin maquillaje si es posible.'],
   posteriores:['Hidrata la piel y usa protector solar.'],
   contra:['Embarazo.','Marcapasos u otros dispositivos electrónicos.','Implantes metálicos en la zona (se revisa en evaluación).']},
- {e:'💧',n:'Ácido Hialurónico',cat:['armonizacion','hidratacion','lineas'],dur:'45 min',precio:'',eval:true,
+ {e:'💧',n:'Ácido Hialurónico',cat:['armonizacion','hidratacion','lineas'],dur:'45 min',precio:'$199.990',precios:[{z:'Aumento de labios',p:199990,nl:240000}],eval:true,
   d:'Armonización e hidratación profunda del rostro, cuidando la naturalidad.',
   b:['Hidratación','Armonía'],
   quees:'Procedimiento de armonización con ácido hialurónico para hidratar en profundidad o realzar rasgos de forma natural.',
@@ -1138,7 +1146,7 @@ const TREATMENTS=[
   galeria:{t:'Aumento y perfilado de labios',n:15}},
  /* Fichas nuevas (correos de Jodie del 10-nov, solo fotos). Textos de Kepler con lenguaje
     seguro; Jodie debe revisar los campos clínicos. Duración rino: 12 a 18 meses (Cristian, 11-nov). */
- {e:'💎',n:'Rinomodelación',cat:['armonizacion'],dur:'45 min',precio:'',eval:true,
+ {e:'💎',n:'Rinomodelación',cat:['armonizacion'],dur:'45 min',precio:'$199.990',precios:[{z:'Rinomodelación',p:199990,nl:250000}],eval:true,
   d:'Ácido hialurónico de alta gama para armonizar el perfil de la nariz, sin cirugía.',
   b:['Perfil más armónico','Sin cirugía'],
   quees:'Procedimiento con ácido hialurónico de alta gama que ayuda a mejorar visualmente el perfil de la nariz, por ejemplo suavizando la apariencia del dorso o proyectando la punta, sin cirugía.',
@@ -1151,8 +1159,8 @@ const TREATMENTS=[
   previos:['Evita alcohol y antiinflamatorios el día previo si no son indispensables.'],
   posteriores:['No presiones ni masajees la zona por 24–48 h.','Evita calor intenso y ejercicio por 24–48 h.','Sigue las indicaciones entregadas.'],
   contra:['Embarazo o lactancia.','Infección activa en la zona.','Cirugías o rellenos previos en la nariz (se revisa en evaluación).','Alergias o alteraciones de coagulación.'],
-  galeria:{t:'Rinomodelación',dir:'rinomodelacion',n:9}},
- {e:'💠',n:'Armonización facial: mentón y mandíbula',cat:['armonizacion'],dur:'45 min',precio:'',eval:true,
+  galeria:{t:'Rinomodelación',dir:'rinomodelacion',n:10}},
+ {e:'💠',n:'Armonización facial: mentón y mandíbula',cat:['armonizacion'],dur:'45 min',precio:'$189.990',precios:[{z:'Aumento de mentón · 1,1 ml',p:189990,nl:239990},{z:'Mentón + perfilado mandibular · 3,3 ml',p:389990,nl:480000}],eval:true,
   d:'Ácido hialurónico para proyectar el mentón y perfilar la mandíbula, con resultados naturales.',
   b:['Proyección de mentón','Contorno definido'],
   quees:'Procedimiento con ácido hialurónico de alta gama que ayuda a proyectar el mentón y definir el contorno mandibular, buscando un perfil más equilibrado y natural.',
@@ -1166,7 +1174,7 @@ const TREATMENTS=[
   posteriores:['No presiones ni masajees la zona por 24–48 h.','Evita calor intenso y ejercicio por 24–48 h.','Sigue las indicaciones entregadas.'],
   contra:['Embarazo o lactancia.','Infección activa en la zona.','Alergias o alteraciones de coagulación.'],
   galeria:{t:'Mentón y perfilado mandibular',dir:'armonizacion',n:8}},
- {e:'✨',n:'Toxina Botulínica',cat:['lineas','rejuvenecimiento'],dur:'30 min',precio:'',eval:true,
+ {e:'✨',n:'Toxina Botulínica',cat:['lineas','rejuvenecimiento'],dur:'30 min',precio:'$89.990',precios:[{z:'Entrecejo + patas de gallo o foxy eyes',p:169990,nl:210000},{z:'Patas de gallo',p:99990,nl:120000},{z:'Foxy eyes',p:89990,nl:110000},{z:'Frente',p:109990,nl:150000}],eval:true,
   d:'Ayuda a suavizar las líneas de expresión de forma natural.',
   b:['Líneas suaves'],
   quees:'Procedimiento médico-estético que atenúa la apariencia de las líneas de expresión de forma temporal y natural.',
@@ -1180,7 +1188,7 @@ const TREATMENTS=[
   posteriores:['No masajees la zona ni te recuestes por 4 horas.','Evita calor intenso y ejercicio el mismo día.'],
   contra:['Embarazo o lactancia.','Ciertas enfermedades neuromusculares.','Infección en la zona (se revisa en evaluación).'],
   galeria:{t:'Botox: entrecejo y patas de gallo',dir:'botox',n:2}},
- {e:'🔥',n:'Lipólisis Enzimática',cat:['modelacion'],dur:'60 min',precio:'',eval:true,
+ {e:'🔥',n:'Lipólisis Enzimática',cat:['modelacion'],dur:'60 min',precio:'$289.990',precios:[{z:'Lipopapada · 5 sesiones (solo inyecciones)',p:289990,nl:null},{z:'Lipopapada · 5 inyectables + 6 drenajes linfáticos con radiofrecuencia',p:350000,nl:null}],eval:true,
   d:'Apoya la modelación corporal y la reducción de la apariencia de grasa localizada.',
   b:['Modela','Apoya reducción'],
   quees:'Tratamiento corporal que aplica activos para favorecer la modelación de zonas con grasa localizada.',
@@ -1193,7 +1201,7 @@ const TREATMENTS=[
   previos:['Hidrátate bien y evita comidas muy pesadas antes de la sesión.'],
   posteriores:['Bebe agua, camina y evita calor intenso las primeras horas.'],
   contra:['Embarazo o lactancia.','Alergias a los activos.','Ciertas condiciones médicas (se revisa en evaluación).']},
- {e:'💆‍♀️',n:'Recuperación Capilar (PRP)',cat:['capilar'],dur:'60 min',precio:'',eval:true,
+ {e:'💆‍♀️',n:'Recuperación Capilar (PRP)',cat:['capilar'],dur:'60 min',precio:'$189.990',precios:[{z:'PRP + Láser LLLT · 4 sesiones',p:189990,nl:280000}],eval:true,
   d:'Plasma rico en plaquetas para favorecer la fortaleza y el estímulo del cabello.',
   b:['Fortalece','Cabello'],
   quees:'Aplicación de plasma rico en plaquetas en el cuero cabelludo para estimular el folículo de forma natural.',
@@ -1356,7 +1364,7 @@ function openDermapen(i){
   var html='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
    +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
    +'<div class="fmeta"><div class="fmi"><small>Duración</small><b>'+t.dur+'</b></div><div class="fmi"><small>Precio desde</small><b>'+precio+'</b></div></div>'
-   +(t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '')
+   +(t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '')+fprecios(t)
    /* --- vista principal --- */
    +'<div class="dp-res"><p>'+t.resumen+'</p><div class="benefs">'+t.b.map(function(x){ return '<span>'+x+'</span>'; }).join('')+'</div></div>'
    +fgaleria(t)
@@ -1400,7 +1408,7 @@ function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'
   var evalBadge = t.eval ? '<div class="fbadge">🩺 Requiere evaluación previa</div>' : '';
   b.innerHTML='<button class="favbtn" onclick="toggleFav('+i+',this)">'+(FAVS.has(i)?'❤️':'🤍')+'</button>'
    +'<div class="demoji">'+t.e+'</div><h4>'+t.n+'</h4><div class="dur">⏱ '+t.dur+'</div>'
-   +meta+evalBadge+fgaleria(t)
+   +meta+evalBadge+fprecios(t)+fgaleria(t)
    +(t.secciones ? t.secciones.map(fseccion).join('') : (
     fsec('Qué es', t.quees)
    +fsec('Para qué sirve', t.sirve)
@@ -1422,6 +1430,14 @@ function openDetail(i){ if(TREATMENTS[i] && TREATMENTS[i].plantilla==='dermapen'
    img/<dir>/<dir>-01..n.jpg · galeria:{t:'título', dir:'carpeta', n:cantidad} (dir por defecto 'labios').
    Sin precios ni promociones en las fotos (Cristian, 11-nov: se recortan). */
 function galFotos(g){ var h='', d=g.dir||'labios'; for(var k=1;k<=g.n;k++){ var u='img/'+d+'/'+d+'-'+(k<10?'0':'')+k+'.jpg'; h+='<img src="'+u+'" loading="lazy" alt="'+g.t+', antes y después" onclick="verFoto(this.src)">'; } return h; }
+function clp(n){ return '$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+/* Precios (correo de Jodie 25-nov): valores con IVA incluido; neto = valor/1,19 */
+function fprecios(t){ if(!t.precios) return '';
+  return '<div class="dp-h">Valores</div><div class="ptab">'+t.precios.map(function(x){
+    return '<div class="prow"><div class="pz">'+x.z+'</div><div class="pv">'
+      +(x.nl?'<s>'+clp(x.nl)+'</s> ':'')+'<b>'+clp(x.p)+'</b>'+(x.nl?' <span class="ptag">Promoción</span>':'')
+      +'<small>IVA incluido · neto '+clp(Math.round(x.p/1.19))+'</small></div></div>'; }).join('')
+    +'</div><div class="rdisc" style="margin-top:4px">Valores referenciales; el plan final se confirma en tu evaluación.</div>'; }
 function fgaleria(t){ if(!t.galeria) return ''; return '<div class="dp-h">Resultados reales · '+t.galeria.t+'</div><div class="galeria">'+galFotos(t.galeria)+'</div><div class="rdisc" style="margin-top:4px">Pacientes reales de Patagonia Glow, publicadas con su autorización. Toca una foto para verla grande.</div>'; }
 function verFoto(u){ var v=document.getElementById('fotoGrande'); if(!v){ v=document.createElement('div'); v.id='fotoGrande'; v.onclick=function(){ v.classList.remove('on'); }; document.body.appendChild(v); } v.innerHTML='<img src="'+u+'" alt=""><span>✕</span>'; v.classList.add('on'); }
 window.verFoto=verFoto;
@@ -1476,9 +1492,8 @@ function renderResumen(){
    +rrow('Hora', selTime||'Por elegir')
    +rrow('Duración', t.dur)
    +rrow('Valor total', precio)
-   +rrow('Abono para reservar', t.precio?'50% al confirmar':'Se confirma al agendar')
-   +rrow('Saldo pendiente', t.precio?'El resto el día de tu sesión':'—')
-   +'<div class="polbox"><b>Política de cancelación</b><p>'+POL_CANCEL+'</p><b>Atrasos</b><p>'+POL_ATRASO+'</p></div>'
+   +rrow('Abono para reservar', 'Se confirma al agendar')
+   +   +'<div class="polbox"><b>Política de cancelación</b><p>'+POL_CANCEL+'</p><b>Atrasos</b><p>'+POL_ATRASO+'</p></div>'
    +(t.eval?'<button class="cta gold" style="margin-top:12px" onclick="go(\'evalprev\')">🩺 Completar evaluación previa</button>':'')
    +'</div>';
 }
